@@ -1,6 +1,5 @@
 import "./globals.css";
-import { ReactQueryProvider } from "@/components/providers";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { TrpcProvider } from "@/components/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
@@ -19,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <TrpcProvider>{children}</TrpcProvider>
       </body>
     </html>
   );
