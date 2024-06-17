@@ -1,4 +1,4 @@
-import type { AppRouter } from "@semicolon/api";
+import type { AppRouter } from "@binar-semicolon/api";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { cookies } from "next/headers";
 import superjson from "superjson";

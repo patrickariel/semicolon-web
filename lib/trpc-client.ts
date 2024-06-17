@@ -1,4 +1,4 @@
-import type { AppRouter } from "@semicolon/api";
+import type { AppRouter } from "@binar-semicolon/api";
 import { httpBatchLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import superjson from "superjson";

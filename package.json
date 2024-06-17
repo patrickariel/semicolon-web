@@ -12,7 +12,7 @@
     "format:check": "prettier --check \"**/*.{js,mjs,cjs,ts,tsx,css,json,md}\""
   },
   "dependencies": {
-    "@semicolon/api": "git+https://github.com/binar-semicolon/api.git",
+    "@binar-semicolon/api": "*",
     "@trpc/client": "^11.0.0-rc.403",
     "@trpc/next": "^11.0.0-rc.403",
     "@trpc/react-query": "^11.0.0-rc.403",
@@ -36,7 +36,6 @@
     }
   },
   "devDependencies": {
-    "patch-package": "^8.0.0",
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
