@@ -65,136 +65,107 @@ export default function RegisterPage() {
   }, [router]);
 
   return (
-    <section className="h-screen flex gap-5 w-full p-4 justify-center">
-      <div className="w-full lg:w-1/2 my-auto">
-        <div className="px-7">
-          <div className="px-9">
-            <h1 className="font-bold text-3xl mt-auto">Sign Up</h1>
-            <p className="text-zinc-400 mt-5 mb-12">
-              What{"'"}s trend, what{"'"}s good for you.
-            </p>
+    <div className="px-7">
+      <div className="px-9">
+        <h1 className="font-bold text-3xl mt-auto">Sign Up</h1>
+        <p className="text-zinc-400 mt-5 mb-12">
+          What{"'"}s trend, what{"'"}s good for you.
+        </p>
 
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
-              >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Username</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John Smith" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>E-mail</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="john.smith@semicolon.com"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="•••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full" loading={loading}>
-                  <span className="ml-2 font-2xl">Sign up</span>
-                </Button>
-              </form>
-            </Form>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Smith" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>E-mail</FormLabel>
+                  <FormControl>
+                    <Input placeholder="john.smith@semicolon.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="•••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full" loading={loading}>
+              <span className="ml-2 font-2xl">Sign up</span>
+            </Button>
+          </form>
+        </Form>
 
-            <p className="mt-8 text-center text-zinc-600">
-              Already have an account?{" "}
-              <Link
-                href="/auth/login"
-                className="text-zinc-600 font-bold cursor-pointer hover:text-slate-300"
-              >
-                Sign in
-              </Link>
-            </p>
+        <p className="text-zinc-500 my-5 text-center">
+          Already have an account?{" "}
+          <Link
+            href="/flow/login"
+            className="text-blue-200 font-bold cursor-pointer hover:text-blue-300"
+          >
+            Sign in
+          </Link>
+        </p>
 
-            <div className="flex items-center gap-2 my-5">
-              <div className="w-full h-1 border-b-2"></div>
-              <span className="font-bold">Or</span>
-              <div className="w-full h-1 border-b-2"></div>
-            </div>
+        <div className="flex items-center gap-2 my-5">
+          <div className="w-full h-1 border-b-2"></div>
+          <span className="font-bold">Or</span>
+          <div className="w-full h-1 border-b-2"></div>
+        </div>
 
-            <div className="my-2">
-              <Button
-                variant="outline"
-                className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300 "
-                onClick={() => console.log("Sign up with Google")}
-              >
-                <FcGoogle className="size-6" />
-                <span>Sign up with Google</span>
-              </Button>
-            </div>
-            <div className="my-2">
-              <Button
-                variant="outline"
-                className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300"
-                onClick={() => console.log("Sign up with Facebook")}
-              >
-                <MdOutlineFacebook className="size-7 fill-[#2aa4f4]" />
-                <span>Sign up with Facebook</span>
-              </Button>
-            </div>
-            <div className="my-2">
-              <Button
-                variant="outline"
-                className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300 "
-                onClick={() => console.log("Sign up with Discord")}
-              >
-                <FaDiscord className="size-6 fill-[#536dfe]" />
-                <span>Sign up with Discord</span>
-              </Button>
-            </div>
-          </div>
+        <div className="my-2">
+          <Button
+            variant="outline"
+            className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300 "
+            onClick={() => console.log("Sign up with Google")}
+          >
+            <FcGoogle className="size-6" />
+            <span>Sign up with Google</span>
+          </Button>
+        </div>
+        <div className="my-2">
+          <Button
+            variant="outline"
+            className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300"
+            onClick={() => console.log("Sign up with Facebook")}
+          >
+            <MdOutlineFacebook className="size-7 fill-[#2aa4f4]" />
+            <span>Sign up with Facebook</span>
+          </Button>
+        </div>
+        <div className="my-2">
+          <Button
+            variant="outline"
+            className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300 "
+            onClick={() => console.log("Sign up with Discord")}
+          >
+            <FaDiscord className="size-6 fill-[#536dfe]" />
+            <span>Sign up with Discord</span>
+          </Button>
         </div>
       </div>
-      <Separator
-        orientation="vertical"
-        className="h-5/6 self-center hidden lg:block"
-      />
-      <div className="w-1/2 flex-col gap-14 justify-center items-center hidden lg:flex">
-        <div className="flex flex-row gap-6">
-          <h1 className="text-7xl xl:text-8xl font-bold">semicolon</h1>
-          <h1 className="text-7xl xl:text-8xl text-sky-300 font-extrabold">
-            ;
-          </h1>
-        </div>
-        <h3 className="text-2xl text-muted-foreground">
-          Where conversation happens.
-        </h3>
-      </div>
-    </section>
+    </div>
   );
 }
