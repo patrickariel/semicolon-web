@@ -31,7 +31,7 @@ export default function Page() {
     resolver: zodResolver(FormSchema),
   });
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [_errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -49,7 +49,7 @@ export default function Page() {
         setLoading(false);
         router.push("/home");
       }, 1000);
-    } catch (error) {
+    } catch (_error) {
       setErrorMessage("An error occurs during registration!");
       setLoading(false);
     }
