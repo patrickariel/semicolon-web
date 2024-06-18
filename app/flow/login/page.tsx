@@ -102,11 +102,11 @@ export default function Page() {
           </form>
         </Form>
 
-        <p className="text-zinc-500 my-5 text-center">
+        <p className="text-zinc-400 my-5 text-center">
           Don{"'"}t have an account?{" "}
           <Link
             href="/flow/signup"
-            className="text-blue-200 font-bold cursor-pointer hover:text-blue-300"
+            className="text-sky-400 font-bold cursor-pointer hover:underline"
           >
             Sign up
           </Link>
