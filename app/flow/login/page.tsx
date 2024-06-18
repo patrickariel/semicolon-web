@@ -122,30 +122,30 @@ export default function Page() {
           <Button
             variant="outline"
             className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300 "
-            onClick={() => console.log("Sign up with Google")}
+            onClick={() => console.log("Sign in with Google")}
           >
             <FcGoogle className="size-6" />
-            <span>Sign up with Google</span>
+            <span>Sign in with Google</span>
           </Button>
         </div>
         <div className="my-2">
           <Button
             variant="outline"
             className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300"
-            onClick={() => console.log("Sign up with Facebook")}
+            onClick={() => console.log("Sign in with Facebook")}
           >
             <MdOutlineFacebook className="size-7 fill-[#2aa4f4]" />
-            <span>Sign up with Facebook</span>
+            <span>Sign in with Facebook</span>
           </Button>
         </div>
         <div className="my-2">
           <Button
             variant="outline"
             className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300 "
-            onClick={() => console.log("Sign up with Discord")}
+            onClick={() => console.log("Sign in with Discord")}
           >
             <FaDiscord className="size-6 fill-[#536dfe]" />
-            <span>Sign up with Discord</span>
+            <span>Sign in with Discord</span>
           </Button>
         </div>
       </div>
