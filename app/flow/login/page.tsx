@@ -35,7 +35,7 @@ export default function Page() {
     resolver: zodResolver(FormSchema),
   });
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [_errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -49,7 +49,7 @@ export default function Page() {
       // Implement login logic here, for now, I'll just log the data
       console.log("Login data:", data);
       router.push("/home");
-    } catch (error) {
+    } catch (_error) {
       setErrorMessage("Failed to login");
     } finally {
       setLoading(false);
