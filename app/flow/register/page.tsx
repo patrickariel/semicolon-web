@@ -10,7 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -67,9 +66,9 @@ export default function RegisterPage() {
   return (
     <div className="px-7">
       <div className="px-9">
-        <h1 className="font-bold text-3xl mt-auto">Sign Up</h1>
+        <h1 className="font-bold text-3xl mt-auto">Sign up</h1>
         <p className="text-zinc-400 mt-5 mb-12">
-          What{"'"}s trend, what{"'"}s good for you.
+          Come and build the next social phenomenon with us.
         </p>
 
         <Form {...form}>
