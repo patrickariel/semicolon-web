@@ -28,7 +28,7 @@ const FormSchema = z.object({
   password: z.string().min(1, "Password must be filled in!"),
 });
 
-export default function LoginPage() {
+export default function Page() {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({

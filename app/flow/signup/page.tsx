@@ -26,7 +26,7 @@ const FormSchema = z.object({
   password: z.string().min(1, "Password is required!"),
 });
 
-export default function RegisterPage() {
+export default function Page() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
