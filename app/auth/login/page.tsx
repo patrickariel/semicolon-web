@@ -10,8 +10,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -58,8 +58,8 @@ export default function LoginPage() {
   }
 
   return (
-    <section className="h-screen flex gap-5 w-full p-4">
-      <div className="w-full md:w-[50%] my-auto">
+    <section className="h-screen flex gap-5 w-full p-4 justify-center">
+      <div className="w-full lg:w-1/2 my-auto">
         <div className="px-7">
           <div className="px-9">
             <h1 className="font-bold text-3xl mt-auto">Happening Today</h1>
@@ -160,15 +160,20 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="w-[50%] relative hidden md:block">
-        <Image
-          src="/images/bg-auth1.png"
-          alt="bg-auth"
-          width={1920}
-          height={1080}
-          objectFit="cover"
-          className="h-full w-full object-cover rounded-2xl"
-        />
+      <Separator
+        orientation="vertical"
+        className="h-5/6 self-center hidden lg:block"
+      />
+      <div className="w-1/2 flex-col gap-14 justify-center items-center hidden lg:flex">
+        <div className="flex flex-row gap-6">
+          <h1 className="text-7xl xl:text-8xl font-bold">semicolon</h1>
+          <h1 className="text-7xl xl:text-8xl text-sky-300 font-extrabold">
+            ;
+          </h1>
+        </div>
+        <h3 className="text-2xl text-muted-foreground">
+          Where conversation happens.
+        </h3>
       </div>
     </section>
   );
