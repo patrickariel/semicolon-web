@@ -80,7 +80,7 @@ export default function Page() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Smith" {...field} />
+                    <Input placeholder="john.smith" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
