@@ -101,7 +101,7 @@ export default function Page() {
         <p className="text-zinc-500 my-5 text-center">
           Don{"'"}t have an account?{" "}
           <Link
-            href="/flow/register"
+            href="/flow/signup"
             className="text-blue-200 font-bold cursor-pointer hover:text-blue-300"
           >
             Sign up
