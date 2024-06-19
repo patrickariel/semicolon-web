@@ -101,8 +101,8 @@ export function AuthForm({
   }, [router]);
 
   return (
-    <div className="px-7">
-      <div className="px-9">
+    <div className="p-5 sm:p-10 lg:p-14 xl:p-20 flex flex-row justify-center rounded-lg sm:border min-w-[250px] sm:min-w-[520px]">
+      <div className="w-full lg:min-w-[400px]">
         <h1 className="font-bold text-3xl mt-auto">{variant}</h1>
         <p className="text-zinc-400 mt-5 mb-12">{flavorText}</p>
 
