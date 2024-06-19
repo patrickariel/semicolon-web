@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -21,9 +22,10 @@ import { MdOutlineFacebook } from "react-icons/md";
 import { z } from "zod";
 
 const FormSchema = z.object({
-  name: z.string().min(1, "Username is required!"),
-  email: z.string().min(1, "Email is required").email("Invalid email format!"),
-  password: z.string().min(1, "Password is required!"),
+  email: z
+    .string()
+    .min(1, "E-mail address is required.")
+    .email("Not a valid e-mail address."),
 });
 
 export default function Page() {
@@ -35,24 +37,8 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    if (loading) {
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      console.log("Form data:", data);
-      // Simulate API call delay
-      setTimeout(() => {
-        setLoading(false);
-        router.push("/home");
-      }, 1000);
-    } catch (_error) {
-      setErrorMessage("An error occurs during registration!");
-      setLoading(false);
-    }
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    await signIn("resend", data);
   };
 
   useEffect(() => {
@@ -75,42 +61,12 @@ export default function Page() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="john.smith" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>E-mail</FormLabel>
                   <FormControl>
                     <Input placeholder="john.smith@semicolon.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="•••••••••••"
-                      {...field}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

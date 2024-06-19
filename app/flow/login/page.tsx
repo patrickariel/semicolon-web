@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -122,7 +123,7 @@ export default function Page() {
           <Button
             variant="outline"
             className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300 "
-            onClick={() => console.log("Sign in with Google")}
+            onClick={() => signIn("google")}
           >
             <FcGoogle className="size-6" />
             <span>Sign in with Google</span>

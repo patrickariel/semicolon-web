@@ -23,14 +23,14 @@ export default function Page() {
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <Card className="w-[300px] h-[200px]">
         <CardHeader>
-          <CardTitle>{data.fullName}</CardTitle>
+          <CardTitle>{data.name}</CardTitle>
           <CardDescription>{data.username}</CardDescription>
         </CardHeader>
         <CardContent>
           <p>{data.bio}</p>
         </CardContent>
         <CardFooter>
-          <p className="text-muted-foreground text-xs">{data.userId}</p>
+          <p className="text-muted-foreground text-xs">{data.id}</p>
         </CardFooter>
       </Card>
     </main>
