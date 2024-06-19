@@ -10,6 +10,12 @@ export const trpc = createTRPCNext<AppRouter>({
         httpBatchLink({
           url: process.env.API_BASE_URL!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
           transformer: superjson,
+          fetch(url, options) {
+            return fetch(url, {
+              ...options,
+              credentials: "include",
+            });
+          },
         }),
       ],
     };
