@@ -1,5 +1,6 @@
 "use client";
 
+import Spinner from "./ui/spinner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
@@ -56,11 +57,11 @@ function SuggestionMessage({
   })();
 
   return (
-    <p className="text-zinc-400 my-5 text-center">
+    <p className="my-5 text-center text-zinc-400">
       {message}
       <Link
         href={href}
-        className="text-sky-400 font-bold cursor-pointer hover:underline"
+        className="cursor-pointer font-bold text-sky-400 hover:underline"
       >
         {action}
       </Link>
@@ -68,7 +69,7 @@ function SuggestionMessage({
   );
 }
 
-export function AuthForm({
+function VerifyForm({
   variant = AuthVariant.SignUp,
 }: {
   variant?: AuthVariant;
@@ -101,70 +102,94 @@ export function AuthForm({
   }, [router]);
 
   return (
-    <div className="p-5 sm:p-10 lg:p-14 xl:p-20 flex flex-row justify-center rounded-lg sm:border min-w-[250px] sm:min-w-[520px]">
-      <div className="w-full lg:min-w-[400px]">
-        <h1 className="font-bold text-3xl mt-auto">{variant}</h1>
-        <p className="text-zinc-400 mt-5 mb-12">{flavorText}</p>
+    <>
+      <h1 className="text-3xl font-bold">{variant}</h1>
+      <p className="mb-12 mt-5 text-zinc-400">{flavorText}</p>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail</FormLabel>
-                  <FormControl>
-                    <Input placeholder="john.smith@semicolon.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full">
-              <span className="ml-2 font-2xl">{variant}</span>
-            </Button>
-          </form>
-        </Form>
-
-        <SuggestionMessage variant={variant} />
-
-        <div className="flex items-center gap-2 my-5">
-          <div className="w-full h-1 border-b-2"></div>
-          <span className="font-bold">Or</span>
-          <div className="w-full h-1 border-b-2"></div>
-        </div>
-
-        <div className="my-2">
-          <Button
-            variant="outline"
-            className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300 "
-            onClick={() => signIn("google")}
-          >
-            <FcGoogle className="size-6" />
-            <span>{variant} with Google</span>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>E-mail</FormLabel>
+                <FormControl>
+                  <Input placeholder="john.smith@semicolon.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full">
+            <span className="font-2xl ml-2">{variant}</span>
           </Button>
-        </div>
-        <div className="my-2">
-          <Button
-            variant="outline"
-            className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300 "
-            onClick={() => signIn("discord")}
-          >
-            <FaDiscord className="size-6 fill-[#536dfe]" />
-            <span>{variant} with Discord</span>
-          </Button>
-        </div>
-        <div className="my-2">
-          <Button
-            variant="outline"
-            className="w-full flex gap-3 items-center text-zinc-700 dark:text-zinc-300"
-            onClick={() => signIn("github")}
-          >
-            <IoLogoGithub className="size-6" />
-            <span>{variant} with GitHub</span>
-          </Button>
-        </div>
+        </form>
+      </Form>
+
+      <SuggestionMessage variant={variant} />
+
+      <div className="my-5 flex items-center gap-2">
+        <div className="h-1 w-full border-b-2"></div>
+        <span className="font-bold">Or</span>
+        <div className="h-1 w-full border-b-2"></div>
+      </div>
+
+      <div className="my-2">
+        <Button
+          variant="outline"
+          className="flex w-full items-center gap-3 text-zinc-700 dark:text-zinc-300"
+          onClick={() => signIn("google")}
+        >
+          <FcGoogle className="size-6" />
+          <span>{variant} with Google</span>
+        </Button>
+      </div>
+      <div className="my-2">
+        <Button
+          variant="outline"
+          className="flex w-full items-center gap-3 text-zinc-700 dark:text-zinc-300"
+          onClick={() => signIn("discord")}
+        >
+          <FaDiscord className="size-6 fill-[#536dfe]" />
+          <span>{variant} with Discord</span>
+        </Button>
+      </div>
+      <div className="my-2">
+        <Button
+          variant="outline"
+          className="flex w-full items-center gap-3 text-zinc-700 dark:text-zinc-300"
+          onClick={() => signIn("github")}
+        >
+          <IoLogoGithub className="size-6" />
+          <span>{variant} with GitHub</span>
+        </Button>
+      </div>
+    </>
+  );
+}
+
+export function AuthForm({
+  variant = AuthVariant.SignUp,
+}: {
+  variant?: AuthVariant;
+}) {
+  const { data: session, status } = useSession();
+
+  console.log(session);
+
+  return (
+    <div className="flex h-full max-h-[730px] min-h-[660px] w-full min-w-[280px] flex-row items-center justify-center rounded-lg px-5 sm:border sm:px-10 lg:px-14 xl:px-20">
+      <div className="flex h-full w-full flex-col justify-center lg:min-w-[400px]">
+        {(() => {
+          if (status === "loading") {
+            return <Spinner className="self-center" />;
+          } else if (status === "unauthenticated") {
+            return <VerifyForm variant={variant} />;
+          } else {
+            return <VerifyForm variant={variant} />;
+          }
+        })()}
       </div>
     </div>
   );
