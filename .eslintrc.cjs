@@ -25,6 +25,7 @@ module.exports = {
         ignoreArrowShorthand: true,
       },
     ],
+    "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
       {

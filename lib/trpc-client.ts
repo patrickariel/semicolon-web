@@ -1,3 +1,4 @@
+import { getBaseUrl } from "./utils";
 import type { AppRouter } from "@binar-semicolon/api";
 import { httpBatchLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
@@ -8,7 +9,7 @@ export const trpc = createTRPCNext<AppRouter>({
     return {
       links: [
         httpBatchLink({
-          url: process.env.API_BASE_URL!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          url: `${getBaseUrl()}/api/trpc`,
           transformer: superjson,
           fetch(url, options) {
             return fetch(url, {

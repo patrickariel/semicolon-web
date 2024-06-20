@@ -6,7 +6,7 @@ import superjson from "superjson";
 export const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: process.env.API_BASE_URL!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      url: `${process.env.API_BASE_URL}/trpc`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
       headers() {
         return {
           Cookie: cookies().toString(),
