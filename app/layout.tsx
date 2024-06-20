@@ -1,6 +1,7 @@
 import "./globals.css";
 import { TrpcProvider } from "@/components/providers";
 import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
 import { Poppins } from "next/font/google";
 
 const font = Poppins({ subsets: ["latin"], weight: "500" });
@@ -18,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={font.className}>
-        <TrpcProvider>{children}</TrpcProvider>
+        <SessionProvider>
+          <TrpcProvider>{children}</TrpcProvider>
+        </SessionProvider>
       </body>
     </html>
   );
