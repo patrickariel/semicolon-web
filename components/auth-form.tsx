@@ -172,6 +172,7 @@ function VerifyForm({
 }
 
 function CompleteForm() {
+  const { update } = useSession();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof CompleteSchema>>({
@@ -179,7 +180,10 @@ function CompleteForm() {
   });
 
   const { mutate } = trpc.user.updateProfile.useMutation({
-    onSuccess: () => router.push("/"),
+    onSuccess: async () => {
+      await update({});
+      router.push("/");
+    },
   });
 
   const onSubmit = (data: z.infer<typeof CompleteSchema>) => mutate(data);
@@ -308,6 +312,7 @@ export function AuthForm({
             return <CompleteForm />;
           } else {
             router.push("/");
+            return <Spinner className="self-center" />;
           }
         })()}
       </div>
