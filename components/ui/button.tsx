@@ -56,7 +56,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }), {
-          "opacity-50 pointer-events-none": loading,
+          "pointer-events-none opacity-50": loading,
         })}
         ref={ref}
         {...props}
