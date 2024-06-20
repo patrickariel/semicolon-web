@@ -1,32 +1,44 @@
 "use client";
 
+import { Calendar } from "./ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import Spinner from "./ui/spinner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { trpc } from "@/lib/trpc-client";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { FaDiscord } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { IoLogoGithub } from "react-icons/io";
 import { z } from "zod";
 
-const FormSchema = z.object({
+const VerifySchema = z.object({
   email: z
-    .string()
-    .min(1, "E-mail address is required.")
+    .string({ required_error: "E-mail address is required." })
     .email("Not a valid e-mail address."),
+});
+
+const CompleteSchema = z.object({
+  username: z.string({ required_error: "Username is required." }),
+  name: z.string({ required_error: "Username is required." }),
+  birthday: z.date({ required_error: "Date of birth is required." }),
 });
 
 export enum AuthVariant {
@@ -74,13 +86,11 @@ function VerifyForm({
 }: {
   variant?: AuthVariant;
 }) {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<z.infer<typeof VerifySchema>>({
+    resolver: zodResolver(VerifySchema),
   });
 
-  const router = useRouter();
-
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (data: z.infer<typeof VerifySchema>) => {
     await signIn("resend", data);
   };
 
@@ -92,14 +102,6 @@ function VerifyForm({
         return "Catch up on everything you've missed.";
     }
   })();
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (localStorage.getItem("token")) {
-        router.push("/home");
-      }
-    }
-  }, [router]);
 
   return (
     <>
@@ -169,14 +171,130 @@ function VerifyForm({
   );
 }
 
+function CompleteForm() {
+  const router = useRouter();
+
+  const form = useForm<z.infer<typeof CompleteSchema>>({
+    resolver: zodResolver(CompleteSchema),
+  });
+
+  const { mutate } = trpc.user.updateProfile.useMutation({
+    onSuccess: () => router.push("/"),
+  });
+
+  const onSubmit = (data: z.infer<typeof CompleteSchema>) => mutate(data);
+
+  return (
+    <>
+      <h1 className="text-3xl font-bold">Complete registration</h1>
+      <p className="mb-12 mt-5 text-zinc-400">
+        Just one more thing before we{"'"}re done.
+      </p>
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-8"
+        >
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field, fieldState: { error } }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="john.smith" {...field} />
+                </FormControl>
+                <FormDescription className={error ? "hidden" : ""}>
+                  Your username should be unique.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field, fieldState: { error } }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="John Smith" {...field} />
+                </FormControl>
+                <FormDescription className={error ? "hidden" : ""}>
+                  However you want yourself to be called.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="birthday"
+            render={({ field, fieldState: { error } }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Date of birth</FormLabel>
+                <Popover modal={true}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground", // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+                        )}
+                      >
+                        {field.value ? ( // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-auto p-0"
+                    align="start"
+                    side="top"
+                  >
+                    <Calendar
+                      captionLayout="dropdown"
+                      fromDate={new Date("1970-01-01")}
+                      toDate={new Date()}
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormDescription className={error ? "hidden" : ""}>
+                  Your date of birth is used to determine your age.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="mt-10 w-full">
+            <span className="font-2xl ml-2">Confirm</span>
+          </Button>
+        </form>
+      </Form>
+    </>
+  );
+}
+
 export function AuthForm({
   variant = AuthVariant.SignUp,
 }: {
   variant?: AuthVariant;
 }) {
   const { data: session, status } = useSession();
-
-  console.log(session);
+  const router = useRouter();
 
   return (
     <div className="flex h-full max-h-[730px] min-h-[660px] w-full min-w-[280px] flex-row items-center justify-center rounded-lg px-5 sm:border sm:px-10 lg:px-14 xl:px-20">
@@ -186,8 +304,10 @@ export function AuthForm({
             return <Spinner className="self-center" />;
           } else if (status === "unauthenticated") {
             return <VerifyForm variant={variant} />;
+          } else if (!session?.user?.name) {
+            return <CompleteForm />;
           } else {
-            return <VerifyForm variant={variant} />;
+            router.push("/");
           }
         })()}
       </div>
