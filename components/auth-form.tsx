@@ -238,7 +238,7 @@ function CompleteForm() {
             render={({ field, fieldState: { error } }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Date of birth</FormLabel>
-                <Popover modal={true}>
+                <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
