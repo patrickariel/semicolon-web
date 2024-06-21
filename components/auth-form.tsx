@@ -301,7 +301,7 @@ export function AuthForm({
   const router = useRouter();
 
   return (
-    <div className="flex h-full max-h-[730px] min-h-[660px] w-full min-w-[280px] flex-row items-center justify-center rounded-lg px-5 sm:border sm:px-10 lg:px-14 xl:px-20">
+    <div className="flex h-full max-h-[720px] min-h-[660px] w-full min-w-[280px] flex-row items-center justify-center rounded-lg px-5 sm:border sm:px-10 lg:px-14">
       <div className="flex h-full w-full flex-col justify-center lg:min-w-[400px]">
         {(() => {
           if (status === "loading") {
