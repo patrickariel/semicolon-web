@@ -31,11 +31,7 @@ const Suggestions = () => (
           >
             <div className="flex min-w-0">
               <Avatar className="size-11">
-                <AvatarImage
-                  width={300}
-                  height={300}
-                  src="/images/az-profile.jpg"
-                />
+                <AvatarImage width={300} height={300} src={user.avatar} />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
               <div className="flex min-w-0 flex-col pl-2">
