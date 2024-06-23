@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader } from "./ui/card";
 import Link from "next/link";
 import React from "react";
 
@@ -10,24 +11,24 @@ const trends = [
 ];
 
 const Trends = () => (
-  <div className="flex flex-col py-3.5">
-    <h2 className="font-bold text-lg pb-[7px] px-3.5">Indonesia trends</h2>
-    {trends.map((trend) => (
-      <Link
-        key={trend.rank}
-        href="#"
-        className="flex justify-between items-center hover:bg-gray-800"
-      >
-        <div className="flex px-3.5 py-[7px]">
-          <div>
-            <p className="text-username text-sm">{trend.rank} • Trending</p>
+  <Card>
+    <CardHeader>Indonesia trends</CardHeader>
+    <CardContent className="flex flex-col gap-5">
+      {trends.map((trend) => (
+        <Link
+          key={trend.rank}
+          href="#"
+          className="flex items-center justify-between"
+        >
+          <div className="flex flex-col gap-1">
+            <p className="text-username align-bottom text-sm">Topic</p>
             <p className="text-base font-bold">{trend.topic}</p>
             <p className="text-username text-sm">{trend.posts}</p>
           </div>
-        </div>
-      </Link>
-    ))}
-  </div>
+        </Link>
+      ))}
+    </CardContent>
+  </Card>
 );
 
 export default Trends;

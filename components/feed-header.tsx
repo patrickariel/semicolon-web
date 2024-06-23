@@ -2,14 +2,14 @@ import Link from "next/link";
 import React from "react";
 
 const FeedHeader = () => (
-  <div className="flex justify-center gap-[150px] pt-[20px] border-b-2 border-line">
+  <div className="flex justify-around pt-4">
     <Link
       href="#"
-      className="px-2.5 pb-3.5 text-base font-bold border-b-4 border-link"
+      className="border-link border-b-4 border-sky-500 px-2.5 pb-3.5 text-base font-bold"
     >
       For You
     </Link>
-    <Link href="#" className="px-2.5 pb-3.5 text-base font-bold text-username">
+    <Link href="#" className="text-username px-2.5 pb-3.5 text-base font-bold">
       Following
     </Link>
   </div>

@@ -1,16 +1,26 @@
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 
-interface LogoProps {
-  className?: string;
-}
-
-const Logo = ({ className }: LogoProps) => (
-  <div className={`min-w-[230px] ${className}`}>
-    <Link href="#">
-      <h2 className="font-bold text-[28px] py-[30px]">semicolon;</h2>
+function Logo({
+  className,
+  children,
+  href,
+  ...props
+}: Parameters<typeof Link>[0]) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex flex-row justify-center gap-2 md:justify-start",
+        className,
+      )}
+      {...props}
+    >
+      <h2 className="hidden text-[28px] font-bold lg:block">semicolon</h2>
+      <h2 className="text-[28px] font-bold text-sky-400">;</h2>
     </Link>
-  </div>
-);
+  );
+}
 
 export default Logo;
