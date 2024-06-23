@@ -21,9 +21,9 @@ const Trends = () => (
           className="flex items-center justify-between"
         >
           <div className="flex flex-col gap-1">
-            <p className="text-username align-bottom text-sm">Topic</p>
-            <p className="text-base font-bold">{trend.topic}</p>
-            <p className="text-username text-sm">{trend.posts}</p>
+            <p className="align-bottom text-sm text-muted-foreground">Topic</p>
+            <p className="font-bold">{trend.topic}</p>
+            <p className="text-sm text-muted-foreground">{trend.posts}</p>
           </div>
         </Link>
       ))}
