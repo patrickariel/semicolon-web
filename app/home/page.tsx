@@ -1,11 +1,11 @@
 "use client";
 
-import FeedHeader from "@/components/feed-header";
-import PostForm from "@/components/post-form";
-import SearchBar from "@/components/search-bar";
-import { Sidebar } from "@/components/sidebar";
-import Suggestions from "@/components/suggestions";
-import Trends from "@/components/trends";
+import { FeedHeader } from "@/components/feed-header";
+import { PostForm } from "@/components/post-form";
+import { SearchBar } from "@/components/search-bar";
+import { SideBar } from "@/components/side-bar";
+import { Suggestions } from "@/components/suggestions";
+import { Trends } from "@/components/trends";
 import { Tweet } from "@/components/tweet";
 import { Separator } from "@/components/ui/separator";
 import React from "react";
@@ -15,7 +15,7 @@ export default function Page() {
     <div className="container mx-auto flex w-screen flex-row px-0 md:pr-8 lg:px-8">
       <div className="flex w-full flex-row">
         <div className="px-4 py-3 md:px-8 lg:py-8">
-          <Sidebar />
+          <SideBar />
         </div>
 
         <Separator orientation="vertical" className="min-h-screen" />

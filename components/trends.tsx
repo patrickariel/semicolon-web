@@ -10,25 +10,27 @@ const trends = [
   { rank: 5, topic: "next js or svelte?", posts: "24K posts" },
 ];
 
-const Trends = () => (
-  <Card>
-    <CardHeader>Indonesia trends</CardHeader>
-    <CardContent className="flex flex-col gap-5">
-      {trends.map((trend) => (
-        <Link
-          key={trend.rank}
-          href="#"
-          className="flex items-center justify-between"
-        >
-          <div className="flex flex-col gap-1">
-            <p className="align-bottom text-sm text-muted-foreground">Topic</p>
-            <p className="font-bold">{trend.topic}</p>
-            <p className="text-sm text-muted-foreground">{trend.posts}</p>
-          </div>
-        </Link>
-      ))}
-    </CardContent>
-  </Card>
-);
-
-export default Trends;
+export function Trends() {
+  return (
+    <Card>
+      <CardHeader>Indonesia trends</CardHeader>
+      <CardContent className="flex flex-col gap-5">
+        {trends.map((trend) => (
+          <Link
+            key={trend.rank}
+            href="#"
+            className="flex items-center justify-between"
+          >
+            <div className="flex flex-col gap-1">
+              <p className="align-bottom text-sm text-muted-foreground">
+                Topic
+              </p>
+              <p className="font-bold">{trend.topic}</p>
+              <p className="text-sm text-muted-foreground">{trend.posts}</p>
+            </div>
+          </Link>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}

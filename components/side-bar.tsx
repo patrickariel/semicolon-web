@@ -1,5 +1,5 @@
-import Logo from "./logo";
-import NavItem from "./nav-item";
+import { Logo } from "./logo";
+import { NavItem } from "./nav-item";
 import { cn } from "@/lib/utils";
 import {
   Bell,
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import React from "react";
 
-export function Sidebar({
+export function SideBar({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {

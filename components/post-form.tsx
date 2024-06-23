@@ -20,7 +20,7 @@ interface FormValues {
   upload: FileList | null;
 }
 
-const PostForm = () => {
+export function PostForm() {
   const form = useForm<FormValues>();
   const [preview, setPreview] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState<boolean>(false);
@@ -139,6 +139,4 @@ const PostForm = () => {
       </Form>
     </div>
   );
-};
-
-export default PostForm;
+}

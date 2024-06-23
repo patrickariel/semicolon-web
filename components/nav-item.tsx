@@ -8,7 +8,7 @@ interface NavItemProps {
   label: string;
 }
 
-function NavItem({ href, icon: Icon, label }: NavItemProps) {
+export function NavItem({ href, icon: Icon, label }: NavItemProps) {
   return (
     <Link href={href} className="flex items-center gap-4">
       <Icon className="size-6 flex-none" />
@@ -16,5 +16,3 @@ function NavItem({ href, icon: Icon, label }: NavItemProps) {
     </Link>
   );
 }
-
-export default NavItem;

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 
-function Logo({
+export function Logo({
   className,
   children,
   href,
@@ -22,5 +22,3 @@ function Logo({
     </Link>
   );
 }
-
-export default Logo;
