@@ -17,7 +17,11 @@ export function Tweet({ username, date, content, image }: TweetProps) {
     <div className="flex w-full flex-row gap-3 p-4">
       <div className="pt-2">
         <Avatar className="size-11">
-          <AvatarImage width={300} height={300} src="/images/az-profile.jpg" />
+          <AvatarImage
+            width={300}
+            height={300}
+            src="https://avatars.githubusercontent.com/u/28171661"
+          />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </div>

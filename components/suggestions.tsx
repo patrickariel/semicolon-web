@@ -6,16 +6,21 @@ import Link from "next/link";
 import React from "react";
 
 const suggestions = [
-  { name: "Rio Triadi", username: "superiot", avatar: "/images/girl1.png" },
+  {
+    name: "Rio Triadi",
+    username: "superiot",
+    avatar: "https://avatars.githubusercontent.com/u/29686170",
+  },
   {
     name: "La Ode",
     username: "L.0de",
-    avatar: "/images/man1.png",
+    avatar: "https://avatars.githubusercontent.com/u/64969059",
   },
   {
     name: "Fathan F",
     username: "a-really-long-ass-username",
-    avatar: "/images/girl2.png",
+    avatar:
+      "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/611.jpg",
   },
 ];
 
