@@ -12,7 +12,7 @@ function Logo({
     <Link
       href={href}
       className={cn(
-        "flex flex-row justify-center gap-2 md:justify-start",
+        "flex flex-row justify-center gap-2 lg:justify-start",
         className,
       )}
       {...props}
