@@ -14,7 +14,7 @@ export default function Page() {
   return (
     <div className="container mx-auto flex w-screen flex-row px-0 md:pr-8 lg:px-8">
       <div className="flex w-full flex-row">
-        <div className="px-5 py-3 md:px-8 lg:py-8">
+        <div className="px-4 py-3 md:px-8 lg:py-8">
           <Sidebar />
         </div>
 
@@ -22,20 +22,16 @@ export default function Page() {
 
         <div className="flex h-fit min-w-[257px] grow flex-col">
           <FeedHeader />
-
           <Separator />
-
           <div className="px-4 pb-[16px] pt-[20px]">
             <PostForm />
           </div>
-
           <Separator />
-
           <div className="mb-4 flex flex-col">
             <Tweet
               username="i_have_a_really_long_username_and_i_cannot_lie"
               date="2024-06-21"
-              content="This is a sample tweet content."
+              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend libero id facilisis scelerisque. Nulla nec lectus tristique, ultricies felis sed, suscipit neque."
               feeling="🤩 happy"
             />
             <Separator />
