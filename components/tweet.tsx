@@ -25,8 +25,8 @@ export function Tweet({ username, date, content, image }: TweetProps) {
         <div className="flex items-center justify-between gap-2">
           <div className="flex w-full min-w-0 flex-col items-start justify-start gap-2 sm:flex-row sm:items-center">
             <div className="flex min-w-0 max-w-full gap-1">
-              <div className="flex min-w-0 flex-row items-center gap-1 text-sm font-bold">
-                <p className="truncate">{username}</p>
+              <div className="flex min-w-0 flex-row items-center gap-1 text-sm">
+                <p className="truncate font-bold">{username}</p>
                 <BadgeCheck className="size-5 flex-none stroke-sky-400" />
               </div>
             </div>
