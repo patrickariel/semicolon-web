@@ -12,7 +12,7 @@ import React from "react";
 
 export default function Page() {
   return (
-    <div className="container mx-auto flex w-screen flex-row pl-0 lg:pl-8">
+    <div className="container mx-auto flex w-screen flex-row px-0 md:pr-8 lg:px-8">
       <div className="flex w-full flex-row">
         <div className="px-5 py-3 md:px-8 lg:py-8">
           <Sidebar />
