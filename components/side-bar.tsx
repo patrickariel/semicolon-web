@@ -20,7 +20,7 @@ export function SideBar({
   return (
     <div
       className={cn(
-        "hidden max-w-[270px] flex-col gap-[30px] px-4 py-3 min-[400px]:flex md:px-8 lg:w-full lg:py-7",
+        "hidden max-w-[270px] flex-col gap-[30px] px-4 py-3 min-[500px]:flex md:px-8 lg:w-full lg:py-7",
         className,
       )}
       {...props}
