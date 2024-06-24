@@ -24,7 +24,7 @@ export default function Page() {
           feeling="🤩 happy"
         />
         <Separator />
-        {_.range(0, 8).map(() => (
+        {_.range(0, 16).map(() => (
           <>
             <Tweet
               username="example_user"

@@ -8,6 +8,10 @@ const trends = [
   { rank: 3, topic: "how to learn next js", posts: "27K posts" },
   { rank: 4, topic: "knex vs sequelize", posts: "25K posts" },
   { rank: 5, topic: "next js or svelte?", posts: "24K posts" },
+  { rank: 6, topic: "praesent sed", posts: "12K posts" },
+  { rank: 7, topic: "sem commodo", posts: "15K posts" },
+  { rank: 8, topic: "fermentum orci id", posts: "10K posts" },
+  { rank: 9, topic: "amet mauris", posts: "11K posts" },
 ];
 
 export function Trends() {
