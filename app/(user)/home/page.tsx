@@ -1,12 +1,7 @@
 "use client";
 
-import { BottomBar } from "@/components/bottom-bar";
 import { FeedHeader } from "@/components/feed-header";
 import { PostForm } from "@/components/post-form";
-import { SearchBar } from "@/components/search-bar";
-import { SideBar } from "@/components/side-bar";
-import { Suggestions } from "@/components/suggestions";
-import { Trends } from "@/components/trends";
 import { Tweet } from "@/components/tweet";
 import { Separator } from "@/components/ui/separator";
 import _ from "lodash";
