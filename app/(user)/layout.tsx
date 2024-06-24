@@ -17,9 +17,11 @@ export default function Layout({
         <Separator orientation="vertical" className="h-auto min-h-screen" />
         <div className="w-full min-w-[257px] md:max-w-[600px]">{children}</div>
         <Separator orientation="vertical" className="h-auto min-h-screen" />
-        <div className="hidden w-1/4 min-w-[300px] flex-none shrink-0 flex-col md:flex">
-          <div className="flex flex-col gap-5 py-[30px] pl-[30px]">
+        <div className="hidden min-h-full w-1/4 min-w-[300px] flex-none shrink-0 flex-col justify-start pl-[30px] pt-0 md:flex">
+          <div className="sticky top-0 z-10 bg-card py-4">
             <SearchBar />
+          </div>
+          <div className="flex flex-col gap-5">
             <Suggestions />
             <Trends />
           </div>
