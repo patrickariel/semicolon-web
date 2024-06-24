@@ -1,3 +1,13 @@
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  BadgeCheck,
+  BarChart2,
+  Ellipsis,
+  Heart,
+  MessageCircle,
+  Repeat2,
+  Upload,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -10,99 +20,88 @@ interface TweetProps {
   image?: string;
 }
 
-export function Tweet({ username, date, content, feeling, image }: TweetProps) {
+export function Tweet({ username, date, content, image }: TweetProps) {
   return (
-    <div className="p-4 border-l-2 border-r-2 border-b-2 border-line w-full">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-start">
-          <div className="w-[46px] h-[46px] rounded-full overflow-hidden">
-            <Image
-              src="/images/az-profile.jpg"
-              alt="search"
-              width={46}
-              height={46}
-              className="object-cover"
-            />
-          </div>
-          <div className="pl-2">
-            <div className="flex gap-1">
-              <p className="text-base font-bold inline-block">
-                {username}
-                <Image
-                  src="/images/verify.png"
-                  alt="verify"
-                  width={26}
-                  height={26}
-                  className="inline w-5 h-5 rounded-full"
-                />
+    <div className="flex w-full flex-row gap-3 p-4">
+      <div className="pt-2">
+        <Avatar className="size-11">
+          <AvatarImage
+            width={300}
+            height={300}
+            src="https://avatars.githubusercontent.com/u/28171661"
+          />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      </div>
+      <div className="flex w-full min-w-0 flex-col">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex w-full min-w-0 flex-col items-start justify-start gap-2 sm:flex-row sm:items-center">
+            <div className="flex min-w-0 max-w-full gap-1">
+              <div className="flex min-w-0 flex-row items-center gap-1 text-sm">
+                <p className="truncate font-bold">{username}</p>
+                <BadgeCheck className="size-5 flex-none stroke-sky-400" />
+              </div>
+            </div>
+            <div className="flex min-w-0 max-w-full flex-row items-center gap-1">
+              <p className="truncate align-middle text-sm text-muted-foreground">
+                @{username}
+              </p>
+              <p className="align-middle text-sm text-muted-foreground">•</p>
+              <p className="text-nowrap align-middle text-sm text-muted-foreground">
+                {date}
               </p>
             </div>
-            <p className="text-username text-sm">
-              @{username.toLowerCase().replace(" ", "")} • {date}
-            </p>
           </div>
+          <Ellipsis className="flex-none" />
         </div>
-        <div className="flex justify-center items-center rounded-full px-3 py-1.5 border-line border-2 gap-1.5">
-          <p className="text-sm font-semibold">{feeling}</p>
-        </div>
-      </div>
-      <p className="pl-[55px] py-2.5 leading-7 text-base">{content}</p>
+        <p className="text-wrap py-2.5 text-sm leading-7">{content}</p>
 
-      {image && (
-        <div className="flex justify-center items-center my-3">
-          <Image
-            src={image}
-            alt="tweet-image"
-            width={300}
-            height={200}
-            className="rounded-lg"
-          />
-        </div>
-      )}
+        {image && (
+          <div className="my-3 flex items-center justify-center">
+            <Image
+              src={image}
+              alt="tweet-image"
+              width={300}
+              height={200}
+              className="rounded-lg"
+            />
+          </div>
+        )}
 
-      <div className="flex justify-between items-center pl-[55px] w-full">
-        <div className="flex justify-center items-center gap-2.5">
+        <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
           <Link
             href="#"
-            className="cursor flex justify-start items-center w-[93px] gap-1.5"
+            className="cursor flex items-center justify-start gap-1"
           >
-            <Image
-              className="like-icon"
-              src="/images/heart.svg"
-              alt="heart"
-              width={26}
-              height={26}
-            />
-            <p className="text-sm font-normal text-like">0 Likes</p>
+            <MessageCircle className="size-[1.1rem] stroke-muted-foreground" />
+            <p className="text-xs text-muted-foreground">15</p>
           </Link>
           <Link
             href="#"
-            className="cursor flex justify-start items-center w-[93px] gap-1.5"
+            className="cursor flex items-center justify-start gap-1"
           >
-            <Image
-              src="/images/trash.svg"
-              alt="delete"
-              width={26}
-              height={26}
-            />
-            <p className="text-sm font-normal text-username">Delete</p>
+            <Repeat2 className="size-[1.1rem] stroke-muted-foreground" />
+            <p className="text-xs text-muted-foreground">15</p>
           </Link>
           <Link
             href="#"
-            className="flex justify-start items-center w-[93px] gap-1.5"
+            className="cursor flex items-center justify-start gap-1"
           >
-            <Image
-              src="/images/warning-2.svg"
-              alt="warning-2"
-              width={26}
-              height={26}
-            />
-            <p className="text-sm font-normal text-username">Report</p>
+            <Heart className="size-[1.1rem] stroke-muted-foreground" />
+            <p className="text-xs text-muted-foreground">15</p>
+          </Link>
+          <Link
+            href="#"
+            className="cursor flex items-center justify-start gap-1"
+          >
+            <BarChart2 className="size-[1.1rem] stroke-muted-foreground" />
+            <p className="text-xs text-muted-foreground">15</p>
+          </Link>
+          <Link href="#" className="flex items-center justify-start gap-1">
+            <Upload className="size-[1.1rem] stroke-muted-foreground" />
           </Link>
         </div>
       </div>
     </div>
   );
 }
-
-export default Tweet;

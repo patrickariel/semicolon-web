@@ -1,23 +1,17 @@
 import { Input } from "./ui/input";
-import Image from "next/image";
+import { Search } from "lucide-react";
 import React from "react";
 
-const SearchBar = () => (
-  <div className="flex items-center justify-start rounded-full bg-secondary">
-    <Image
-      src="/images/search-normal-dim.svg"
-      alt="search"
-      width={26}
-      height={26}
-      className="ml-4 mr-3"
-    />
-    <Input
-      type="text"
-      placeholder="Search"
-      id="search"
-      className="flex-grow h-12  text-white bg-transparent text-base placeholder:text-base rounded-full"
-    />
-  </div>
-);
-
-export default SearchBar;
+export function SearchBar() {
+  return (
+    <div className="flex items-center justify-start gap-4 rounded-full border pl-4">
+      <Search />
+      <Input
+        type="text"
+        placeholder="Search"
+        id="search"
+        className="h-12 flex-grow rounded-r-full border-none bg-transparent text-base text-white"
+      />
+    </div>
+  );
+}

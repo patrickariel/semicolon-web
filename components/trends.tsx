@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader } from "./ui/card";
 import Link from "next/link";
 import React from "react";
 
@@ -9,25 +10,27 @@ const trends = [
   { rank: 5, topic: "next js or svelte?", posts: "24K posts" },
 ];
 
-const Trends = () => (
-  <div className="flex flex-col py-3.5">
-    <h2 className="font-bold text-lg pb-[7px] px-3.5">Indonesia trends</h2>
-    {trends.map((trend) => (
-      <Link
-        key={trend.rank}
-        href="#"
-        className="flex justify-between items-center hover:bg-gray-800"
-      >
-        <div className="flex px-3.5 py-[7px]">
-          <div>
-            <p className="text-username text-sm">{trend.rank} • Trending</p>
-            <p className="text-base font-bold">{trend.topic}</p>
-            <p className="text-username text-sm">{trend.posts}</p>
-          </div>
-        </div>
-      </Link>
-    ))}
-  </div>
-);
-
-export default Trends;
+export function Trends() {
+  return (
+    <Card>
+      <CardHeader>Indonesia trends</CardHeader>
+      <CardContent className="flex flex-col gap-5">
+        {trends.map((trend) => (
+          <Link
+            key={trend.rank}
+            href="#"
+            className="flex items-center justify-between"
+          >
+            <div className="flex flex-col gap-1">
+              <p className="align-bottom text-sm text-muted-foreground">
+                Topic
+              </p>
+              <p className="font-bold">{trend.topic}</p>
+              <p className="text-sm text-muted-foreground">{trend.posts}</p>
+            </div>
+          </Link>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
