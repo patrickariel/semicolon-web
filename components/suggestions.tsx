@@ -61,7 +61,7 @@ export function Suggestions() {
         </div>
       </CardContent>
       <CardFooter>
-        <Link href="#" className="font-medium text-sky-400 hover:underline">
+        <Link href="#" className="text-sm text-sky-400 hover:underline">
           Show more
         </Link>
       </CardFooter>
