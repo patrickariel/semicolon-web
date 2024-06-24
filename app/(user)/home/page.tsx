@@ -10,8 +10,10 @@ import React from "react";
 export default function Page() {
   return (
     <div className="flex flex-col">
-      <FeedHeader />
-      <Separator />
+      <div className="sticky top-0 z-50 bg-card">
+        <FeedHeader />
+        <Separator />
+      </div>
       <PostForm />
       <Separator />
       <div className="mb-4 flex flex-col">
