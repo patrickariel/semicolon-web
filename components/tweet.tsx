@@ -1,5 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { BadgeCheck, Ellipsis, Heart, OctagonAlert, Trash } from "lucide-react";
+import {
+  BadgeCheck,
+  BarChart2,
+  Ellipsis,
+  Heart,
+  MessageCircle,
+  Repeat2,
+  Upload,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -60,30 +68,37 @@ export function Tweet({ username, date, content, image }: TweetProps) {
           </div>
         )}
 
-        <div className="flex w-full items-center justify-between px-3">
+        <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
           <Link
             href="#"
-            className="cursor flex items-center justify-start gap-3"
+            className="cursor flex items-center justify-start gap-1"
           >
-            <Heart className="size-5 stroke-muted-foreground" />
-            <p className="hidden text-sm font-normal text-muted-foreground sm:block">
-              0 Likes
-            </p>
+            <MessageCircle className="size-[1.1rem] stroke-muted-foreground" />
+            <p className="text-xs text-muted-foreground">15</p>
           </Link>
           <Link
             href="#"
-            className="cursor flex items-center justify-start gap-3"
+            className="cursor flex items-center justify-start gap-1"
           >
-            <Trash className="size-5 stroke-muted-foreground" />
-            <p className="hidden text-sm font-normal text-muted-foreground sm:block">
-              Delete
-            </p>
+            <Repeat2 className="size-[1.1rem] stroke-muted-foreground" />
+            <p className="text-xs text-muted-foreground">15</p>
           </Link>
-          <Link href="#" className="flex items-center justify-start gap-3">
-            <OctagonAlert className="size-5 stroke-muted-foreground" />
-            <p className="hidden text-sm font-normal text-muted-foreground sm:block">
-              Report
-            </p>
+          <Link
+            href="#"
+            className="cursor flex items-center justify-start gap-1"
+          >
+            <Heart className="size-[1.1rem] stroke-muted-foreground" />
+            <p className="text-xs text-muted-foreground">15</p>
+          </Link>
+          <Link
+            href="#"
+            className="cursor flex items-center justify-start gap-1"
+          >
+            <BarChart2 className="size-[1.1rem] stroke-muted-foreground" />
+            <p className="text-xs text-muted-foreground">15</p>
+          </Link>
+          <Link href="#" className="flex items-center justify-start gap-1">
+            <Upload className="size-[1.1rem] stroke-muted-foreground" />
           </Link>
         </div>
       </div>
