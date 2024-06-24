@@ -43,7 +43,7 @@ export function PostForm() {
   };
 
   return (
-    <div className="flex w-full flex-row gap-3">
+    <div className="flex w-full flex-row gap-3 px-4 pb-[16px] pt-[20px]">
       <div className="pt-2">
         <Avatar className="size-11">
           <AvatarImage

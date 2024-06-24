@@ -9,12 +9,10 @@ import React from "react";
 
 export default function Page() {
   return (
-    <div className="flex h-fit min-w-[257px] grow flex-col md:max-w-[600px]">
+    <div className="flex flex-col">
       <FeedHeader />
       <Separator />
-      <div className="px-4 pb-[16px] pt-[20px]">
-        <PostForm />
-      </div>
+      <PostForm />
       <Separator />
       <div className="mb-4 flex flex-col">
         <Tweet
@@ -24,7 +22,7 @@ export default function Page() {
           feeling="🤩 happy"
         />
         <Separator />
-        {_.range(0, 10).map(() => (
+        {_.range(0, 8).map(() => (
           <>
             <Tweet
               username="example_user"
