@@ -9,11 +9,12 @@ import { Suggestions } from "@/components/suggestions";
 import { Trends } from "@/components/trends";
 import { Tweet } from "@/components/tweet";
 import { Separator } from "@/components/ui/separator";
+import _ from "lodash";
 import React from "react";
 
 export default function Page() {
   return (
-    <div className="container mx-auto flex min-h-screen w-screen flex-col px-0 md:pr-8 lg:px-8">
+    <div className="container mx-auto flex min-h-screen w-screen min-w-[280px] flex-col px-0 md:pr-8 lg:px-8">
       <div className="flex min-h-full w-full flex-row justify-center">
         <div className="hidden max-w-[270px] px-4 py-3 min-[400px]:block md:px-8 lg:w-full lg:py-7">
           <SideBar />
@@ -36,20 +37,17 @@ export default function Page() {
               feeling="🤩 happy"
             />
             <Separator />
-            <Tweet
-              username="example_user"
-              date="2024-06-21"
-              content="This is a sample tweet content."
-              feeling="🤩 happy"
-            />
-            <Separator />
-            <Tweet
-              username="example_user"
-              date="2024-06-21"
-              content="This is a sample tweet content."
-              feeling="🤩 happy"
-            />
-            <Separator />
+            {_.range(0, 10).map(() => (
+              <>
+                <Tweet
+                  username="example_user"
+                  date="2024-06-21"
+                  content="This is a sample tweet content."
+                  feeling="🤩 happy"
+                />
+                <Separator />
+              </>
+            ))}
           </div>
         </div>
 
@@ -66,9 +64,7 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 block w-screen min-[400px]:hidden">
-        <BottomBar />
-      </div>
+      <BottomBar />
     </div>
   );
 }

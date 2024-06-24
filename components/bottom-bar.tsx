@@ -17,7 +17,7 @@ export function BottomBar({
   return (
     <div
       className={cn(
-        "flex flex-row justify-around gap-2 border bg-card py-3",
+        "sticky bottom-0 flex w-full flex-row justify-around gap-2 border bg-card py-3 min-[400px]:hidden",
         className,
       )}
       {...props}
