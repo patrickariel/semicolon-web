@@ -18,7 +18,13 @@ export function SideBar({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("flex flex-col gap-[30px]", className)} {...props}>
+    <div
+      className={cn(
+        "hidden max-w-[270px] flex-col gap-[30px] px-4 py-3 min-[400px]:flex md:px-8 lg:w-full lg:py-7",
+        className,
+      )}
+      {...props}
+    >
       <Logo href="#" />
       <NavItem href="#" icon={Home} label="Home" />
       <NavItem href="#" icon={Search} label="Explore" />

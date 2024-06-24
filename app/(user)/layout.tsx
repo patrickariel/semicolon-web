@@ -13,9 +13,7 @@ export default function Layout({
   return (
     <div className="container mx-auto flex min-h-screen w-screen min-w-[280px] flex-col px-0 md:pr-8 lg:px-8">
       <div className="flex min-h-full w-full flex-row justify-center">
-        <div className="hidden max-w-[270px] px-4 py-3 min-[400px]:block md:px-8 lg:w-full lg:py-7">
-          <SideBar />
-        </div>
+        <SideBar />
         <Separator orientation="vertical" className="h-auto min-h-screen" />
         <div className="w-full min-w-[257px] md:max-w-[600px]">{children}</div>
         <Separator orientation="vertical" className="h-auto min-h-screen" />
@@ -23,9 +21,7 @@ export default function Layout({
           <div className="flex flex-col gap-5 py-[30px] pl-[30px]">
             <SearchBar />
             <Suggestions />
-            <div className="flex flex-col rounded-[16px] bg-secondary">
-              <Trends />
-            </div>
+            <Trends />
           </div>
         </div>
       </div>
