@@ -41,10 +41,10 @@ export function Suggestions() {
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div className="flex min-w-0 flex-col pl-2">
-                  <p className="flex flex-row items-center gap-2 text-base font-bold">
+                  <span className="flex flex-row items-center gap-2 text-base font-bold">
                     <p className="truncate">{user.name}</p>
                     <BadgeCheck className="size-5 flex-none stroke-sky-400" />
-                  </p>
+                  </span>
                   <p className="truncate text-sm text-muted-foreground">
                     @{user.username}
                   </p>
