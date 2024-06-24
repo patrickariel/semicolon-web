@@ -47,7 +47,7 @@ export function Tweet({ username, date, content, image }: TweetProps) {
                 @{username}
               </p>
               <p className="align-middle text-sm text-muted-foreground">•</p>
-              <p className="align-middle text-sm text-muted-foreground">
+              <p className="text-nowrap align-middle text-sm text-muted-foreground">
                 {date}
               </p>
             </div>
