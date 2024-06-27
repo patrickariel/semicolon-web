@@ -22,7 +22,7 @@ export function BottomBar({
       )}
       {...props}
     >
-      <Link href="#">
+      <Link href="/home">
         <Home />
       </Link>
       <Link href="#">
