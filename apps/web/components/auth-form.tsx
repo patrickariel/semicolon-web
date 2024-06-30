@@ -29,13 +29,13 @@ import { FcGoogle } from "react-icons/fc";
 import { IoLogoGithub } from "react-icons/io";
 import { z } from "zod";
 
-const VerifySchema = z.object({
+const EmailSchema = z.object({
   email: z
     .string({ required_error: "E-mail address is required." })
     .email("Not a valid e-mail address."),
 });
 
-const CompleteSchema = z.object({
+const RegisterSchema = z.object({
   username: z.string({ required_error: "Username is required." }),
   name: z.string({ required_error: "Username is required." }),
   birthday: z.date({ required_error: "Date of birth is required." }),
@@ -81,16 +81,16 @@ function SuggestionMessage({
   );
 }
 
-function VerifyForm({
+function PreAuthForm({
   variant = AuthVariant.SignUp,
 }: {
   variant?: AuthVariant;
 }) {
-  const form = useForm<z.infer<typeof VerifySchema>>({
-    resolver: zodResolver(VerifySchema),
+  const form = useForm<z.infer<typeof EmailSchema>>({
+    resolver: zodResolver(EmailSchema),
   });
 
-  const onSubmit = async (data: z.infer<typeof VerifySchema>) => {
+  const onSubmit = async (data: z.infer<typeof EmailSchema>) => {
     await signIn("resend", data);
   };
 
@@ -171,12 +171,12 @@ function VerifyForm({
   );
 }
 
-function CompleteForm() {
+function PostAuthForm() {
   const { update } = useSession();
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof CompleteSchema>>({
-    resolver: zodResolver(CompleteSchema),
+  const form = useForm<z.infer<typeof RegisterSchema>>({
+    resolver: zodResolver(RegisterSchema),
   });
 
   const { mutate } = trpc.user.register.useMutation({
@@ -186,7 +186,7 @@ function CompleteForm() {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof CompleteSchema>) => mutate(data);
+  const onSubmit = (data: z.infer<typeof RegisterSchema>) => mutate(data);
 
   return (
     <>
@@ -307,9 +307,9 @@ export function AuthForm({
           if (status === "loading") {
             return <Spinner className="self-center" />;
           } else if (status === "unauthenticated") {
-            return <VerifyForm variant={variant} />;
+            return <PreAuthForm variant={variant} />;
           } else if (!session?.user?.registered) {
-            return <CompleteForm />;
+            return <PostAuthForm />;
           } else {
             router.push("/");
             return <Spinner className="self-center" />;
