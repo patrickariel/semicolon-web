@@ -1,5 +1,5 @@
-import { getToken } from "@auth/core/jwt";
 import { PrismaClient } from "@prisma/client";
+import { auth } from "@semicolon/auth";
 import { TRPCError, initTRPC } from "@trpc/server";
 import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
@@ -8,26 +8,10 @@ import { OpenApiMeta } from "trpc-openapi";
 const prisma = new PrismaClient();
 
 export const createContext = async ({
-  req,
-  res: _,
+  req: _req,
+  res: _res,
 }: CreateNextContextOptions) => {
-  let session: Awaited<ReturnType<typeof getToken>> | null = null;
-
-  if (process.env.AUTH_SECRET && req.headers.cookie) {
-    const jwt = await getToken({
-      req: { headers: { cookie: req.headers.cookie } },
-      secret: process.env.AUTH_SECRET,
-      secureCookie: process.env.NODE_ENV === "production",
-      salt:
-        process.env.NODE_ENV === "production"
-          ? "__Secure-authjs.session-token"
-          : "authjs.session-token",
-    });
-
-    if (jwt?.exp && new Date() < new Date(jwt.exp * 1000)) {
-      session = jwt;
-    }
-  }
+  const session = await auth();
 
   return { session };
 };
@@ -43,9 +27,9 @@ export const optUserProcedure = t.procedure.use(
   async ({ ctx: { session }, next }) =>
     next({
       ctx: {
-        user: session?.email
+        user: session?.user?.email
           ? await prisma.user.findUnique({
-              where: { email: session.email },
+              where: { email: session.user.email },
             })
           : null,
         session,
