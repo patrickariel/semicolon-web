@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "dev": "prisma studio",
+    "dev": "prisma studio --browser none",
     "typecheck": "tsc --noEmit"
   },
   "exports": {
