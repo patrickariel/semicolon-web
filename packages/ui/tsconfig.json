@@ -1,0 +1,9 @@
+{
+  "extends": "@semicolon/typescript-config/react-library.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": ["src", "eslint.config.mjs"],
+  "exclude": ["node_modules", "dist"]
+}
