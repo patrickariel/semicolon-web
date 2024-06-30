@@ -29,7 +29,7 @@ export const user = router({
         where: { id },
       });
 
-      if (!user || !(user.name && user.username)) {
+      if (!user?.registered) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "The requested user does not exist",
