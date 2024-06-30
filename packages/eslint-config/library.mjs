@@ -8,12 +8,6 @@ export default tseslint.config(
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
   {
-    languageOptions: {
-      parserOptions: {
-        project: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
     rules: {
       // INFO: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/69660
       "@typescript-eslint/no-misused-promises": "off",

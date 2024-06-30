@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "prisma studio --browser none",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "exports": {
