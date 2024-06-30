@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { auth } from "@semicolon/auth";
 import { TRPCError, initTRPC } from "@trpc/server";
-import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
+import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import superjson from "superjson";
 import { OpenApiMeta } from "trpc-openapi";
 
@@ -9,9 +9,10 @@ const prisma = new PrismaClient();
 
 export const createContext = async ({
   req: _req,
-  res: _res,
-}: CreateNextContextOptions) => {
+}: FetchCreateContextFnOptions) => {
   const session = await auth();
+
+  console.log(`fucks: ${session}`);
 
   return { session };
 };
