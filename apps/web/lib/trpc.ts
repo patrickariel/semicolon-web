@@ -10,7 +10,6 @@ export const trpc = createTRPCClient<AppRouter>({
       headers() {
         return {
           Cookie: cookies().toString(),
-          "X-Auth-Secret": process.env.AUTH_SECRET,
         };
       },
       fetch(url, options) {
