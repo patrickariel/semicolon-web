@@ -1,0 +1,9 @@
+{
+  "extends": "@semicolon/typescript-config/react-library.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

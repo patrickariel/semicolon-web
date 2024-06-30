@@ -1,0 +1,21 @@
+{
+  "name": "@semicolon/db",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "prisma studio",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./zod": "./prisma/generated/zod/index.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.14.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.15.0",
+    "zod-prisma-types": "^3.1.8"
+  }
+}
