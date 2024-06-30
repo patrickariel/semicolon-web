@@ -9,3 +9,4 @@ export const appRouter = router({
 export type AppRouter = typeof appRouter;
 export type RouterInput = inferRouterInputs<AppRouter>;
 export type RouterOutput = inferRouterOutputs<AppRouter>;
+export { createContext } from "./trpc";
