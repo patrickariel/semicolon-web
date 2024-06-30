@@ -14,6 +14,7 @@
   "dependencies": {
     "@prisma/client": "^5.15.0",
     "@semicolon/auth": "*",
+    "@semicolon/db": "*",
     "@trpc/server": "^11.0.0-rc.403",
     "superjson": "^2.2.1",
     "zod": "^3.23.8"
@@ -21,8 +22,6 @@
   "devDependencies": {
     "@semicolon/eslint-config": "*",
     "@semicolon/typescript-config": "*",
-    "@semicolon/api": "*",
-    "@semicolon/db": "*",
     "typescript-eslint": "^7.13.1"
   }
 }
