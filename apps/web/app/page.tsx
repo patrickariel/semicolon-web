@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { auth } from "@semicolon/auth";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
