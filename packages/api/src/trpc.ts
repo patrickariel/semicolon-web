@@ -12,8 +12,6 @@ export const createContext = async ({
 }: FetchCreateContextFnOptions) => {
   const session = await auth();
 
-  console.log(`fucks: ${session}`);
-
   return { session };
 };
 
@@ -28,9 +26,9 @@ export const optUserProcedure = t.procedure.use(
   async ({ ctx: { session }, next }) =>
     next({
       ctx: {
-        user: session?.user?.email
+        user: session?.user?.id
           ? await prisma.user.findUnique({
-              where: { email: session.user.email },
+              where: { id: session.user.id },
             })
           : null,
         session,
@@ -38,29 +36,36 @@ export const optUserProcedure = t.procedure.use(
     }),
 );
 
-export const incompleteUserProcedure = optUserProcedure.use(
+export const newUserProcedure = optUserProcedure.use(
   async ({ ctx: { user, ...ctx }, next }) => {
     if (!user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
+    } else if (user.registered) {
+      throw new TRPCError({ code: "PRECONDITION_FAILED" });
     } else {
       return next({
-        ctx: {
-          user: { ...user, name: user.name, username: user.username },
-          ...ctx,
-        },
+        ctx: { user, ...ctx },
       });
     }
   },
 );
 
-export const userProcedure = incompleteUserProcedure.use(
+export const userProcedure = optUserProcedure.use(
   async ({ ctx: { user, ...ctx }, next }) => {
-    if (!(user.name && user.username)) {
-      throw new TRPCError({ code: "PRECONDITION_FAILED" });
+    if (!user?.registered) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
     } else {
       return next({
         ctx: {
-          user: { ...user, name: user.name, username: user.username },
+          user: {
+            ...user,
+            // The following three fields should always be present if the user is registered
+            /* eslint-disable @typescript-eslint/no-non-null-assertion */
+            name: user.name!,
+            username: user.username!,
+            birthday: user.birthday!,
+            /* eslint-enable @typescript-eslint/no-non-null-assertion */
+          },
           ...ctx,
         },
       });

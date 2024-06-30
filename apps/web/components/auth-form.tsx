@@ -141,7 +141,7 @@ function VerifyForm({
         <Button
           variant="outline"
           className="flex w-full items-center gap-3 text-zinc-700 dark:text-zinc-300"
-          onClick={() => signIn("google")}
+          onClick={() => signIn("google", { callbackUrl: "/" })}
         >
           <FcGoogle className="size-6" />
           <span>{variant} with Google</span>
@@ -151,7 +151,7 @@ function VerifyForm({
         <Button
           variant="outline"
           className="flex w-full items-center gap-3 text-zinc-700 dark:text-zinc-300"
-          onClick={() => signIn("discord")}
+          onClick={() => signIn("discord", { callbackUrl: "/" })}
         >
           <FaDiscord className="size-6 fill-[#536dfe]" />
           <span>{variant} with Discord</span>
@@ -161,7 +161,7 @@ function VerifyForm({
         <Button
           variant="outline"
           className="flex w-full items-center gap-3 text-zinc-700 dark:text-zinc-300"
-          onClick={() => signIn("github")}
+          onClick={() => signIn("github", { callbackUrl: "/" })}
         >
           <IoLogoGithub className="size-6" />
           <span>{variant} with GitHub</span>
@@ -179,9 +179,9 @@ function CompleteForm() {
     resolver: zodResolver(CompleteSchema),
   });
 
-  const { mutate } = trpc.user.updateProfile.useMutation({
+  const { mutate } = trpc.user.register.useMutation({
     onSuccess: async () => {
-      await update({});
+      await update();
       router.push("/");
     },
   });
@@ -308,7 +308,7 @@ export function AuthForm({
             return <Spinner className="self-center" />;
           } else if (status === "unauthenticated") {
             return <VerifyForm variant={variant} />;
-          } else if (!session?.user?.name) {
+          } else if (!session?.user?.registered) {
             return <CompleteForm />;
           } else {
             router.push("/");
