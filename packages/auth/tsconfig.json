@@ -1,0 +1,10 @@
+{
+  "extends": "@semicolon/typescript-config/base.json",
+  "compilerOptions": {
+    "lib": ["ES2015"],
+    "module": "ES2015",
+    "moduleResolution": "Bundler"
+  },
+  "exclude": ["node_modules"],
+  "include": ["."]
+}
