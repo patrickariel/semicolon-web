@@ -11,11 +11,9 @@ import { z } from "zod";
 declare module "next-auth" {
   interface Session {
     user?: {
-      id: string; // ID will be automatically supplied on sign up
-      email: string; // We only use providers that supports emails
+      id: string; // ID should always be present
       username?: string | null;
-      image?: string | null;
-      registered?: boolean;
+      registered?: boolean | null;
     } & DefaultSession["user"];
   }
 }
@@ -23,10 +21,8 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     id: string;
-    email: string;
     username?: string | null;
-    image?: string | null;
-    registered?: boolean;
+    registered?: boolean | null;
   }
 }
 
@@ -63,8 +59,7 @@ export const {
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (trigger === "update" && session.user) {
-        // HACK: Massively insecure
-        // HACK: See https://github.com/nextauthjs/next-auth/discussions/9715#discussioncomment-8475629 and https://github.com/nextauthjs/next-auth/discussions/3941
+        // HACK: Remove this once we have the ability to update sessions directly from the server
         const update = UpdateSchema.safeParse(session.user); // eslint-disable-line @typescript-eslint/no-unsafe-member-access
         if (update.data) {
           token = {
