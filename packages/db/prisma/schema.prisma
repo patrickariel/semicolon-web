@@ -16,6 +16,7 @@ model User {
   username      String?   @unique
   name          String?
   email         String    @unique
+  registered    Boolean   @default(false)
   emailVerified DateTime? @map("email_verified")
   birthday      DateTime?
   image         String?   @map("image")

@@ -1,0 +1,23 @@
+{
+  "name": "@semicolon/auth",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "next-auth": "^5.0.0-beta.19",
+    "@auth/prisma-adapter": "^2.4.1",
+    "@semicolon/db": "*"
+  },
+  "devDependencies": {
+    "@semicolon/typescript-config": "*",
+    "@semicolon/eslint-config": "*",
+    "typescript-eslint": "^7.13.1"
+  }
+}

@@ -7,12 +7,6 @@ on:
   pull_request:
     types: [opened, synchronize]
 
-permissions:
-  packages: read
-
-env:
-  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   format:
     name: Check formatting

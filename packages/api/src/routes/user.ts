@@ -3,8 +3,9 @@ import {
   router,
   publicProcedure,
   userProcedure,
-  incompleteUserProcedure,
+  newUserProcedure,
 } from "@semicolon/api/trpc";
+import { update } from "@semicolon/auth";
 import { UserSchema } from "@semicolon/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -16,14 +17,19 @@ export const user = router({
     .meta({ openapi: { method: "GET", path: "/users/id/{id}" } })
     .input(z.object({ id: z.string().uuid() }))
     .output(
-      UserSchema.omit({ email: true, emailVerified: true, updatedAt: true }),
+      UserSchema.omit({
+        email: true,
+        emailVerified: true,
+        updatedAt: true,
+        birthday: true,
+      }),
     )
     .query(async ({ input: { id } }) => {
       const user = await prisma.user.findUnique({
         where: { id },
       });
 
-      if (!user || !(user.name && user.username)) {
+      if (!user?.registered) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "The requested user does not exist",
@@ -36,10 +42,16 @@ export const user = router({
     .meta({ openapi: { method: "GET", path: "/users/me" } })
     .input(z.void())
     .output(
-      UserSchema.merge(z.object({ name: z.string(), username: z.string() })),
+      UserSchema.merge(
+        z.object({
+          name: z.string(),
+          username: z.string(),
+          birthday: z.date(),
+        }),
+      ),
     )
     .query(({ ctx: { user } }) => user),
-  updateProfile: incompleteUserProcedure
+  register: newUserProcedure
     .input(
       z.object({
         name: z.string(),
@@ -49,9 +61,11 @@ export const user = router({
       }),
     )
     .mutation(async ({ ctx: { user }, input }) => {
-      await prisma.user.update({
+      const { name, username, image, registered } = await prisma.user.update({
         where: { email: user.email },
-        data: input,
+        data: { ...input, registered: true },
       });
+
+      await update({ user: { name, username, image, registered } });
     }),
 });

@@ -5,7 +5,7 @@ import { PostForm } from "@/components/post-form";
 import { Tweet } from "@/components/tweet";
 import { Separator } from "@semicolon/ui/separator";
 import _ from "lodash";
-import React from "react";
+import React, { Fragment } from "react";
 
 export default function Page() {
   return (
@@ -24,8 +24,8 @@ export default function Page() {
           feeling="🤩 happy"
         />
         <Separator />
-        {_.range(0, 16).map(() => (
-          <>
+        {_.range(0, 16).map((i) => (
+          <Fragment key={i}>
             <Tweet
               username="example_user"
               date="2024-06-21"
@@ -33,7 +33,7 @@ export default function Page() {
               feeling="🤩 happy"
             />
             <Separator />
-          </>
+          </Fragment>
         ))}
       </div>
     </div>

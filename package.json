@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "trpc-openapi": "^1.2.0",
-    "patch-package": "^8.0.0"
+    "patch-package": "^8.0.0",
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "prettier": "^3.2.5",

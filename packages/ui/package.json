@@ -4,7 +4,8 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   },
   "exports": {
     "./*": "./src/*.tsx",
@@ -23,9 +24,13 @@
     "@radix-ui/react-popover": "^1.1.0",
     "@radix-ui/react-select": "^2.1.0",
     "@radix-ui/react-separator": "^1.1.0",
-    "@radix-ui/react-slot": "^1.0.2"
+    "@radix-ui/react-slot": "^1.0.2",
+    "class-variance-authority": "^0.7.0"
   },
   "devDependencies": {
-    "clsx": "^2.1.1"
+    "clsx": "^2.1.1",
+    "@semicolon/eslint-config": "*",
+    "@semicolon/typescript-config": "*",
+    "typescript-eslint": "^7.13.1"
   }
 }

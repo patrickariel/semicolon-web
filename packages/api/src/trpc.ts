@@ -1,33 +1,16 @@
-import { getToken } from "@auth/core/jwt";
 import { PrismaClient } from "@prisma/client";
+import { auth } from "@semicolon/auth";
 import { TRPCError, initTRPC } from "@trpc/server";
-import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
+import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import superjson from "superjson";
 import { OpenApiMeta } from "trpc-openapi";
 
 const prisma = new PrismaClient();
 
 export const createContext = async ({
-  req,
-  res: _,
-}: CreateNextContextOptions) => {
-  let session: Awaited<ReturnType<typeof getToken>> | null = null;
-
-  if (process.env.AUTH_SECRET && req.headers.cookie) {
-    const jwt = await getToken({
-      req: { headers: { cookie: req.headers.cookie } },
-      secret: process.env.AUTH_SECRET,
-      secureCookie: process.env.NODE_ENV === "production",
-      salt:
-        process.env.NODE_ENV === "production"
-          ? "__Secure-authjs.session-token"
-          : "authjs.session-token",
-    });
-
-    if (jwt?.exp && new Date() < new Date(jwt.exp * 1000)) {
-      session = jwt;
-    }
-  }
+  req: _req,
+}: FetchCreateContextFnOptions) => {
+  const session = await auth();
 
   return { session };
 };
@@ -43,9 +26,9 @@ export const optUserProcedure = t.procedure.use(
   async ({ ctx: { session }, next }) =>
     next({
       ctx: {
-        user: session?.email
+        user: session?.user?.id
           ? await prisma.user.findUnique({
-              where: { email: session.email },
+              where: { id: session.user.id },
             })
           : null,
         session,
@@ -53,29 +36,36 @@ export const optUserProcedure = t.procedure.use(
     }),
 );
 
-export const incompleteUserProcedure = optUserProcedure.use(
+export const newUserProcedure = optUserProcedure.use(
   async ({ ctx: { user, ...ctx }, next }) => {
     if (!user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
+    } else if (user.registered) {
+      throw new TRPCError({ code: "PRECONDITION_FAILED" });
     } else {
       return next({
-        ctx: {
-          user: { ...user, name: user.name, username: user.username },
-          ...ctx,
-        },
+        ctx: { user, ...ctx },
       });
     }
   },
 );
 
-export const userProcedure = incompleteUserProcedure.use(
+export const userProcedure = optUserProcedure.use(
   async ({ ctx: { user, ...ctx }, next }) => {
-    if (!(user.name && user.username)) {
-      throw new TRPCError({ code: "PRECONDITION_FAILED" });
+    if (!user?.registered) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
     } else {
       return next({
         ctx: {
-          user: { ...user, name: user.name, username: user.username },
+          user: {
+            ...user,
+            // The following three fields should always be present if the user is registered
+            /* eslint-disable @typescript-eslint/no-non-null-assertion */
+            name: user.name!,
+            username: user.username!,
+            birthday: user.birthday!,
+            /* eslint-enable @typescript-eslint/no-non-null-assertion */
+          },
           ...ctx,
         },
       });

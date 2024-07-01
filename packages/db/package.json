@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "prisma studio --browser none",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "exports": {
@@ -12,10 +13,14 @@
     "./zod": "./prisma/generated/zod/index.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.14.0"
+    "@prisma/client": "^5.14.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "prisma": "^5.15.0",
-    "zod-prisma-types": "^3.1.8"
+    "zod-prisma-types": "^3.1.8",
+    "@semicolon/eslint-config": "*",
+    "@semicolon/typescript-config": "*",
+    "typescript-eslint": "^7.13.1"
   }
 }
