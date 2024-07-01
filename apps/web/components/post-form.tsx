@@ -34,10 +34,12 @@ export function PostForm() {
       reader.onload = () => {
         const fileURL = reader.result as string;
         setPreview(fileURL);
-        setIsVideo(file.type.startsWith("video"));
+        setIsVideo(file !== undefined ? file.type.startsWith("video") : false);
       };
 
-      reader.readAsDataURL(file);
+      if (file) {
+        reader.readAsDataURL(file);
+      }
       console.log("File uploaded:", file);
     }
   };
@@ -115,8 +117,10 @@ export function PostForm() {
                         if (files && files.length > 0) {
                           field.onChange(files);
                           const file = files[0];
-                          setPreview(URL.createObjectURL(file));
-                          setIsVideo(file.type.startsWith("video"));
+                          if (file) {
+                            setPreview(URL.createObjectURL(file));
+                            setIsVideo(file.type.startsWith("video"));
+                          }
                         }
                       }}
                     />
