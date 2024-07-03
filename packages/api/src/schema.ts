@@ -2,7 +2,7 @@ import { PostSchema } from "@semicolon/db/zod";
 import isAlphanumeric from "validator/es/lib/isAlphanumeric";
 import { z } from "zod";
 
-export const Username = z
+export const UsernameSchema = z
   .string({ required_error: "Username is required" })
   .refine((arg) => isAlphanumeric(arg, undefined, { ignore: "-_." }), {
     message:

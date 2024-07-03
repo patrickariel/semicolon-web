@@ -2,7 +2,7 @@
 
 import { trpc } from "@/lib/trpc-client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Username } from "@semicolon/api/schema";
+import { UsernameSchema } from "@semicolon/api/schema";
 import { Button } from "@semicolon/ui/button";
 import { Calendar } from "@semicolon/ui/calendar";
 import {
@@ -37,7 +37,7 @@ const EmailSchema = z.object({
 });
 
 const RegisterSchema = z.object({
-  username: Username,
+  username: UsernameSchema,
   name: z.string({ required_error: "Name is required" }),
   birthday: z.date({ required_error: "Date of birth is required" }),
 });
