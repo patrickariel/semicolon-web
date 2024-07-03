@@ -13,6 +13,7 @@ import Link from "next/link";
 import React from "react";
 
 interface TweetProps {
+  name: string;
   username: string;
   date: string;
   content: string;
@@ -20,7 +21,7 @@ interface TweetProps {
   image?: string;
 }
 
-export function Tweet({ username, date, content, image }: TweetProps) {
+export function Tweet({ name, username, date, content, image }: TweetProps) {
   return (
     <div className="flex w-full flex-row gap-3 p-4">
       <div className="pt-2">
@@ -38,7 +39,7 @@ export function Tweet({ username, date, content, image }: TweetProps) {
           <div className="flex w-full min-w-0 flex-col items-start justify-start gap-2 sm:flex-row sm:items-center">
             <div className="flex min-w-0 max-w-full gap-1">
               <div className="flex min-w-0 flex-row items-center gap-1 text-sm">
-                <p className="truncate font-bold">{username}</p>
+                <p className="truncate font-bold">{name}</p>
                 <BadgeCheck className="size-5 flex-none stroke-sky-400" />
               </div>
             </div>
