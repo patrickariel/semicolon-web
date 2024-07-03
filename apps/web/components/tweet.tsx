@@ -1,3 +1,4 @@
+import { uuidTranslator } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import {
   BadgeCheck,
@@ -16,7 +17,8 @@ interface TweetProps {
   id: string;
   name: string;
   username: string;
-  date: string;
+  avatar: string | null;
+  createdAt: Date;
   content: string;
   image?: string;
 }
@@ -24,21 +26,18 @@ interface TweetProps {
 export function Tweet({
   id,
   name,
+  avatar,
   username,
-  date,
+  createdAt,
   content,
   image,
 }: TweetProps) {
   return (
-    <Link href={`/tweet/${id}`}>
+    <Link href={`/tweet/${uuidTranslator.fromUUID(id)}`}>
       <div className="flex w-full flex-row gap-3 p-4">
         <div className="pt-2">
           <Avatar className="size-11">
-            <AvatarImage
-              width={300}
-              height={300}
-              src="https://avatars.githubusercontent.com/u/28171661"
-            />
+            {avatar && <AvatarImage width={300} height={300} src={avatar} />}
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>
@@ -47,7 +46,7 @@ export function Tweet({
             <div className="flex w-full min-w-0 flex-col items-start justify-start gap-2 sm:flex-row sm:items-center">
               <div className="flex min-w-0 max-w-full gap-1">
                 <div className="flex min-w-0 flex-row items-center gap-1 text-sm">
-                  <p className="truncate font-bold">{username}</p>
+                  <p className="truncate font-bold">{name}</p>
                   <BadgeCheck className="size-5 flex-none stroke-sky-400" />
                 </div>
               </div>
@@ -57,7 +56,7 @@ export function Tweet({
                 </p>
                 <p className="text-muted-foreground align-middle text-sm">•</p>
                 <p className="text-muted-foreground text-nowrap align-middle text-sm">
-                  {date}
+                  {createdAt.toDateString()}
                 </p>
               </div>
             </div>

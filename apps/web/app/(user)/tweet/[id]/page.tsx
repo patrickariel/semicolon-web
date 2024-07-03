@@ -4,64 +4,41 @@ import { CommentForm } from "@/components/comment-form";
 import TweetDetail from "@/components/detail-tweet";
 import HeaderWithBackButton from "@/components/header-detail-tweet";
 import { Tweet } from "@/components/tweet";
+import { trpc } from "@/lib/trpc-client";
+import { uuidTranslator } from "@/lib/utils";
 import { Separator } from "@semicolon/ui/separator";
 import _ from "lodash";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment } from "react";
 
-const TweetPage: React.FC = () => {
-  const [mounted, setMounted] = useState(false);
+export default function Page({ params: { id } }: { params: { id: string } }) {
+  const { data: tweet } = trpc.post.id.useQuery({
+    id: uuidTranslator.toUUID(id),
+  });
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { data } = trpc.post.search.useQuery({});
 
-  if (!mounted) {
-    return null;
+  if (!tweet) {
+    return;
   }
 
-  const tweet = {
-    id: "1",
-    user: {
-      name: "John Doe",
-      username: "john_doe",
-      profile_image_url: "https://avatars.githubusercontent.com/u/28171661",
-    },
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend libero id facilisis scelerisque. Nulla nec lectus tristique, ultricies felis sed, suscipit neque.",
-    created_at: "2024-06-21",
-    image: "https://via.placeholder.com/1280x720",
-    reply_count: 15,
-    retweet_count: 10,
-    like_count: 100,
-  };
+  if (!data) {
+    return;
+  }
 
   return (
-    <div className="container mx-auto px-4">
+    <div>
       <HeaderWithBackButton />
-      <TweetDetail tweet={tweet} />
+      <TweetDetail {...tweet} />
       <CommentForm />
       <Separator />
       <div className="mb-4 flex flex-col">
-        <Tweet
-          username="i_have_a_really_long_username_and_i_cannot_lie"
-          date="2024-06-21"
-          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend libero id facilisis scelerisque. Nulla nec lectus tristique, ultricies felis sed, suscipit neque."
-          feeling="🤩 happy"
-        />
-        <Separator />
-        {_.range(0, 16).map((i) => (
+        {data.results.map((tweet, i) => (
           <Fragment key={i}>
-            <Tweet
-              username="example_user"
-              date="2024-06-21"
-              content="This is a sample tweet content."
-              feeling="🤩 happy"
-            />
+            <Tweet {...tweet} />
             <Separator />
           </Fragment>
         ))}
       </div>
     </div>
   );
-};
-
-export default TweetPage;
+}
