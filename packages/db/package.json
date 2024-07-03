@@ -8,6 +8,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./zod": "./prisma/generated/zod/index.ts"
