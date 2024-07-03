@@ -1,9 +1,9 @@
 "use client";
 
 import { CommentForm } from "@/components/comment-form";
-import { TweetDetail } from "@/components/detail-tweet";
 import { HeaderWithBackButton } from "@/components/header-detail-tweet";
-import { Tweet } from "@/components/tweet";
+import { Post } from "@/components/post";
+import { PostDetail } from "@/components/post-detail";
 import { trpc } from "@/lib/trpc-client";
 import { uuidTranslator } from "@/lib/utils";
 import { Separator } from "@semicolon/ui/separator";
@@ -28,13 +28,13 @@ export default function Page({ params: { id } }: { params: { id: string } }) {
   return (
     <div>
       <HeaderWithBackButton />
-      <TweetDetail {...tweet} />
+      <PostDetail {...tweet} />
       <CommentForm />
       <Separator />
       <div className="mb-4 flex flex-col">
         {data.results.map((tweet, i) => (
           <Fragment key={i}>
-            <Tweet {...tweet} />
+            <Post {...tweet} />
             <Separator />
           </Fragment>
         ))}

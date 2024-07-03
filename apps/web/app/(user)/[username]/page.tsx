@@ -1,5 +1,5 @@
+import { Post } from "@/components/post";
 import ProfileCard from "@/components/profile-card";
-import { Tweet } from "@/components/tweet";
 import { Separator } from "@semicolon/ui/separator";
 import _ from "lodash";
 import React from "react";
@@ -32,11 +32,13 @@ export default function Page({
       <div className="mb-4 flex flex-col">
         {_.range(0, 16).map((index) => (
           <React.Fragment key={index}>
-            <Tweet
+            <Post
+              id=""
+              name=""
+              avatar={null}
               username="example_user"
-              date="2024-06-21"
+              createdAt={new Date()}
               content="This is a sample tweet content."
-              feeling="🤩 happy"
             />
             <Separator />
           </React.Fragment>

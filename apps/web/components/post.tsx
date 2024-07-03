@@ -23,7 +23,7 @@ interface TweetProps {
   image?: string;
 }
 
-export function Tweet({
+export function Post({
   id,
   name,
   avatar,

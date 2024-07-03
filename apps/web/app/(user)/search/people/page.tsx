@@ -1,11 +1,11 @@
 "use client";
 
-import { Separator } from "../../../../../../packages/ui/src/separator";
+import { Post } from "@/components/post";
 import { PostForm } from "@/components/post-form";
 import { SearchBar } from "@/components/search-bar";
 import { SearchFeedHeader } from "@/components/search-feed-header";
 import { SearchResultUser } from "@/components/search-results-user";
-import { Tweet } from "@/components/tweet";
+import { Separator } from "@semicolon/ui/separator";
 import _ from "lodash";
 import React, { useState } from "react";
 

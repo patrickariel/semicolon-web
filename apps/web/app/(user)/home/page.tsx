@@ -1,8 +1,8 @@
 "use client";
 
 import { FeedHeader } from "@/components/feed-header";
+import { Post } from "@/components/post";
 import { PostForm } from "@/components/post-form";
-import { Tweet } from "@/components/tweet";
 import { trpc } from "@/lib/trpc-client";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
@@ -27,7 +27,7 @@ export default function Page() {
         <div className="mb-4 flex flex-col">
           {data.results.map((tweet, i) => (
             <Fragment key={i}>
-              <Tweet {...tweet} />
+              <Post {...tweet} />
               <Separator />
             </Fragment>
           ))}

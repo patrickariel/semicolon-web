@@ -15,7 +15,7 @@ interface TweetProps {
   likeCount: number;
 }
 
-export function TweetDetail({
+export function PostDetail({
   name,
   avatar,
   username,

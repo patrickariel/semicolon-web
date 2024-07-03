@@ -1,5 +1,5 @@
 import { trpc } from "../lib/trpc";
-import { Tweet } from "./tweet";
+import { Post } from "./post";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
 import { Card, CardContent } from "@semicolon/ui/card";
@@ -57,7 +57,7 @@ export function SearchResults({ query }: { query: string }) {
         <h2 className="text-xl font-bold">Posts</h2>
         {postResults.length === 0 && <p>No posts found.</p>}
         {postResults.map((post) => (
-          <Tweet key={post.id} post={post} />
+          <Post key={post.id} post={post} />
         ))}
       </div>
     </div>
