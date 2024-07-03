@@ -24,14 +24,14 @@ model User {
   registered    Boolean   @default(false)
   emailVerified DateTime?
   birthday      DateTime?
-  followedBy    User[]    @relation("UserFollows")
-  following     User[]    @relation("UserFollows")
+  followedBy    User[]    @relation("UserFollow")
+  following     User[]    @relation("UserFollow")
   image         String?
   accounts      Account[]
   sessions      Session[]
   bio           String?
   posts         Post[]
-  likes         Like[]
+  likes         Post[]    @relation("Like")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -85,17 +85,8 @@ model Post {
   parentId  String?  @db.Uuid
   parent    Post?    @relation("PostTree", fields: [parentId], references: [id])
   children  Post[]   @relation("PostTree")
-  likes     Like[]
+  likes     User[]   @relation("Like")
   media     Media[]
-}
-
-model Like {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String   @db.Uuid
-  postId    String   @db.Uuid
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Media {

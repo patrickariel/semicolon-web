@@ -22,10 +22,8 @@ export type Account = {
   updatedAt: Timestamp;
 };
 export type Like = {
-  id: Generated<string>;
-  userId: string;
-  postId: string;
-  createdAt: Generated<Timestamp>;
+  A: string;
+  B: string;
 };
 export type Media = {
   id: Generated<string>;
@@ -60,14 +58,19 @@ export type User = {
   createdAt: Generated<Timestamp>;
   updatedAt: Timestamp;
 };
+export type UserFollow = {
+  A: string;
+  B: string;
+};
 export type VerificationToken = {
   identifier: string;
   token: string;
   expires: Timestamp;
 };
 export type DB = {
+  _Like: Like;
+  _UserFollow: UserFollow;
   Account: Account;
-  Like: Like;
   Media: Media;
   Post: Post;
   Session: Session;
