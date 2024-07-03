@@ -12,10 +12,29 @@ export const post = router({
   id: publicProcedure
     .meta({ openapi: { method: "GET", path: "/posts/id/{id}" } })
     .input(z.object({ id: z.string().uuid() }))
-    .output(PostSchema.omit({ createdAt: true }))
+    .output(
+      PostSchema.merge(
+        z.object({
+          name: z.string(),
+          username: z.string(),
+          avatar: z.string(),
+          likeCount: z.number(),
+          replyCount: z.number(),
+        }),
+      ),
+    )
     .query(async ({ input: { id } }) => {
       const post = await db.post.findUnique({
         where: { id },
+        include: {
+          user: true,
+          _count: {
+            select: {
+              likes: true,
+              children: true,
+            },
+          },
+        },
       });
 
       if (!post) {
@@ -24,7 +43,15 @@ export const post = router({
           message: "The requested post does not exist",
         });
       }
-      return post;
+
+      return {
+        ..._.omit(post, "user", "_count"),
+        name: post.user.name!, // eslint-disable-line
+        username: post.user.username!, // eslint-disable-line
+        avatar: post.user.image,
+        likeCount: post._count.likes,
+        replyCount: post._count.children,
+      };
     }),
   create: userProcedure
     .meta({ openapi: { method: "POST", path: "/posts/new" } })
@@ -138,6 +165,7 @@ export const post = router({
             z.object({
               name: z.string(),
               username: z.string(),
+              avatar: z.string().nullable(),
               likeCount: z.number(),
               replyCount: z.number(),
             }),
@@ -179,7 +207,7 @@ export const post = router({
             (eb) =>
               eb
                 .selectFrom("User")
-                .select(["User.id", "User.name", "User.username"])
+                .select(["User.id", "User.name", "User.username", "User.image"])
                 .as("Author"),
             (join) => join.onRef("Post.userId", "=", "Author.id"),
           )
@@ -203,6 +231,7 @@ export const post = router({
             "Post.parentId",
             "Author.name",
             "Author.username",
+            "Author.image as avatar",
             (eb) =>
               eb.fn.coalesce("AggrLike.count", sql<number>`0`).as("likeCount"),
             (eb) =>
