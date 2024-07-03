@@ -98,7 +98,7 @@ export function CommentForm() {
 
           <div className="flex items-center justify-between gap-4 pt-[17px]">
             <div className="flex items-center justify-center gap-2.5">
-              <div className="item-feeling border-line flex cursor-pointer items-center justify-center gap-1.5 rounded-full border-2 px-3 py-1.5">
+              <div className="item-feeling flex cursor-pointer items-center justify-center gap-1.5 rounded-full border px-3 py-1.5">
                 <p>🤩</p>
                 <p className="hidden text-sm font-semibold sm:block">Emotes</p>
               </div>
