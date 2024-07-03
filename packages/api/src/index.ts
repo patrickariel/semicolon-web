@@ -1,11 +1,11 @@
-import { search } from "./routes/search";
+import { post } from "./routes/post";
 import { user } from "./routes/user";
 import { router } from "./trpc";
 import { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 export const appRouter = router({
   user,
-  search,
+  post,
 });
 
 export type AppRouter = typeof appRouter;
