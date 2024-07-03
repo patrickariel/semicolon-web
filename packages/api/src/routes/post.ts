@@ -3,7 +3,7 @@ import { Username } from "@semicolon/api/schema";
 import { db } from "@semicolon/db";
 import { PostSchema } from "@semicolon/db/zod";
 import { TRPCError } from "@trpc/server";
-import { Expression, SqlBool } from "kysely";
+import { Expression, NotNull, SqlBool } from "kysely";
 import { sql } from "kysely";
 import _ from "lodash";
 import { z } from "zod";
@@ -135,7 +135,12 @@ export const post = router({
       z.object({
         results: z.array(
           PostSchema.merge(
-            z.object({ likeCount: z.number(), replyCount: z.number() }),
+            z.object({
+              name: z.string(),
+              username: z.string(),
+              likeCount: z.number(),
+              replyCount: z.number(),
+            }),
           ),
         ),
         nextCursor: z.string().uuid().nullish(),
@@ -173,6 +178,14 @@ export const post = router({
           .leftJoin(
             (eb) =>
               eb
+                .selectFrom("User")
+                .select(["User.id", "User.name", "User.username"])
+                .as("Author"),
+            (join) => join.onRef("Post.userId", "=", "Author.id"),
+          )
+          .leftJoin(
+            (eb) =>
+              eb
                 .selectFrom("Post")
                 .select([
                   "Post.parentId",
@@ -188,6 +201,8 @@ export const post = router({
             "Post.userId",
             "Post.content",
             "Post.parentId",
+            "Author.name",
+            "Author.username",
             (eb) =>
               eb.fn.coalesce("AggrLike.count", sql<number>`0`).as("likeCount"),
             (eb) =>
@@ -195,6 +210,7 @@ export const post = router({
                 .coalesce("AggrReply.count", sql<number>`0`)
                 .as("replyCount"),
           ])
+          .$narrowType<{ name: NotNull; username: NotNull }>()
           .limit(maxResults + 1);
 
         const toTsvector = sql`to_tsvector(concat_ws(' ', "Post"."content"))`;
