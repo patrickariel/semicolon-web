@@ -1,6 +1,7 @@
 import { router, publicProcedure } from "../trpc";
 import { Username } from "@semicolon/api/schema";
 import { db } from "@semicolon/db";
+import { PostSchema } from "@semicolon/db/zod";
 import { TRPCError } from "@trpc/server";
 import { Expression, SqlBool } from "kysely";
 import { sql } from "kysely";
@@ -9,6 +10,7 @@ import { z } from "zod";
 
 export const post = router({
   search: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/posts/search" } })
     .input(
       z
         .object({
@@ -29,6 +31,16 @@ export const post = router({
           ...obj,
           ...(obj.query && { query: obj.query.split(/\s+/).join(" & ") }),
         })),
+    )
+    .output(
+      z.object({
+        results: z.array(
+          PostSchema.merge(
+            z.object({ likeCount: z.number(), replyCount: z.number() }),
+          ),
+        ),
+        nextCursor: z.string().uuid().nullish(),
+      }),
     )
     .query(
       async ({
