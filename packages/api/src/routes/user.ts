@@ -67,17 +67,29 @@ export const user = router({
 
       await update({ user: { name, username, image, registered } });
     }),
-  search: publicProcedure.input(z.object({ query: z.string() })).query(
-    async ({ input: { query } }) =>
-      await db.user.findMany({
-        where: {
-          username: {
-            search: query,
+  search: publicProcedure
+    .input(z.object({ query: z.string() }))
+    .output(
+      z.array(
+        UserSchema.omit({
+          email: true,
+          emailVerified: true,
+          updatedAt: true,
+          birthday: true,
+        }),
+      ),
+    )
+    .query(
+      async ({ input: { query } }) =>
+        await db.user.findMany({
+          where: {
+            username: {
+              search: query,
+            },
+            bio: {
+              search: query,
+            },
           },
-          bio: {
-            search: query,
-          },
-        },
-      }),
-  ),
+        }),
+    ),
 });
