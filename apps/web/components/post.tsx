@@ -33,7 +33,7 @@ export function Post({
   image,
 }: TweetProps) {
   return (
-    <Link href={`/tweet/${uuidTranslator.fromUUID(id)}`}>
+    <Link href={`/post/${uuidTranslator.fromUUID(id)}`}>
       <div className="flex w-full flex-row gap-3 p-4">
         <div className="pt-2">
           <Avatar className="size-11">
