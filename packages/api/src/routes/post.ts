@@ -65,11 +65,11 @@ export const post = router({
           .leftJoin(
             (eb) =>
               eb
-                .selectFrom("Like")
-                .select(["Like.postId", sql<number>`COUNT(*)::int`.as("count")])
-                .groupBy("Like.postId")
+                .selectFrom("_Like")
+                .select(["_Like.A", sql<number>`COUNT(*)::int`.as("count")])
+                .groupBy("_Like.A")
                 .as("AggrLike"),
-            (join) => join.onRef("Post.id", "=", "AggrLike.postId"),
+            (join) => join.onRef("Post.id", "=", "AggrLike.A"),
           )
           .leftJoin(
             (eb) =>
