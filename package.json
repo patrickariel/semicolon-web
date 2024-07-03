@@ -6,22 +6,24 @@
     "dev": "turbo dev",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
-    "format:write": "prettier --write \"**/*.{js,mjs,cjs,ts,tsx,css,json,md}\" && prisma format --schema packages/db/prisma/schema.prisma",
-    "format:check": "prettier --check \"**/*.{js,mjs,cjs,ts,tsx,css,json,md}\" && prisma format --schema packages/db/prisma/schema.prisma && git diff --exit-code packages/db/prisma/schema.prisma",
-    "postinstall": "patch-package && prisma generate --schema packages/db/prisma/schema.prisma --generator client"
+    "format:write": "prettier --write \"**/*.{js,mjs,cjs,ts,tsx,css,json,md}\" && prisma format",
+    "format:check": "prettier --check \"**/*.{js,mjs,cjs,ts,tsx,css,json,md}\" && prisma format && git diff --exit-code packages/db/prisma/schema.prisma",
+    "postinstall": "patch-package && prisma generate"
   },
   "dependencies": {
-    "trpc-openapi": "^1.2.0",
+    "cli-highlight": "^2.1.11",
+    "figures": "^6.1.0",
     "patch-package": "^8.0.0",
+    "trpc-openapi": "^1.2.0",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "turbo": "^2.0.6",
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@trpc/server": "^11.0.0-rc.374"
+    "@trpc/server": "^11.0.0-rc.374",
+    "prettier": "^3.2.5",
+    "turbo": "^2.0.6"
   },
   "overrides": {
     "trpc-openapi": {

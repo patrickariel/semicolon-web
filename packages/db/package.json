@@ -8,19 +8,29 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./zod": "./prisma/generated/zod/index.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
+    "chalk": "^5.3.0",
+    "emphasize": "^7.0.0",
+    "kysely": "^0.27.3",
+    "prisma-extension-kysely": "^2.1.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "prisma": "^5.15.0",
-    "zod-prisma-types": "^3.1.8",
+    "@faker-js/faker": "^8.4.1",
     "@semicolon/eslint-config": "*",
     "@semicolon/typescript-config": "*",
-    "typescript-eslint": "^7.13.1"
+    "prisma": "^5.15.0",
+    "prisma-kysely": "^1.8.0",
+    "tsx": "^4.16.0",
+    "typescript-eslint": "^7.13.1",
+    "zod-prisma-types": "^3.1.8"
   }
 }

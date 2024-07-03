@@ -2,6 +2,7 @@
 
 import { trpc } from "@/lib/trpc-client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Username } from "@semicolon/api/schema";
 import { Button } from "@semicolon/ui/button";
 import { Calendar } from "@semicolon/ui/calendar";
 import {
@@ -31,14 +32,14 @@ import { z } from "zod";
 
 const EmailSchema = z.object({
   email: z
-    .string({ required_error: "E-mail address is required." })
-    .email("Not a valid e-mail address."),
+    .string({ required_error: "E-mail address is required" })
+    .email("Not a valid e-mail address"),
 });
 
 const RegisterSchema = z.object({
-  username: z.string({ required_error: "Username is required." }),
-  name: z.string({ required_error: "Username is required." }),
-  birthday: z.date({ required_error: "Date of birth is required." }),
+  username: Username,
+  name: z.string({ required_error: "Name is required" }),
+  birthday: z.date({ required_error: "Date of birth is required" }),
 });
 
 export enum AuthVariant {
