@@ -1,4 +1,4 @@
-import { router, publicProcedure } from "../trpc";
+import { router, publicProcedure, userProcedure } from "../trpc";
 import { Username } from "@semicolon/api/schema";
 import { db } from "@semicolon/db";
 import { PostSchema } from "@semicolon/db/zod";
@@ -9,6 +9,60 @@ import _ from "lodash";
 import { z } from "zod";
 
 export const post = router({
+  id: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/posts/id/{id}" } })
+    .input(z.object({ id: z.string().uuid() }))
+    .output(PostSchema.omit({ createdAt: true }))
+    .query(async ({ input: { id } }) => {
+      const post = await db.post.findUnique({
+        where: { id },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The requested post does not exist",
+        });
+      }
+      return post;
+    }),
+
+  create: userProcedure
+    .meta({ openapi: { method: "POST", path: "/posts/" } })
+    .input(z.object({ userId: z.string(), content: z.string() }))
+    .mutation(async ({ input }) => {
+      await db.post.create({
+        data: input,
+      });
+    }),
+
+  update: userProcedure
+    .meta({ openapi: { method: "PUT", path: "/posts/id/{id}" } })
+    .input(
+      z.object({
+        id: z.string(),
+        content: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      await db.post.update({
+        where: { id: input.id },
+        data: input,
+      });
+    }),
+
+  delete: userProcedure
+    .meta({ openapi: { method: "DELETE", path: "/posts/id/{id}" } })
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      await db.post.delete({
+        where: { id: input.id },
+      });
+    }),
   search: publicProcedure
     .meta({ openapi: { method: "GET", path: "/posts/search" } })
     .input(
