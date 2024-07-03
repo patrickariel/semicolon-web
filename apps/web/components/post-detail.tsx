@@ -1,19 +1,8 @@
+import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Separator } from "@semicolon/ui/separator";
 import { BarChart2, Heart, MessageCircle, Repeat2, Upload } from "lucide-react";
 import Image from "next/image";
-
-interface TweetProps {
-  id: string;
-  avatar: string;
-  name: string;
-  username: string;
-  content: string;
-  createdAt: Date;
-  image?: string;
-  replyCount: number;
-  likeCount: number;
-}
 
 export function PostDetail({
   name,
@@ -21,13 +10,12 @@ export function PostDetail({
   username,
   createdAt,
   content,
-  image,
-}: TweetProps) {
+}: PostResolved) {
   return (
     <div className="flex flex-col gap-3 px-4">
       <div className="flex flex-row items-center gap-3">
         <Avatar className="size-11">
-          <AvatarImage width={300} height={300} src={avatar} />
+          {avatar && <AvatarImage width={300} height={300} src={avatar} />}
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
@@ -37,17 +25,17 @@ export function PostDetail({
               <p className="text-sm text-gray-600">@{username}</p>
             </div>
           </div>
-          {image && (
+          {/* {avatar && (
             <div className="mt-4">
               <Image
-                src={image}
+                src={avatar}
                 alt="Tweet Image"
                 width={500}
                 height={500}
                 className="rounded-lg"
               />
             </div>
-          )}
+          )} */}
         </div>
       </div>
       <p>{content}</p>

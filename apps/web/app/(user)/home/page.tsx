@@ -12,9 +12,6 @@ import React, { Fragment } from "react";
 export default function Page() {
   const { data } = trpc.post.search.useQuery({});
 
-  if (!data) {
-  }
-
   return (
     <div className="flex flex-col">
       <div className="bg-card sticky top-0 z-50">

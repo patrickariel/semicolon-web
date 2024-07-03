@@ -1,4 +1,5 @@
 import { uuidTranslator } from "@/lib/utils";
+import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import {
   BadgeCheck,
@@ -13,16 +14,6 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-interface TweetProps {
-  id: string;
-  name: string;
-  username: string;
-  avatar: string | null;
-  createdAt: Date;
-  content: string;
-  image?: string;
-}
-
 export function Post({
   id,
   name,
@@ -30,8 +21,7 @@ export function Post({
   username,
   createdAt,
   content,
-  image,
-}: TweetProps) {
+}: PostResolved) {
   return (
     <Link href={`/post/${uuidTranslator.fromUUID(id)}`}>
       <div className="flex w-full flex-row gap-3 p-4">
@@ -64,7 +54,7 @@ export function Post({
           </div>
           <p className="text-wrap py-2.5 text-sm leading-7">{content}</p>
 
-          {image && (
+          {/* {image && (
             <div className="my-3 flex items-center justify-center">
               <Image
                 src={image}
@@ -74,7 +64,7 @@ export function Post({
                 className="rounded-lg"
               />
             </div>
-          )}
+          )} */}
 
           <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
             <div className="cursor flex items-center justify-start gap-1">
