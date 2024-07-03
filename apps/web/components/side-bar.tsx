@@ -25,8 +25,8 @@ export function SideBar({
       )}
       {...props}
     >
-      <Logo href="#" />
-      <NavItem href="#" icon={Home} label="Home" />
+      <Logo href="/home" />
+      <NavItem href="/home" icon={Home} label="Home" />
       <NavItem href="#" icon={Search} label="Explore" />
       <NavItem href="#" icon={Bell} label="Notifications" />
       <NavItem href="#" icon={Mail} label="Messages" />
