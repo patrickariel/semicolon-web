@@ -1,5 +1,5 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { PrismaClient } from "@semicolon/db";
+import { db } from "@semicolon/db";
 import NextAuth, { DefaultSession } from "next-auth";
 import type { JWT as _ } from "next-auth/jwt";
 import Discord from "next-auth/providers/discord";
@@ -26,8 +26,6 @@ declare module "next-auth/jwt" {
   }
 }
 
-const prisma = new PrismaClient();
-
 const UpdateSchema = z.object({
   name: z.string(),
   username: z.string(),
@@ -48,7 +46,7 @@ export const {
     Discord,
     GitHub,
   ],
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, trigger, session, user }) {
@@ -68,7 +66,7 @@ export const {
           };
         }
       } else if (trigger === "signIn") {
-        const user = await prisma.user.findUnique({
+        const user = await db.user.findUnique({
           where: { id: token.id },
         });
         token = {

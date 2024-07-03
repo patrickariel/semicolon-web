@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
 import { auth } from "@semicolon/auth";
+import { db } from "@semicolon/db";
 import { TRPCError, initTRPC } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import superjson from "superjson";
 import { OpenApiMeta } from "trpc-openapi";
-
-const prisma = new PrismaClient();
 
 export const createContext = async ({
   req: _req,
@@ -27,7 +25,7 @@ export const optUserProcedure = t.procedure.use(
     next({
       ctx: {
         user: session?.user?.id
-          ? await prisma.user.findUnique({
+          ? await db.user.findUnique({
               where: { id: session.user.id },
             })
           : null,
