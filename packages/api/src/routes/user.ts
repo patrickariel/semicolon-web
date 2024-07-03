@@ -1,3 +1,4 @@
+import { Username } from "../schema";
 import {
   router,
   publicProcedure,
@@ -53,7 +54,7 @@ export const user = router({
     .input(
       z.object({
         name: z.string(),
-        username: z.string(),
+        username: Username,
         image: z.string().url().optional(),
         birthday: z.date(),
       }),
