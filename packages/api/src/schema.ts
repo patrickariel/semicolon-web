@@ -9,7 +9,7 @@ export const Username = z
       "Username must only contain letters, numbers, periods, hyphens or dashes",
   });
 
-export const PostResolved = PostSchema.merge(
+export const PostResolvedSchema = PostSchema.merge(
   z.object({
     name: z.string(),
     username: z.string(),
@@ -18,3 +18,5 @@ export const PostResolved = PostSchema.merge(
     replyCount: z.number(),
   }),
 );
+
+export type PostResolved = z.infer<typeof PostResolvedSchema>;
