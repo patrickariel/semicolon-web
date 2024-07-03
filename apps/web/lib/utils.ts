@@ -1,3 +1,7 @@
+import short from "short-uuid";
+
+export const uuidTranslator = short(short.constants.flickrBase58);
+
 export function getBaseUrl() {
   if (typeof window !== "undefined") {
     return "";
