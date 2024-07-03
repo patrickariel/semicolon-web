@@ -1,7 +1,6 @@
 import { router, publicProcedure, userProcedure } from "../trpc";
-import { Username } from "@semicolon/api/schema";
+import { PostResolved, Username } from "@semicolon/api/schema";
 import { db } from "@semicolon/db";
-import { PostSchema } from "@semicolon/db/zod";
 import { TRPCError } from "@trpc/server";
 import { Expression, NotNull, SqlBool } from "kysely";
 import { sql } from "kysely";
@@ -12,17 +11,7 @@ export const post = router({
   id: publicProcedure
     .meta({ openapi: { method: "GET", path: "/posts/id/{id}" } })
     .input(z.object({ id: z.string().uuid() }))
-    .output(
-      PostSchema.merge(
-        z.object({
-          name: z.string(),
-          username: z.string(),
-          avatar: z.string(),
-          likeCount: z.number(),
-          replyCount: z.number(),
-        }),
-      ),
-    )
+    .output(PostResolved)
     .query(async ({ input: { id } }) => {
       const post = await db.post.findUnique({
         where: { id },
@@ -160,17 +149,7 @@ export const post = router({
     )
     .output(
       z.object({
-        results: z.array(
-          PostSchema.merge(
-            z.object({
-              name: z.string(),
-              username: z.string(),
-              avatar: z.string().nullable(),
-              likeCount: z.number(),
-              replyCount: z.number(),
-            }),
-          ),
-        ),
+        results: z.array(PostResolved),
         nextCursor: z.string().uuid().nullish(),
       }),
     )
