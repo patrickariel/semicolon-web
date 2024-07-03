@@ -1,8 +1,8 @@
 "use client";
 
 import { CommentForm } from "@/components/comment-form";
-import TweetDetail from "@/components/detail-tweet";
-import HeaderWithBackButton from "@/components/header-detail-tweet";
+import { TweetDetail } from "@/components/detail-tweet";
+import { HeaderWithBackButton } from "@/components/header-detail-tweet";
 import { Tweet } from "@/components/tweet";
 import { trpc } from "@/lib/trpc-client";
 import { uuidTranslator } from "@/lib/utils";

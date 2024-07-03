@@ -15,7 +15,7 @@ interface TweetProps {
   likeCount: number;
 }
 
-export default function TweetDetail({
+export function TweetDetail({
   name,
   avatar,
   username,
@@ -23,7 +23,6 @@ export default function TweetDetail({
   content,
   image,
 }: TweetProps) {
-  console.log(avatar);
   return (
     <div className="flex flex-col gap-3 px-4">
       <div className="flex flex-row items-center gap-3">
@@ -53,9 +52,9 @@ export default function TweetDetail({
       </div>
       <p>{content}</p>
       <div className="text-sm text-zinc-600">{createdAt.toDateString()}</div>
-      <div>
-        <Separator className="mt-3" />
-        <div className="mt-3 flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
+      <div className="flex flex-col gap-3">
+        <Separator />
+        <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
           <div className="cursor flex items-center justify-start gap-2">
             <MessageCircle className="stroke-muted-foreground size-[1.3rem]" />
             <p className="text-muted-foreground text-xs">15</p>
@@ -76,7 +75,7 @@ export default function TweetDetail({
             <Upload className="stroke-muted-foreground size-[1.3rem]" />
           </div>
         </div>
-        <Separator className="mt-3" />
+        <Separator />
       </div>
     </div>
   );
