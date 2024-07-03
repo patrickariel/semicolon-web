@@ -57,6 +57,9 @@ export const post = router({
           maxResults,
         },
       }) => {
+        // We need to do raw queries here, because Prisma can't filter on aggregrate counts
+        // https://github.com/prisma/prisma/issues/6570
+
         let dbQuery = db.$kysely
           .selectFrom("Post")
           .leftJoin(
