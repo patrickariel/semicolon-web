@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import {
   router,
   publicProcedure,
@@ -6,11 +5,10 @@ import {
   newUserProcedure,
 } from "@semicolon/api/trpc";
 import { update } from "@semicolon/auth";
+import { db } from "@semicolon/db";
 import { UserSchema } from "@semicolon/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
 
 export const user = router({
   id: publicProcedure
@@ -25,7 +23,7 @@ export const user = router({
       }),
     )
     .query(async ({ input: { id } }) => {
-      const user = await prisma.user.findUnique({
+      const user = await db.user.findUnique({
         where: { id },
       });
 
@@ -61,11 +59,24 @@ export const user = router({
       }),
     )
     .mutation(async ({ ctx: { user }, input }) => {
-      const { name, username, image, registered } = await prisma.user.update({
+      const { name, username, image, registered } = await db.user.update({
         where: { email: user.email },
         data: { ...input, registered: true },
       });
 
       await update({ user: { name, username, image, registered } });
     }),
+  search: publicProcedure.input(z.object({ query: z.string() })).query(
+    async ({ input: { query } }) =>
+      await db.user.findMany({
+        where: {
+          username: {
+            search: query,
+          },
+          bio: {
+            search: query,
+          },
+        },
+      }),
+  ),
 });
