@@ -1,11 +1,17 @@
 import { faker } from "@faker-js/faker";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { db } from "@semicolon/db";
+import { sql } from "kysely";
 import _ from "lodash";
 
-const prisma = new PrismaClient();
+function randomExcluded(min: number, max: number, exclude: number) {
+  let n = Math.floor(Math.random() * (max - min) + min);
+  if (n >= exclude) n++;
+  return n;
+}
 
 async function main() {
-  await prisma.user.create({
+  await db.user.create({
     data: {
       id: "baf0014e-94cf-4980-888c-5f0d437c65f6",
       name: "John Smith",
@@ -15,7 +21,7 @@ async function main() {
     },
   });
 
-  const users = await prisma.user.createManyAndReturn({
+  const users = await db.user.createManyAndReturn({
     data: _.range(0, 50).map(() => ({
       name: faker.person.fullName(),
       username: faker.internet.userName(),
@@ -24,7 +30,17 @@ async function main() {
     })),
   });
 
-  const posts = await prisma.post.createManyAndReturn({
+  await db.$kysely
+    .insertInto("_UserFollow")
+    .values(
+      users.map(({ id }, i) => ({
+        A: sql`${users[randomExcluded(0, users.length - 1, i)]!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        B: sql`${id}::uuid`,
+      })),
+    )
+    .execute();
+
+  const posts = await db.post.createManyAndReturn({
     data: _.flattenDeep(
       users.map((user) =>
         _.range(0, 25).map((): Prisma.PostCreateManyAndReturnArgs["data"] => ({
@@ -42,7 +58,19 @@ async function main() {
     ),
   });
 
-  const replies = await prisma.post.createManyAndReturn({
+  for (const chunk of _.chunk(posts, 32767 / 2)) {
+    await db.$kysely
+      .insertInto("_Like")
+      .values(
+        chunk.map((post) => ({
+          A: sql`${post.id}::uuid`,
+          B: sql`${_.sample(users)!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        })),
+      )
+      .execute();
+  }
+
+  const replies = await db.post.createManyAndReturn({
     data: _.flattenDeep(
       posts.map((post) =>
         _.range(0, 5).map((): Prisma.PostCreateManyAndReturnArgs["data"] => ({
@@ -61,7 +89,19 @@ async function main() {
     ),
   });
 
-  const _moreReplies = await prisma.post.createManyAndReturn({
+  for (const posts of _.chunk(replies, 32767 / 2)) {
+    await db.$kysely
+      .insertInto("_Like")
+      .values(
+        posts.map((post) => ({
+          A: sql`${post.id}::uuid`,
+          B: sql`${_.sample(users)!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        })),
+      )
+      .execute();
+  }
+
+  const moreReplies = await db.post.createManyAndReturn({
     data: _.flattenDeep(
       replies.map((reply) =>
         _.range(0, 5).map((): Prisma.PostCreateManyAndReturnArgs["data"] => ({
@@ -79,14 +119,26 @@ async function main() {
       ),
     ),
   });
+
+  for (const replies of _.chunk(moreReplies, 32767 / 2)) {
+    await db.$kysely
+      .insertInto("_Like")
+      .values(
+        replies.map((post) => ({
+          A: sql`${post.id}::uuid`,
+          B: sql`${_.sample(users)!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        })),
+      )
+      .execute();
+  }
 }
 
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    await db.$disconnect();
   })
   .catch(async (e: unknown) => {
     console.error(e);
-    await prisma.$disconnect();
+    await db.$disconnect();
     process.exit(1);
   });
