@@ -18,6 +18,7 @@ async function main() {
       username: "john.smith",
       email: "john.smith@example.com",
       bio: "Software developer.",
+      image: faker.image.avatar(),
     },
   });
 
@@ -27,6 +28,7 @@ async function main() {
       username: faker.internet.userName(),
       email: faker.internet.email(),
       bio: faker.person.bio(),
+      image: faker.image.avatar(),
     })),
   });
 
