@@ -26,16 +26,18 @@ export const post = router({
       }
       return post;
     }),
-
   create: userProcedure
-    .meta({ openapi: { method: "POST", path: "/posts/" } })
-    .input(z.object({ userId: z.string(), content: z.string() }))
-    .mutation(async ({ input }) => {
+    .meta({ openapi: { method: "POST", path: "/posts/new" } })
+    .input(z.object({ content: z.string(), to: z.string().uuid().optional() }))
+    .mutation(async ({ ctx: { user }, input: { content, to } }) => {
       await db.post.create({
-        data: input,
+        data: {
+          userId: user.id,
+          parentId: to,
+          content,
+        },
       });
     }),
-
   update: userProcedure
     .meta({ openapi: { method: "PUT", path: "/posts/id/{id}" } })
     .input(
@@ -44,13 +46,35 @@ export const post = router({
         content: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx: { user }, input: { id, content } }) => {
+      const post = await db.post.findUnique({
+        select: { userId: true },
+        where: {
+          id,
+        },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Requested post not found",
+        });
+      }
+
+      if (post.userId !== user.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not permitted to modify requested post",
+        });
+      }
+
       await db.post.update({
-        where: { id: input.id },
-        data: input,
+        where: { id: id },
+        data: {
+          content,
+        },
       });
     }),
-
   delete: userProcedure
     .meta({ openapi: { method: "DELETE", path: "/posts/id/{id}" } })
     .input(
@@ -58,9 +82,30 @@ export const post = router({
         id: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx: { user }, input: { id } }) => {
+      const post = await db.post.findUnique({
+        select: { userId: true },
+        where: {
+          id,
+        },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Requested post not found",
+        });
+      }
+
+      if (post.userId !== user.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not permitted to modify requested post",
+        });
+      }
+
       await db.post.delete({
-        where: { id: input.id },
+        where: { id },
       });
     }),
   search: publicProcedure
