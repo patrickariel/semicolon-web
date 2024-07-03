@@ -83,8 +83,8 @@ model Post {
   userId    String   @db.Uuid
   content   String
   parentId  String?  @db.Uuid
-  parent    Post?    @relation("PostTree", fields: [parentId], references: [id])
-  children  Post[]   @relation("PostTree")
+  parent    Post?    @relation("PostHierarchy", fields: [parentId], references: [id])
+  children  Post[]   @relation("PostHierarchy")
   likes     User[]   @relation("Like")
   media     Media[]
 }
