@@ -24,6 +24,8 @@ model User {
   registered    Boolean   @default(false)
   emailVerified DateTime?
   birthday      DateTime?
+  followedBy    User[]    @relation("UserFollows")
+  following     User[]    @relation("UserFollows")
   image         String?
   accounts      Account[]
   sessions      Session[]
