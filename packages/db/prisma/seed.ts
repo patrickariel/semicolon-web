@@ -1,7 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Prisma } from "@prisma/client";
 import { db } from "@semicolon/db";
-import { sql } from "kysely";
 import _ from "lodash";
 
 function randomExcluded(min: number, max: number, exclude: number) {
@@ -34,10 +33,13 @@ async function main() {
 
   await db.$kysely
     .insertInto("_UserFollow")
-    .values(
+    .values((eb) =>
       users.map(({ id }, i) => ({
-        A: sql`${users[randomExcluded(0, users.length - 1, i)]!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        B: sql`${id}::uuid`,
+        A: eb.cast(
+          eb.val(users[randomExcluded(0, users.length - 1, i)]!.id), // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          "uuid",
+        ),
+        B: eb.cast(eb.val(id), "uuid"), // eslint-disable-line @typescript-eslint/no-non-null-assertion
       })),
     )
     .execute();
@@ -63,10 +65,10 @@ async function main() {
   for (const chunk of _.chunk(posts, 32767 / 2)) {
     await db.$kysely
       .insertInto("_Like")
-      .values(
+      .values((eb) =>
         chunk.map((post) => ({
-          A: sql`${post.id}::uuid`,
-          B: sql`${_.sample(users)!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          A: eb.cast(eb.val(post.id), "uuid"),
+          B: eb.cast(eb.val(_.sample(users)!.id), "uuid"), // eslint-disable-line @typescript-eslint/no-non-null-assertion
         })),
       )
       .execute();
@@ -94,10 +96,10 @@ async function main() {
   for (const posts of _.chunk(replies, 32767 / 2)) {
     await db.$kysely
       .insertInto("_Like")
-      .values(
+      .values((eb) =>
         posts.map((post) => ({
-          A: sql`${post.id}::uuid`,
-          B: sql`${_.sample(users)!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          A: eb.cast(eb.val(post.id), "uuid"),
+          B: eb.cast(eb.val(_.sample(users)!.id), "uuid"), // eslint-disable-line @typescript-eslint/no-non-null-assertion
         })),
       )
       .execute();
@@ -125,10 +127,10 @@ async function main() {
   for (const replies of _.chunk(moreReplies, 32767 / 2)) {
     await db.$kysely
       .insertInto("_Like")
-      .values(
+      .values((eb) =>
         replies.map((post) => ({
-          A: sql`${post.id}::uuid`,
-          B: sql`${_.sample(users)!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          A: eb.cast(eb.val(post.id), "uuid"),
+          B: eb.cast(eb.val(_.sample(users)!.id), "uuid"), // eslint-disable-line @typescript-eslint/no-non-null-assertion
         })),
       )
       .execute();

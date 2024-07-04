@@ -177,7 +177,10 @@ export const post = router({
             (eb) =>
               eb
                 .selectFrom("_Like")
-                .select(["_Like.A", sql<number>`COUNT(*)::int`.as("count")])
+                .select((eb) => [
+                  "_Like.A",
+                  eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
+                ])
                 .groupBy("_Like.A")
                 .as("AggrLike"),
             (join) => join.onRef("Post.id", "=", "AggrLike.A"),
@@ -194,9 +197,9 @@ export const post = router({
             (eb) =>
               eb
                 .selectFrom("Post")
-                .select([
+                .select((eb) => [
                   "Post.parentId",
-                  sql<number>`COUNT(*)::int`.as("count"),
+                  eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
                 ])
                 .groupBy("Post.parentId")
                 .as("AggrReply"),
