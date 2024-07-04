@@ -18,7 +18,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 type PostButtonProps = ButtonProps &
   (
@@ -101,8 +101,13 @@ export function Post({
   createdAt,
   content,
 }: PostResolved) {
+  const [shortId, setShortId] = useState(() => uuidTranslator.fromUUID(id));
+
+  useEffect(() => {
+    setShortId(uuidTranslator.fromUUID(id));
+  }, [id]);
+
   const router = useRouter();
-  const shortId = uuidTranslator.fromUUID(id);
 
   return (
     <div
