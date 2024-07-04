@@ -59,18 +59,9 @@ CREATE TABLE "Post" (
     "userId" UUID NOT NULL,
     "content" TEXT NOT NULL,
     "parentId" UUID,
+    "media" TEXT[],
 
     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Media" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "postId" UUID NOT NULL,
-    "mediaUrl" TEXT NOT NULL,
-    "mediaType" TEXT NOT NULL,
-
-    CONSTRAINT "Media_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -117,9 +108,6 @@ ALTER TABLE "Post" ADD CONSTRAINT "Post_userId_fkey" FOREIGN KEY ("userId") REFE
 
 -- AddForeignKey
 ALTER TABLE "Post" ADD CONSTRAINT "Post_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Post"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Media" ADD CONSTRAINT "Media_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_UserFollow" ADD CONSTRAINT "_UserFollow_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

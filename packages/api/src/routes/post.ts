@@ -180,6 +180,14 @@ export const post = router({
           .leftJoin(
             (eb) =>
               eb
+                .selectFrom("User")
+                .select(["User.id", "User.name", "User.username", "User.image"])
+                .as("Author"),
+            (join) => join.onRef("Post.userId", "=", "Author.id"),
+          )
+          .leftJoin(
+            (eb) =>
+              eb
                 .selectFrom("_Like")
                 .select((eb) => [
                   "_Like.A",
@@ -188,14 +196,6 @@ export const post = router({
                 .groupBy("_Like.A")
                 .as("AggrLike"),
             (join) => join.onRef("Post.id", "=", "AggrLike.A"),
-          )
-          .leftJoin(
-            (eb) =>
-              eb
-                .selectFrom("User")
-                .select(["User.id", "User.name", "User.username", "User.image"])
-                .as("Author"),
-            (join) => join.onRef("Post.userId", "=", "Author.id"),
           )
           .leftJoin(
             (eb) =>
@@ -215,6 +215,7 @@ export const post = router({
             "Post.userId",
             "Post.content",
             "Post.parentId",
+            "Post.media",
             "Author.name",
             "Author.username",
             "Author.image as avatar",

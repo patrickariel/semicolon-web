@@ -1,7 +1,9 @@
 import { Slot } from "@radix-ui/react-slot";
 import type { PostResolved } from "@semicolon/api/schema";
+import { AspectRatio } from "@semicolon/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button, ButtonProps } from "@semicolon/ui/button";
+import { Separator } from "@semicolon/ui/separator";
 import { cn } from "@semicolon/ui/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import {
@@ -92,6 +94,157 @@ export function PostButton({
   );
 }
 
+function ThumbGrid({
+  className,
+  srcs,
+}: React.HTMLAttributes<HTMLDivElement> & {
+  srcs: string[];
+}) {
+  if (srcs.length === 0) {
+    throw new Error(`ThumbGrid must be supplied at least one image URL.`);
+  }
+
+  switch (srcs.length) {
+    case 1:
+      return (
+        <div className={cn("w-full overflow-hidden rounded-lg", className)}>
+          {srcs.map((src, i) => (
+            <AspectRatio ratio={4 / 3} className="bg-muted w-full" key={i}>
+              <Image
+                src={src}
+                alt="Photo by Drew Beamer"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="rounded-md object-cover"
+              />
+            </AspectRatio>
+          ))}
+        </div>
+      );
+    case 2:
+      return (
+        <div
+          className={cn(
+            "flex w-full flex-row overflow-hidden rounded-lg",
+            className,
+          )}
+        >
+          {srcs.map((src, i) => (
+            <>
+              <AspectRatio ratio={3 / 2} className="bg-muted w-full" key={i}>
+                <Image
+                  src={src}
+                  alt="Photo by Drew Beamer"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover"
+                />
+              </AspectRatio>
+              {i === 0 && <Separator orientation="vertical" />}
+            </>
+          ))}
+        </div>
+      );
+    case 3:
+      return (
+        <div
+          className={cn(
+            "flex w-full flex-row overflow-hidden rounded-lg",
+            className,
+          )}
+        >
+          <AspectRatio ratio={4 / 3} className="bg-muted w-full">
+            <Image
+              src={srcs[0]!} // eslint-disable-line @typescript-eslint/no-non-null-assertion
+              alt="Photo by Drew Beamer"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
+            />
+          </AspectRatio>
+          <Separator orientation="vertical" />
+          <AspectRatio ratio={4 / 3} className="bg-muted w-full">
+            <div className="flex flex-col">
+              {srcs.slice(1).map((src, i) => (
+                <>
+                  <AspectRatio
+                    ratio={4 / 3}
+                    className="bg-muted w-full"
+                    key={i}
+                  >
+                    <Image
+                      src={src}
+                      alt="Photo by Drew Beamer"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover"
+                    />
+                  </AspectRatio>
+                  {i === 0 && <Separator />}
+                </>
+              ))}
+            </div>
+          </AspectRatio>
+        </div>
+      );
+    default:
+      return (
+        <div
+          className={cn(
+            "flex w-full flex-row overflow-hidden rounded-lg",
+            className,
+          )}
+        >
+          <AspectRatio ratio={4 / 3} className="bg-muted w-full">
+            <div className="flex flex-col">
+              {srcs.slice(0, 2).map((src, i) => (
+                <>
+                  <AspectRatio
+                    ratio={4 / 3}
+                    className="bg-muted w-full"
+                    key={i}
+                  >
+                    <Image
+                      src={src}
+                      alt="Photo by Drew Beamer"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover"
+                    />
+                  </AspectRatio>
+                  {i === 0 && <Separator />}
+                </>
+              ))}
+            </div>
+          </AspectRatio>
+          <Separator orientation="vertical" />
+          <AspectRatio ratio={4 / 3} className="bg-muted w-full">
+            <div className="flex flex-col">
+              {srcs.slice(2, 4).map((src, i) => (
+                <>
+                  <AspectRatio
+                    ratio={4 / 3}
+                    className="bg-muted w-full"
+                    key={i}
+                  >
+                    <Image
+                      src={src}
+                      alt="Photo by Drew Beamer"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover"
+                    />
+                  </AspectRatio>
+                  {i === 0 && <Separator />}
+                </>
+              ))}
+            </div>
+          </AspectRatio>
+        </div>
+      );
+  }
+}
+
 export function Post({
   id,
   name,
@@ -99,6 +252,7 @@ export function Post({
   username,
   createdAt,
   content,
+  media,
 }: PostResolved) {
   const router = useRouter();
 
@@ -160,17 +314,7 @@ export function Post({
         </div>
         <p className="text-wrap text-sm leading-7">{content}</p>
 
-        {/* {image && (
-            <div className="my-3 flex items-center justify-center">
-              <Image
-                src={image}
-                alt="tweet-image"
-                width={300}
-                height={200}
-                className="rounded-lg"
-              />
-            </div>
-          )} */}
+        {media.length > 0 && <ThumbGrid srcs={media} />}
 
         <div className="flex w-full min-w-0 items-center justify-between">
           <PostButton icon={MessageCircle} href={`/post/${id}`} label="15" />

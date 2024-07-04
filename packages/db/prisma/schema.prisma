@@ -86,13 +86,5 @@ model Post {
   parent    Post?    @relation("PostHierarchy", fields: [parentId], references: [id])
   children  Post[]   @relation("PostHierarchy")
   likes     User[]   @relation("Like")
-  media     Media[]
-}
-
-model Media {
-  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  postId    String @db.Uuid
-  mediaUrl  String
-  mediaType String
-  post      Post   @relation(fields: [postId], references: [id])
+  media     String[]
 }

@@ -18,6 +18,11 @@ async function main() {
       email: "john.smith@example.com",
       bio: "Software developer.",
       image: faker.image.avatar(),
+      birthday: faker.date.between({
+        from: "1990-01-01",
+        to: "2007-01-01",
+      }),
+      registered: true,
     },
   });
 
@@ -28,6 +33,11 @@ async function main() {
       email: faker.internet.email(),
       bio: faker.person.bio(),
       image: faker.image.avatar(),
+      birthday: faker.date.between({
+        from: "1990-01-01",
+        to: "2007-01-01",
+      }),
+      registered: true,
     })),
   });
 
@@ -57,6 +67,15 @@ async function main() {
             from: "2020-01-01",
             to: "2024-01-01",
           }),
+          media: _.sample([
+            [],
+            _.range(0, _.random(1, 4)).map(() =>
+              faker.image.urlLoremFlickr({
+                width: _.random(800, 1600),
+                height: _.random(800, 1600),
+              }),
+            ),
+          ]),
         })),
       ),
     ),
@@ -88,6 +107,15 @@ async function main() {
             from: post.createdAt,
             to: "2024-01-01",
           }),
+          media: _.sample([
+            [],
+            _.range(0, _.random(1, 4)).map(() =>
+              faker.image.urlLoremFlickr({
+                width: _.random(800, 1600),
+                height: _.random(800, 1600),
+              }),
+            ),
+          ]),
         })),
       ),
     ),
@@ -119,6 +147,15 @@ async function main() {
             from: reply.createdAt,
             to: "2024-01-01",
           }),
+          media: _.sample([
+            [],
+            _.range(0, _.random(1, 4)).map(() =>
+              faker.image.urlLoremFlickr({
+                width: _.random(800, 1600),
+                height: _.random(800, 1600),
+              }),
+            ),
+          ]),
         })),
       ),
     ),

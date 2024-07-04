@@ -12,12 +12,7 @@
     "./utils": "./src/lib/utils.ts"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-day-picker": "^8.10.1",
-    "@shadcn/ui": "^0.0.4",
-    "tailwind-merge": "^2.3.0",
-    "lucide-react": "^0.395.0",
-    "react-hook-form": "^7.52.0",
+    "@radix-ui/react-aspect-ratio": "^1.1.0",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-label": "^2.0.2",
@@ -25,12 +20,18 @@
     "@radix-ui/react-select": "^2.1.0",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.0.2",
-    "class-variance-authority": "^0.7.0"
+    "@shadcn/ui": "^0.0.4",
+    "class-variance-authority": "^0.7.0",
+    "lucide-react": "^0.395.0",
+    "react": "^18.2.0",
+    "react-day-picker": "^8.10.1",
+    "react-hook-form": "^7.52.0",
+    "tailwind-merge": "^2.3.0"
   },
   "devDependencies": {
-    "clsx": "^2.1.1",
     "@semicolon/eslint-config": "*",
     "@semicolon/typescript-config": "*",
+    "clsx": "^2.1.1",
     "typescript-eslint": "^7.13.1"
   }
 }
