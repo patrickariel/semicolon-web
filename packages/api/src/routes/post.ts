@@ -149,7 +149,7 @@ export const post = router({
     )
     .output(
       z.object({
-        results: z.array(PostResolved),
+        results: z.array(PostResolvedSchema),
         nextCursor: z.string().uuid().nullish(),
       }),
     )
