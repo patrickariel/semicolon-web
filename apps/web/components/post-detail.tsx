@@ -21,8 +21,8 @@ export function PostDetail({
         <div className="flex flex-col">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-lg font-semibold">{name}</h4>
-              <p className="text-sm text-gray-600">@{username}</p>
+              <h4 className="text-md font-semibold">{name}</h4>
+              <p className="text-sm text-zinc-500">@{username}</p>
             </div>
           </div>
           {/* {avatar && (
@@ -39,7 +39,7 @@ export function PostDetail({
         </div>
       </div>
       <p>{content}</p>
-      <div className="text-sm text-zinc-600">{createdAt.toDateString()}</div>
+      <div className="text-sm text-zinc-500">{createdAt.toDateString()}</div>
       <div className="flex flex-col gap-3">
         <Separator />
         <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">

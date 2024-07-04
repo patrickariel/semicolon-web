@@ -1,3 +1,5 @@
+"use client";
+
 import { Post } from "@/components/post";
 import ProfileCard from "@/components/profile-card";
 import { Separator } from "@semicolon/ui/separator";

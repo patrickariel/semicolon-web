@@ -1,4 +1,3 @@
-// src/components/HeaderWithBackButton.tsx
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,7 +15,7 @@ export function HeaderWithBackButton() {
   }
 
   return (
-    <div className="flex items-center space-x-4 p-4 shadow-md">
+    <div className="flex items-center space-x-4 p-2 pb-3 shadow-md">
       <button
         className="rounded-full p-2 hover:bg-zinc-900"
         onClick={() => router.push("/home")}
