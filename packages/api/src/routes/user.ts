@@ -1,4 +1,4 @@
-import { UsernameSchema } from "../schema";
+import { BirthdaySchema, UsernameSchema } from "../schema";
 import {
   router,
   publicProcedure,
@@ -56,7 +56,7 @@ export const user = router({
         name: z.string(),
         username: UsernameSchema,
         image: z.string().url().optional(),
-        birthday: z.date(),
+        birthday: BirthdaySchema,
       }),
     )
     .mutation(async ({ ctx: { user }, input }) => {

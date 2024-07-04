@@ -10,6 +10,12 @@ export const UsernameSchema = z
       "Username must only contain letters, numbers, periods, hyphens or dashes",
   });
 
+export const BirthdaySchema = z
+  .date({ required_error: "Birthday is required" })
+  .refine((date) => date < new Date(), {
+    message: "Invalid birth date",
+  });
+
 export const PostResolvedSchema = PostSchema.merge(
   z.object({
     name: z.string(),
