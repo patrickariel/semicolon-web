@@ -1,5 +1,9 @@
 import { router, publicProcedure, userProcedure } from "../trpc";
-import { PostResolvedSchema, UsernameSchema } from "@semicolon/api/schema";
+import {
+  PostResolvedSchema,
+  ShortToUUID,
+  UsernameSchema,
+} from "@semicolon/api/schema";
 import { db } from "@semicolon/db";
 import { TRPCError } from "@trpc/server";
 import { Expression, NotNull, SqlBool } from "kysely";
@@ -10,7 +14,7 @@ import { z } from "zod";
 export const post = router({
   id: publicProcedure
     .meta({ openapi: { method: "GET", path: "/posts/id/{id}" } })
-    .input(z.object({ id: z.string().uuid() }))
+    .input(z.object({ id: ShortToUUID }))
     .output(PostResolvedSchema)
     .query(async ({ input: { id } }) => {
       const post = await db.post.findUnique({

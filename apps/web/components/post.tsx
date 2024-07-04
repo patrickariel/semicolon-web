@@ -1,4 +1,3 @@
-import { uuidTranslator } from "@/lib/utils";
 import { Slot } from "@radix-ui/react-slot";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
@@ -18,7 +17,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 type PostButtonProps = ButtonProps &
   (
@@ -101,12 +100,6 @@ export function Post({
   createdAt,
   content,
 }: PostResolved) {
-  const [shortId, setShortId] = useState(() => uuidTranslator.fromUUID(id));
-
-  useEffect(() => {
-    setShortId(uuidTranslator.fromUUID(id));
-  }, [id]);
-
   const router = useRouter();
 
   return (
@@ -118,11 +111,11 @@ export function Post({
           e.target === e.currentTarget &&
           document.getSelection()?.type !== "Range"
         ) {
-          router.push(`/post/${shortId}`);
+          router.push(`/post/${id}`);
         }
       }}
       onKeyUp={(e) => {
-        e.key === "Enter" ? router.push(`/post/${shortId}`) : null;
+        e.key === "Enter" ? router.push(`/post/${id}`) : null;
       }}
     >
       <div className="pt-2">
@@ -156,7 +149,7 @@ export function Post({
               </Link>
               <p className="text-muted-foreground align-middle text-sm">•</p>
               <Link
-                href={`/post/${shortId}`}
+                href={`/post/${id}`}
                 className="text-muted-foreground text-nowrap align-middle text-sm hover:underline"
               >
                 {createdAt.toDateString()}
@@ -180,11 +173,7 @@ export function Post({
           )} */}
 
         <div className="flex w-full min-w-0 items-center justify-between">
-          <PostButton
-            icon={MessageCircle}
-            href={`/post/${shortId}`}
-            label="15"
-          />
+          <PostButton icon={MessageCircle} href={`/post/${id}`} label="15" />
           <PostButton
             icon={Repeat2}
             highlight="green"

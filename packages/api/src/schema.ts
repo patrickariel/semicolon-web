@@ -1,4 +1,5 @@
 import { PostSchema } from "@semicolon/db/zod";
+import short from "short-uuid";
 import isAlphanumeric from "validator/es/lib/isAlphanumeric";
 import { z } from "zod";
 
@@ -16,8 +17,41 @@ export const BirthdaySchema = z
     message: "Invalid birth date",
   });
 
+const uuidTranslator = short(short.constants.flickrBase58);
+
+export const ShortToUUID = z
+  .string()
+  .transform((val, ctx) => {
+    try {
+      return uuidTranslator.toUUID(val);
+    } catch (_) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid suuid",
+      });
+      return z.NEVER;
+    }
+  })
+  .pipe(z.string().uuid());
+
+export const UUIDToShort = z
+  .string()
+  .uuid()
+  .transform((val, ctx) => {
+    try {
+      return uuidTranslator.fromUUID(val);
+    } catch (_) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Cannot shorten uuid",
+      });
+      return z.NEVER;
+    }
+  });
+
 export const PostResolvedSchema = PostSchema.merge(
   z.object({
+    id: UUIDToShort,
     name: z.string(),
     username: z.string(),
     avatar: z.string().nullable(),
