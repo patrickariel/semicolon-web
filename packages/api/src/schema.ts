@@ -4,6 +4,7 @@ import { z } from "zod";
 
 export const UsernameSchema = z
   .string({ required_error: "Username is required" })
+  .max(15, "Username cannot be longer than 15 characters")
   .refine((arg) => isAlphanumeric(arg, undefined, { ignore: "-_." }), {
     message:
       "Username must only contain letters, numbers, periods, hyphens or dashes",
