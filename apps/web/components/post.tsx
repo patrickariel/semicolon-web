@@ -63,7 +63,7 @@ export function PostButton({
 }: PostButtonProps) {
   const Comp = href
     ? ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
-        <Link href={href} {...props} onClick={(e) => e.stopPropagation()}>
+        <Link href={href} {...props}>
           {children}
         </Link>
       )
@@ -80,7 +80,6 @@ export function PostButton({
         asChild={href ? true : false}
         onClick={(e) => {
           onClick?.(e);
-          e.stopPropagation();
         }}
         {...props}
       >
@@ -109,20 +108,20 @@ export function Post({
     <div
       className="relative flex w-full cursor-pointer flex-row gap-3 p-4 pb-2"
       tabIndex={0}
-      onClick={() =>
-        document.getSelection()?.type !== "Range" &&
-        router.push(`/post/${shortId}`)
-      }
+      onClick={(e) => {
+        if (
+          e.target === e.currentTarget &&
+          document.getSelection()?.type !== "Range"
+        ) {
+          router.push(`/post/${shortId}`);
+        }
+      }}
       onKeyUp={(e) => {
         e.key === "Enter" ? router.push(`/post/${shortId}`) : null;
       }}
     >
       <div className="pt-2">
-        <Link
-          href={`/${username}`}
-          className="z-10"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <Link href={`/${username}`} className="z-10">
           <Avatar className="size-11">
             {avatar && <AvatarImage width={300} height={300} src={avatar} />}
             <AvatarFallback>CN</AvatarFallback>
@@ -137,7 +136,6 @@ export function Post({
                 <Link
                   href={`/${username}`}
                   className="truncate font-bold hover:underline"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   {name}
                 </Link>
@@ -148,7 +146,6 @@ export function Post({
               <Link
                 className="text-muted-foreground truncate align-middle text-sm"
                 href={`/${username}`}
-                onClick={(e) => e.stopPropagation()}
               >
                 @{username}
               </Link>
