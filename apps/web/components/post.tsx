@@ -1,9 +1,10 @@
 import { ThumbGrid } from "./thumb-grid";
-import { formatShortDate } from "@/lib/utils";
+import { formatLongDate, formatShortDate } from "@/lib/utils";
 import { Slot } from "@radix-ui/react-slot";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button, ButtonProps } from "@semicolon/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@semicolon/ui/tooltip";
 import { cn } from "@semicolon/ui/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import {
@@ -162,13 +163,20 @@ export function Post({
                 @{username}
               </Link>
               <p className="text-muted-foreground align-middle text-sm">•</p>
-              <Link
-                href={`/post/${id}`}
-                className="text-muted-foreground text-nowrap align-middle text-sm hover:underline"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {formatShortDate(createdAt)}
-              </Link>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Link
+                    href={`/post/${id}`}
+                    className="text-muted-foreground text-nowrap align-middle text-sm hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {formatShortDate(createdAt)}
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{formatLongDate(createdAt)}</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
           <Ellipsis className="flex-none" />

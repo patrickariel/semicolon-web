@@ -1,4 +1,5 @@
 import { ThumbGrid } from "./thumb-grid";
+import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Separator } from "@semicolon/ui/separator";
@@ -33,21 +34,8 @@ export function PostDetail({
       {media.length > 0 && <ThumbGrid srcs={media} />}
       <div className="flex flex-row items-center gap-1">
         <div className="text-sm text-zinc-500">
-          {Intl.DateTimeFormat(undefined, {
-            hour: "numeric",
-            minute: "numeric",
-          }).format(createdAt)}
-        </div>
-        <div className="text-sm text-zinc-500">·</div>
-        <div className="text-sm text-zinc-500">
-          {Intl.DateTimeFormat(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          }).format(createdAt)}
-        </div>
-        <div className="text-sm text-zinc-500">·</div>
-        <div className="text-sm text-zinc-500">
+          {formatLongDate(createdAt)}
+          {" · "}
           {new Intl.NumberFormat(undefined, { notation: "compact" }).format(
             views,
           )}{" "}

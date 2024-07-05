@@ -37,3 +37,14 @@ export function formatShortDate(date: Date) {
     }).format(date);
   }
 }
+
+export function formatLongDate(date: Date) {
+  return `${Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "numeric",
+  }).format(date)} · ${Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date)}`;
+}
