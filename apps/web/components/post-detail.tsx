@@ -1,5 +1,4 @@
 import { ThumbGrid } from "./thumb-grid";
-import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Separator } from "@semicolon/ui/separator";
@@ -47,7 +46,13 @@ export function PostDetail({
             day: "numeric",
           }).format(createdAt)}
         </div>
-        <div className="text-sm text-zinc-500">{views} views</div>
+        <div className="text-sm text-zinc-500">·</div>
+        <div className="text-sm text-zinc-500">
+          {new Intl.NumberFormat(undefined, { notation: "compact" }).format(
+            views,
+          )}{" "}
+          views
+        </div>
       </div>
       <div className="flex flex-col gap-3">
         <Separator />
