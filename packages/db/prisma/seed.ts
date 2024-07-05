@@ -29,7 +29,7 @@ async function main() {
   const users = await db.user.createManyAndReturn({
     data: _.range(0, 50).map(() => ({
       name: faker.person.fullName(),
-      username: faker.internet.userName(),
+      username: faker.internet.userName().substring(0, 15),
       email: faker.internet.email(),
       bio: faker.person.bio(),
       image: faker.image.avatar(),
@@ -44,13 +44,15 @@ async function main() {
   await db.$kysely
     .insertInto("_UserFollow")
     .values((eb) =>
-      users.map(({ id }, i) => ({
-        A: eb.cast(
-          eb.val(users[randomExcluded(0, users.length - 1, i)]!.id), // eslint-disable-line @typescript-eslint/no-non-null-assertion
-          "uuid",
-        ),
-        B: eb.cast(eb.val(id), "uuid"), // eslint-disable-line @typescript-eslint/no-non-null-assertion
-      })),
+      users.flatMap(({ id }, i) => {
+        const otherUsers = users.slice();
+        otherUsers.splice(i, 1);
+        const sampledUsers = _.sampleSize(otherUsers, _.random(5, 50));
+        return sampledUsers.map((user) => ({
+          A: eb.cast(eb.val(user.id), "uuid"),
+          B: eb.cast(eb.val(id), "uuid"),
+        }));
+      }),
     )
     .execute();
 
@@ -70,7 +72,7 @@ async function main() {
           media: _.sample([
             [],
             _.range(0, _.random(1, 4)).map(() =>
-              faker.image.urlLoremFlickr({
+              faker.image.urlPicsumPhotos({
                 width: _.random(800, 1600),
                 height: _.random(800, 1600),
               }),
@@ -81,14 +83,16 @@ async function main() {
     ),
   });
 
-  for (const chunk of _.chunk(posts, 32767 / 2)) {
+  for (const chunk of _.chunk(posts, 32767 / (2 * 150))) {
     await db.$kysely
       .insertInto("_Like")
       .values((eb) =>
-        chunk.map((post) => ({
-          A: eb.cast(eb.val(post.id), "uuid"),
-          B: eb.cast(eb.val(_.sample(users)!.id), "uuid"), // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        })),
+        chunk.flatMap((post) =>
+          _.sampleSize(users, _.random(5, users.length)).map((user) => ({
+            A: eb.cast(eb.val(post.id), "uuid"),
+            B: eb.cast(eb.val(user.id), "uuid"),
+          })),
+        ),
       )
       .execute();
   }
@@ -98,7 +102,7 @@ async function main() {
       posts.map((post) =>
         _.range(0, 5).map((): Prisma.PostCreateManyAndReturnArgs["data"] => ({
           parentId: post.id,
-          userId: _.sample(users)!.id, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          userId: _.sample(users)!.id,
           content: faker.lorem.paragraph({
             min: 1,
             max: 4,
@@ -110,7 +114,7 @@ async function main() {
           media: _.sample([
             [],
             _.range(0, _.random(1, 4)).map(() =>
-              faker.image.urlLoremFlickr({
+              faker.image.urlPicsumPhotos({
                 width: _.random(800, 1600),
                 height: _.random(800, 1600),
               }),
@@ -121,14 +125,16 @@ async function main() {
     ),
   });
 
-  for (const posts of _.chunk(replies, 32767 / 2)) {
+  for (const chunk of _.chunk(replies, 32767 / (2 * 150))) {
     await db.$kysely
       .insertInto("_Like")
       .values((eb) =>
-        posts.map((post) => ({
-          A: eb.cast(eb.val(post.id), "uuid"),
-          B: eb.cast(eb.val(_.sample(users)!.id), "uuid"), // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        })),
+        chunk.flatMap((post) =>
+          _.sampleSize(users, _.random(5, users.length)).map((user) => ({
+            A: eb.cast(eb.val(post.id), "uuid"),
+            B: eb.cast(eb.val(user.id), "uuid"),
+          })),
+        ),
       )
       .execute();
   }
@@ -138,7 +144,7 @@ async function main() {
       replies.map((reply) =>
         _.range(0, 5).map((): Prisma.PostCreateManyAndReturnArgs["data"] => ({
           parentId: reply.id,
-          userId: _.sample(users)!.id, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          userId: _.sample(users)!.id,
           content: faker.lorem.paragraph({
             min: 1,
             max: 4,
@@ -150,7 +156,7 @@ async function main() {
           media: _.sample([
             [],
             _.range(0, _.random(1, 4)).map(() =>
-              faker.image.urlLoremFlickr({
+              faker.image.urlPicsumPhotos({
                 width: _.random(800, 1600),
                 height: _.random(800, 1600),
               }),
@@ -161,14 +167,16 @@ async function main() {
     ),
   });
 
-  for (const replies of _.chunk(moreReplies, 32767 / 2)) {
+  for (const chunk of _.chunk(moreReplies, 32767 / (2 * 150))) {
     await db.$kysely
       .insertInto("_Like")
       .values((eb) =>
-        replies.map((post) => ({
-          A: eb.cast(eb.val(post.id), "uuid"),
-          B: eb.cast(eb.val(_.sample(users)!.id), "uuid"), // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        })),
+        chunk.flatMap((post) =>
+          _.sampleSize(users, _.random(5, users.length)).map((user) => ({
+            A: eb.cast(eb.val(post.id), "uuid"),
+            B: eb.cast(eb.val(user.id), "uuid"),
+          })),
+        ),
       )
       .execute();
   }
