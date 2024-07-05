@@ -11,7 +11,7 @@ import React, { Fragment } from "react";
 
 export default function Page({ params: { id } }: { params: { id: string } }) {
   const { data: tweet } = trpc.post.id.useQuery({ id });
-  const { data } = trpc.post.search.useQuery({});
+  const { data } = trpc.post.replies.useQuery({ id });
 
   if (!tweet || !data) {
     return;
@@ -24,9 +24,9 @@ export default function Page({ params: { id } }: { params: { id: string } }) {
       <CommentForm />
       <Separator />
       <div className="mb-4 flex flex-col">
-        {data.results.map((tweet, i) => (
+        {data.replies.map((post, i) => (
           <Fragment key={i}>
-            <Post {...tweet} />
+            <Post {...post} />
             <Separator />
           </Fragment>
         ))}
