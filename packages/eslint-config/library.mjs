@@ -11,6 +11,7 @@ export default tseslint.config(
     rules: {
       // INFO: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/69660
       "@typescript-eslint/no-misused-promises": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
