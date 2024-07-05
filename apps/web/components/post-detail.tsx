@@ -1,3 +1,4 @@
+import { PostButton } from "./post-button";
 import { ThumbGrid } from "./thumb-grid";
 import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
@@ -13,6 +14,9 @@ export function PostDetail({
   content,
   views,
   media,
+  replyCount,
+  likeCount,
+  id,
 }: PostResolved) {
   return (
     <div className="flex flex-col gap-3 px-4">
@@ -42,28 +46,36 @@ export function PostDetail({
           views
         </div>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
         <Separator />
         <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
-          <div className="cursor flex items-center justify-start gap-2">
-            <MessageCircle className="stroke-muted-foreground size-[1.3rem]" />
-            <p className="text-muted-foreground text-xs">15</p>
-          </div>
-          <div className="cursor flex items-center justify-start gap-2">
-            <Repeat2 className="stroke-muted-foreground size-[1.3rem]" />
-            <p className="text-muted-foreground text-xs">15</p>
-          </div>
-          <div className="cursor flex items-center justify-start gap-2">
-            <Heart className="stroke-muted-foreground size-[1.3rem]" />
-            <p className="text-muted-foreground text-xs">15</p>
-          </div>
-          <div className="cursor flex items-center justify-start gap-2">
-            <BarChart2 className="stroke-muted-foreground size-[1.3rem]" />
-            <p className="text-muted-foreground text-xs">15</p>
-          </div>
-          <div className="cursor flex items-center justify-start gap-2">
-            <Upload className="stroke-muted-foreground size-[1.3rem]" />
-          </div>
+          <PostButton
+            icon={MessageCircle}
+            iconSize="big"
+            href={`/post/${id}`}
+            label={replyCount}
+          />
+          <PostButton
+            icon={Repeat2}
+            iconSize="big"
+            highlight="green"
+            onClick={() => undefined}
+            label={15}
+          />
+          <PostButton
+            icon={Heart}
+            iconSize="big"
+            highlight="pink"
+            onClick={() => undefined}
+            label={likeCount}
+          />
+          <PostButton
+            icon={BarChart2}
+            iconSize="big"
+            onClick={() => undefined}
+            label={views}
+          />
+          <PostButton icon={Upload} onClick={() => undefined} />
         </div>
         <Separator />
       </div>
