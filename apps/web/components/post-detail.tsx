@@ -4,7 +4,14 @@ import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Separator } from "@semicolon/ui/separator";
-import { BarChart2, Heart, MessageCircle, Repeat2, Upload } from "lucide-react";
+import {
+  BarChart2,
+  Bookmark,
+  Heart,
+  MessageCircle,
+  Repeat2,
+  Upload,
+} from "lucide-react";
 
 export function PostDetail({
   name,
@@ -40,9 +47,11 @@ export function PostDetail({
         <div className="text-sm text-zinc-500">
           {formatLongDate(createdAt)}
           {" · "}
-          {new Intl.NumberFormat(undefined, { notation: "compact" }).format(
-            views,
-          )}{" "}
+          <b className="text-foreground text-base font-extrabold">
+            {new Intl.NumberFormat(undefined, { notation: "compact" }).format(
+              views,
+            )}{" "}
+          </b>
           views
         </div>
       </div>
@@ -70,10 +79,10 @@ export function PostDetail({
             label={likeCount}
           />
           <PostButton
-            icon={BarChart2}
+            icon={Bookmark}
             iconSize="big"
             onClick={() => undefined}
-            label={views}
+            label={15}
           />
           <PostButton icon={Upload} onClick={() => undefined} />
         </div>

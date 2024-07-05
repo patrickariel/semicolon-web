@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@semicolon/ui/tooltip";
 import {
   BadgeCheck,
   BarChart2,
+  Bookmark,
   Ellipsis,
   Heart,
   MessageCircle,
@@ -128,7 +129,10 @@ export function Post({
             onClick={() => undefined}
             label={views}
           />
-          <PostButton icon={Upload} onClick={() => undefined} />
+          <div className="flex flex-row">
+            <PostButton icon={Bookmark} onClick={() => undefined} />
+            <PostButton icon={Upload} onClick={() => undefined} />
+          </div>
         </div>
       </div>
     </div>
