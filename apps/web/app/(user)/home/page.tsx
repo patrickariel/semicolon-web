@@ -10,7 +10,7 @@ import _ from "lodash";
 import React, { Fragment } from "react";
 
 export default function Page() {
-  const { data } = trpc.post.search.useQuery({});
+  const { data } = trpc.post.search.useQuery({ reply: false });
 
   return (
     <div className="flex flex-col">
@@ -30,7 +30,7 @@ export default function Page() {
           ))}
         </div>
       ) : (
-        <div className="flex min-h-32 items-center justify-center">
+        <div className="flex min-h-20 items-center justify-center">
           <Spinner size={30} />
         </div>
       )}
