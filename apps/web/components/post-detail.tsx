@@ -4,14 +4,7 @@ import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Separator } from "@semicolon/ui/separator";
-import {
-  BarChart2,
-  Bookmark,
-  Heart,
-  MessageCircle,
-  Repeat2,
-  Upload,
-} from "lucide-react";
+import { Bookmark, Heart, MessageCircle, Repeat2, Upload } from "lucide-react";
 
 export function PostDetail({
   name,

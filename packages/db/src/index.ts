@@ -16,7 +16,6 @@ export type {
   User,
   Post,
   Account,
-  Media,
   Session,
   VerificationToken,
 } from "@prisma/client";
