@@ -1,4 +1,4 @@
-import { PostSchema } from "@semicolon/db/zod";
+import { PostSchema, UserSchema } from "@semicolon/db/zod";
 import short from "short-uuid";
 import isAlphanumeric from "validator/es/lib/isAlphanumeric";
 import { z } from "zod";
@@ -39,7 +39,7 @@ export const UUIDToShort = z
   .uuid()
   .transform((val, ctx) => {
     try {
-      return uuidTranslator.fromUUID(val);
+      return uuidTranslator.fromUUID(val) as string;
     } catch (_) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -48,6 +48,22 @@ export const UUIDToShort = z
       return z.NEVER;
     }
   });
+
+export const UserResolvedSchema = UserSchema.merge(
+  z.object({
+    name: z.string(),
+    username: z.string(),
+    following: z.number(),
+    followers: z.number(),
+  }),
+).omit({ registered: true });
+
+export const PublicUserResolvedSchema = UserResolvedSchema.omit({
+  email: true,
+  emailVerified: true,
+  updatedAt: true,
+  birthday: true,
+});
 
 export const PostResolvedSchema = PostSchema.merge(
   z.object({

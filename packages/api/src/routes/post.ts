@@ -38,12 +38,73 @@ export const post = router({
       }
 
       return {
-        ..._.omit(post, "user", "_count"),
-        name: post.user.name!, // eslint-disable-line
-        username: post.user.username!, // eslint-disable-line
+        ...post,
+        name: post.user.name!,
+        username: post.user.username!,
         avatar: post.user.image,
         likeCount: post._count.likes,
         replyCount: post._count.children,
+      };
+    }),
+  replies: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/posts/id/{id}/replies" } })
+    .input(
+      z.object({
+        id: ShortToUUID,
+        cursor: z.string().uuid().nullish(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        replies: z.array(PostResolvedSchema),
+        nextCursor: z.string().uuid().nullish(),
+      }),
+    )
+    .query(async ({ input: { id, maxResults, cursor } }) => {
+      const post = await db.post.findUnique({
+        where: { id },
+        include: {
+          children: {
+            ...(cursor && { cursor: { id: cursor } }),
+            take: maxResults + 1,
+            include: {
+              user: true,
+              _count: {
+                select: {
+                  likes: true,
+                  children: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The requested post does not exist",
+        });
+      }
+
+      let nextCursor: typeof cursor | undefined;
+
+      if (post.children.length > maxResults) {
+        const nextItem = post.children.pop();
+        nextCursor = nextItem!.id;
+      }
+
+      return {
+        replies: post.children.map((child) => ({
+          ...child,
+          name: child.user.name!,
+          username: child.user.username!,
+          avatar: child.user.image,
+          likeCount: child._count.likes,
+          replyCount: child._count.children,
+        })),
+        nextCursor,
       };
     }),
   create: userProcedure
@@ -138,6 +199,7 @@ export const post = router({
           until: z.date().optional(),
           from: UsernameSchema.optional(),
           to: UsernameSchema.optional(),
+          reply: z.boolean().optional(),
           minLikes: z.number().optional(),
           minReplies: z.number().optional(),
           sortBy: z
@@ -163,6 +225,7 @@ export const post = router({
           query,
           since,
           until,
+          reply,
           from,
           to,
           minLikes,
@@ -250,17 +313,19 @@ export const post = router({
           });
         }
 
+        if (reply !== undefined) {
+          dbQuery = dbQuery.where(({ eb }) =>
+            eb("Post.parentId", reply ? "is not" : "is", null),
+          );
+        }
+
         if (from) {
-          dbQuery = dbQuery
-            .leftJoin("User as Author", (join) =>
-              join.onRef("Author.id", "=", "Post.userId"),
-            )
-            .where(({ eb, and }) =>
-              and([
-                eb("Author.username", "=", from),
-                eb("Author.id", "is not", null),
-              ]),
-            );
+          dbQuery = dbQuery.where(({ eb, and }) =>
+            and([
+              eb("Author.username", "=", from),
+              eb("Author.id", "is not", null),
+            ]),
+          );
         }
 
         if (to) {

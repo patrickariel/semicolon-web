@@ -1,4 +1,8 @@
-import { BirthdaySchema, UsernameSchema } from "../schema";
+import {
+  BirthdaySchema,
+  PublicUserResolvedSchema,
+  UsernameSchema,
+} from "../schema";
 import {
   router,
   publicProcedure,
@@ -13,19 +17,20 @@ import { z } from "zod";
 
 export const user = router({
   id: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/users/id/{id}" } })
+    .meta({ openapi: { method: "GET", path: "/users/by/id/{id}" } })
     .input(z.object({ id: z.string().uuid() }))
-    .output(
-      UserSchema.omit({
-        email: true,
-        emailVerified: true,
-        updatedAt: true,
-        birthday: true,
-      }),
-    )
+    .output(PublicUserResolvedSchema)
     .query(async ({ input: { id } }) => {
       const user = await db.user.findUnique({
         where: { id },
+        include: {
+          _count: {
+            select: {
+              followedBy: true,
+              following: true,
+            },
+          },
+        },
       });
 
       if (!user?.registered) {
@@ -35,7 +40,47 @@ export const user = router({
         });
       }
 
-      return user;
+      return {
+        ...user,
+        name: user.name!,
+        username: user.username!,
+        following: user._count.following,
+        followers: user._count.followedBy,
+      };
+    }),
+  username: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/users/by/username/{username}" } })
+    .input(z.object({ username: UsernameSchema }))
+    .output(PublicUserResolvedSchema)
+    .query(async ({ input: { username } }) => {
+      const user = await db.user.findUnique({
+        where: { username },
+        include: {
+          _count: {
+            select: {
+              followedBy: true,
+              following: true,
+            },
+          },
+        },
+      });
+
+      if (!user?.registered) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The requested user does not exist",
+        });
+      }
+
+      console.log(user._count);
+
+      return {
+        ...user,
+        name: user.name!,
+        username: user.username!,
+        following: user._count.following,
+        followers: user._count.followedBy,
+      };
     }),
   me: userProcedure
     .meta({ openapi: { method: "GET", path: "/users/me" } })
