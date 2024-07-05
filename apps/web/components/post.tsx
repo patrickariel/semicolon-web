@@ -253,6 +253,7 @@ export function Post({
   name,
   avatar,
   username,
+  verified,
   createdAt,
   content,
   media,
@@ -298,7 +299,9 @@ export function Post({
                 >
                   {name}
                 </Link>
-                <BadgeCheck className="size-5 flex-none stroke-sky-400" />
+                {verified && (
+                  <BadgeCheck className="size-5 flex-none stroke-sky-400" />
+                )}
               </div>
             </div>
             <div className="flex min-w-0 max-w-full flex-row items-center gap-1">

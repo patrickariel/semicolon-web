@@ -53,10 +53,11 @@ export const UserResolvedSchema = UserSchema.merge(
   z.object({
     name: z.string(),
     username: z.string(),
+    registered: z.date(),
     following: z.number(),
     followers: z.number(),
   }),
-).omit({ registered: true });
+);
 
 export const PublicUserResolvedSchema = UserResolvedSchema.omit({
   email: true,
@@ -70,6 +71,7 @@ export const PostResolvedSchema = PostSchema.merge(
     id: UUIDToShort,
     name: z.string(),
     username: z.string(),
+    verified: z.boolean(),
     avatar: z.string().nullable(),
     likeCount: z.number(),
     replyCount: z.number(),

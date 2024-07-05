@@ -41,6 +41,7 @@ export const post = router({
         ...post,
         name: post.user.name!,
         username: post.user.username!,
+        verified: post.user.verified,
         avatar: post.user.image,
         likeCount: post._count.likes,
         replyCount: post._count.children,
@@ -100,6 +101,7 @@ export const post = router({
           ...child,
           name: child.user.name!,
           username: child.user.username!,
+          verified: child.user.verified,
           avatar: child.user.image,
           likeCount: child._count.likes,
           replyCount: child._count.children,
@@ -244,7 +246,13 @@ export const post = router({
             (eb) =>
               eb
                 .selectFrom("User")
-                .select(["User.id", "User.name", "User.username", "User.image"])
+                .select([
+                  "User.id",
+                  "User.name",
+                  "User.username",
+                  "User.image",
+                  "User.verified",
+                ])
                 .as("Author"),
             (join) => join.onRef("Post.userId", "=", "Author.id"),
           )
@@ -281,6 +289,7 @@ export const post = router({
             "Post.media",
             "Author.name",
             "Author.username",
+            "Author.verified",
             "Author.image as avatar",
             (eb) =>
               eb.fn.coalesce("AggrLike.count", sql<number>`0`).as("likeCount"),

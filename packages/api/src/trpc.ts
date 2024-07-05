@@ -21,17 +21,34 @@ const t = initTRPC
 type Context = Awaited<ReturnType<typeof createContext>>;
 
 export const optUserProcedure = t.procedure.use(
-  async ({ ctx: { session }, next }) =>
-    next({
+  async ({ ctx: { session }, next }) => {
+    let user;
+    if (session?.user?.id) {
+      user = await db.user.findUnique({
+        where: { id: session.user.id },
+        include: {
+          _count: {
+            select: {
+              followedBy: true,
+              following: true,
+            },
+          },
+        },
+      });
+    }
+
+    return next({
       ctx: {
-        user: session?.user?.id
-          ? await db.user.findUnique({
-              where: { id: session.user.id },
-            })
+        user: user
+          ? {
+              ...user,
+              following: user._count.following,
+              followers: user._count.followedBy,
+            }
           : null,
-        session,
       },
-    }),
+    });
+  },
 );
 
 export const newUserProcedure = optUserProcedure.use(
@@ -59,6 +76,7 @@ export const userProcedure = optUserProcedure.use(
             ...user,
             // The following three fields should always be present if the user is registered
             /* eslint-disable @typescript-eslint/no-non-null-assertion */
+            registered: user.registered,
             name: user.name!,
             username: user.username!,
             birthday: user.birthday!,

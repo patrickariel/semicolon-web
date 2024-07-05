@@ -21,7 +21,9 @@ model User {
   username      String?   @unique
   name          String?
   email         String    @unique
-  registered    Boolean   @default(false)
+  registered    DateTime?
+  location      String?
+  verified      Boolean   @default(false)
   emailVerified DateTime?
   birthday      DateTime?
   followedBy    User[]    @relation("UserFollow")

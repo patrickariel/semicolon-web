@@ -13,7 +13,7 @@ declare module "next-auth" {
     user?: {
       id: string; // ID should always be present
       username?: string | null;
-      registered?: boolean | null;
+      registered?: Date | null;
     } & DefaultSession["user"];
   }
 }
@@ -22,7 +22,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     username?: string | null;
-    registered?: boolean | null;
+    registered?: Date | null;
   }
 }
 
@@ -30,7 +30,7 @@ const UpdateSchema = z.object({
   name: z.string(),
   username: z.string(),
   image: z.string().url().optional(),
-  registered: z.boolean(),
+  registered: z.date(),
 });
 
 export const {

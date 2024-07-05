@@ -1,6 +1,7 @@
 import {
   BirthdaySchema,
   PublicUserResolvedSchema,
+  UserResolvedSchema,
   UsernameSchema,
 } from "../schema";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@semicolon/api/trpc";
 import { update } from "@semicolon/auth";
 import { db } from "@semicolon/db";
-import { UserSchema } from "@semicolon/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -22,7 +22,7 @@ export const user = router({
     .output(PublicUserResolvedSchema)
     .query(async ({ input: { id } }) => {
       const user = await db.user.findUnique({
-        where: { id },
+        where: { id, registered: { not: null } },
         include: {
           _count: {
             select: {
@@ -33,7 +33,7 @@ export const user = router({
         },
       });
 
-      if (!user?.registered) {
+      if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "The requested user does not exist",
@@ -44,6 +44,7 @@ export const user = router({
         ...user,
         name: user.name!,
         username: user.username!,
+        registered: user.registered!,
         following: user._count.following,
         followers: user._count.followedBy,
       };
@@ -54,7 +55,7 @@ export const user = router({
     .output(PublicUserResolvedSchema)
     .query(async ({ input: { username } }) => {
       const user = await db.user.findUnique({
-        where: { username },
+        where: { username, registered: { not: null } },
         include: {
           _count: {
             select: {
@@ -65,19 +66,28 @@ export const user = router({
         },
       });
 
-      if (!user?.registered) {
+      if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "The requested user does not exist",
         });
       }
 
-      console.log(user._count);
+      const huh = PublicUserResolvedSchema.safeParse({
+        ...user,
+        name: user.name!,
+        username: user.username!,
+        registered: user.registered!,
+        following: user._count.following,
+        followers: user._count.followedBy,
+      });
+      console.log(huh.error);
 
       return {
         ...user,
         name: user.name!,
         username: user.username!,
+        registered: user.registered!,
         following: user._count.following,
         followers: user._count.followedBy,
       };
@@ -85,15 +95,7 @@ export const user = router({
   me: userProcedure
     .meta({ openapi: { method: "GET", path: "/users/me" } })
     .input(z.void())
-    .output(
-      UserSchema.merge(
-        z.object({
-          name: z.string(),
-          username: z.string(),
-          birthday: z.date(),
-        }),
-      ),
-    )
+    .output(UserResolvedSchema)
     .query(({ ctx: { user } }) => user),
   register: newUserProcedure
     .input(
@@ -107,34 +109,42 @@ export const user = router({
     .mutation(async ({ ctx: { user }, input }) => {
       const { name, username, image, registered } = await db.user.update({
         where: { email: user.email },
-        data: { ...input, registered: true },
+        data: { ...input, registered: new Date() },
       });
 
       await update({ user: { name, username, image, registered } });
     }),
   search: publicProcedure
     .input(z.object({ query: z.string() }))
-    .output(
-      z.array(
-        UserSchema.omit({
-          email: true,
-          emailVerified: true,
-          updatedAt: true,
-          birthday: true,
-        }),
-      ),
-    )
-    .query(
-      async ({ input: { query } }) =>
-        await db.user.findMany({
-          where: {
-            username: {
-              search: query,
-            },
-            bio: {
-              search: query,
+    .output(z.array(PublicUserResolvedSchema))
+    .query(async ({ input: { query } }) => {
+      const users = await db.user.findMany({
+        where: {
+          username: {
+            search: query,
+          },
+          bio: {
+            search: query,
+          },
+          NOT: { registered: null },
+        },
+        include: {
+          _count: {
+            select: {
+              followedBy: true,
+              following: true,
             },
           },
-        }),
-    ),
+        },
+      });
+
+      return users.map((user) => ({
+        ...user,
+        name: user.name!,
+        username: user.username!,
+        registered: user.registered!,
+        following: user._count.following,
+        followers: user._count.followedBy,
+      }));
+    }),
 });

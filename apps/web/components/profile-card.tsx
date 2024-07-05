@@ -7,8 +7,8 @@ import React from "react";
 interface ProfileCardProps {
   name: string;
   username: string;
-  bio: string;
-  location: string;
+  bio: string | null;
+  location: string | null;
   following: number;
   followers: number;
   coverImage: string;
@@ -87,7 +87,7 @@ const ProfileCard = ({
             </div>
           </div>
 
-          <p className="text-sm leading-[26px]">{bio}</p>
+          {bio && <p className="text-sm leading-[26px]">{bio}</p>}
 
           <div className="flex gap-5">
             <div className="flex gap-1.5">

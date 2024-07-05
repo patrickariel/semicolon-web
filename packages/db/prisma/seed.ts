@@ -3,12 +3,6 @@ import { Prisma } from "@prisma/client";
 import { db } from "@semicolon/db";
 import _ from "lodash";
 
-function randomExcluded(min: number, max: number, exclude: number) {
-  let n = Math.floor(Math.random() * (max - min) + min);
-  if (n >= exclude) n++;
-  return n;
-}
-
 async function main() {
   await db.user.create({
     data: {
@@ -17,12 +11,17 @@ async function main() {
       username: "john.smith",
       email: "john.smith@example.com",
       bio: "Software developer.",
+      location: faker.location.country(),
+      verified: true,
       image: faker.image.avatar(),
       birthday: faker.date.between({
         from: "1990-01-01",
         to: "2007-01-01",
       }),
-      registered: true,
+      registered: faker.date.between({
+        from: "2020-01-01",
+        to: "2024-01-01",
+      }),
     },
   });
 
@@ -31,13 +30,18 @@ async function main() {
       name: faker.person.fullName(),
       username: faker.internet.userName().substring(0, 15),
       email: faker.internet.email(),
+      location: faker.location.country(),
+      verified: _.sample([true, false]),
       bio: faker.person.bio(),
       image: faker.image.avatar(),
       birthday: faker.date.between({
         from: "1990-01-01",
         to: "2007-01-01",
       }),
-      registered: true,
+      registered: faker.date.between({
+        from: "2020-01-01",
+        to: "2024-01-01",
+      }),
     })),
   });
 

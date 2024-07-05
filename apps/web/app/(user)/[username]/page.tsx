@@ -32,13 +32,13 @@ export default function Page({
       <ProfileCard
         name={user.name}
         username={username}
-        bio="Newbie coder, trying to be better."
+        bio={user.bio}
         following={user.following}
         followers={user.followers}
         coverImage="https://cdn.pixabay.com/photo/2017/08/05/12/58/computer-2583383_1280.jpg"
         profileImage={user.image}
-        location="Europe"
-        createdAt={new Date("2024-02-01")}
+        location={user.location}
+        createdAt={user.registered}
         verified={true}
         isOwner={true}
         isFollowing={false}
