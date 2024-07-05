@@ -33,7 +33,7 @@ type PostButtonProps = ButtonProps &
       }
   ) & {
     icon: LucideIcon;
-    label?: string;
+    label?: string | number;
   } & VariantProps<typeof highlightVariants>;
 
 const highlightVariants = cva([], {
@@ -64,7 +64,7 @@ export function PostButton({
 }: PostButtonProps) {
   const Comp = href
     ? ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
-        <Link href={href} {...props}>
+        <Link href={href} onClick={(e) => e.stopPropagation()} {...props}>
           {children}
         </Link>
       )
@@ -80,6 +80,7 @@ export function PostButton({
         )}
         asChild={href ? true : false}
         onClick={(e) => {
+          e.stopPropagation();
           onClick?.(e);
         }}
         {...props}
@@ -88,7 +89,9 @@ export function PostButton({
           <Icon className={`stroke-muted-foreground size-[1.1rem]`} />
         </Comp>
       </Button>
-      {label && <p className={`text-muted-foreground text-xs`}>{label}</p>}
+      {label !== undefined && (
+        <p className="text-muted-foreground text-xs">{label}</p>
+      )}
       {children}
     </div>
   );
@@ -253,6 +256,8 @@ export function Post({
   createdAt,
   content,
   media,
+  replyCount,
+  likeCount,
 }: PostResolved) {
   const router = useRouter();
 
@@ -260,11 +265,8 @@ export function Post({
     <div
       className="relative flex w-full cursor-pointer flex-row gap-3 p-4 pb-2"
       tabIndex={0}
-      onClick={(e) => {
-        if (
-          e.target === e.currentTarget &&
-          document.getSelection()?.type !== "Range"
-        ) {
+      onClick={() => {
+        if (document.getSelection()?.type !== "Range") {
           router.push(`/post/${id}`);
         }
       }}
@@ -273,7 +275,11 @@ export function Post({
       }}
     >
       <div className="pt-2">
-        <Link href={`/${username}`} className="z-10">
+        <Link
+          href={`/${username}`}
+          onClick={(e) => e.stopPropagation()}
+          className="z-10"
+        >
           <Avatar className="size-11">
             {avatar && <AvatarImage width={300} height={300} src={avatar} />}
             <AvatarFallback>CN</AvatarFallback>
@@ -288,6 +294,7 @@ export function Post({
                 <Link
                   href={`/${username}`}
                   className="truncate font-bold hover:underline"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   {name}
                 </Link>
@@ -298,6 +305,7 @@ export function Post({
               <Link
                 className="text-muted-foreground truncate align-middle text-sm"
                 href={`/${username}`}
+                onClick={(e) => e.stopPropagation()}
               >
                 @{username}
               </Link>
@@ -305,6 +313,7 @@ export function Post({
               <Link
                 href={`/post/${id}`}
                 className="text-muted-foreground text-nowrap align-middle text-sm hover:underline"
+                onClick={(e) => e.stopPropagation()}
               >
                 {createdAt.toDateString()}
               </Link>
@@ -317,18 +326,22 @@ export function Post({
         {media.length > 0 && <ThumbGrid srcs={media} />}
 
         <div className="flex w-full min-w-0 items-center justify-between">
-          <PostButton icon={MessageCircle} href={`/post/${id}`} label="15" />
+          <PostButton
+            icon={MessageCircle}
+            href={`/post/${id}`}
+            label={replyCount}
+          />
           <PostButton
             icon={Repeat2}
             highlight="green"
             onClick={() => undefined}
-            label="15"
+            label={15}
           />
           <PostButton
             icon={Heart}
             highlight="pink"
             onClick={() => undefined}
-            label="15"
+            label={likeCount}
           />
           <PostButton icon={BarChart2} onClick={() => undefined} label="15" />
           <PostButton icon={Upload} onClick={() => undefined} />
