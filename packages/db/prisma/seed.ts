@@ -71,8 +71,9 @@ async function main() {
           }),
           createdAt: faker.date.between({
             from: "2020-01-01",
-            to: "2024-01-01",
+            to: new Date(),
           }),
+          views: _.random(5, 500),
           media: _.sample([
             [],
             _.range(0, _.random(1, 4)).map(() =>
@@ -113,8 +114,9 @@ async function main() {
           }),
           createdAt: faker.date.between({
             from: post.createdAt,
-            to: "2024-01-01",
+            to: new Date(),
           }),
+          views: _.random(5, 500),
           media: _.sample([
             [],
             _.range(0, _.random(1, 4)).map(() =>
@@ -155,8 +157,9 @@ async function main() {
           }),
           createdAt: faker.date.between({
             from: reply.createdAt,
-            to: "2024-01-01",
+            to: new Date(),
           }),
+          views: _.random(5, 500),
           media: _.sample([
             [],
             _.range(0, _.random(1, 4)).map(() =>

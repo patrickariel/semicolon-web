@@ -18,7 +18,6 @@ import { Input } from "@semicolon/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@semicolon/ui/popover";
 import Spinner from "@semicolon/ui/spinner";
 import { cn } from "@semicolon/ui/utils";
-import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -250,7 +249,11 @@ function PostAuthForm() {
                         )}
                       >
                         {field.value ? ( // eslint-disable-line @typescript-eslint/no-unnecessary-condition
-                          format(field.value, "PPP")
+                          Intl.DateTimeFormat(undefined, {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }).format(field.value)
                         ) : (
                           <span>Pick a date</span>
                         )}

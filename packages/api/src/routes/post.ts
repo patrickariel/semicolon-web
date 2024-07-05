@@ -287,6 +287,7 @@ export const post = router({
             "Post.content",
             "Post.parentId",
             "Post.media",
+            "Post.views",
             "Author.name",
             "Author.username",
             "Author.verified",
@@ -298,7 +299,11 @@ export const post = router({
                 .coalesce("AggrReply.count", sql<number>`0`)
                 .as("replyCount"),
           ])
-          .$narrowType<{ name: NotNull; username: NotNull }>()
+          .$narrowType<{
+            name: NotNull;
+            username: NotNull;
+            verified: NotNull;
+          }>()
           .limit(maxResults + 1);
 
         const toTsvector = sql`to_tsvector(concat_ws(' ', "Post"."content"))`;

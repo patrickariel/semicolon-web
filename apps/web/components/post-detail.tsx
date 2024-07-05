@@ -1,8 +1,9 @@
+import { ThumbGrid } from "./thumb-grid";
+import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Separator } from "@semicolon/ui/separator";
 import { BarChart2, Heart, MessageCircle, Repeat2, Upload } from "lucide-react";
-import Image from "next/image";
 
 export function PostDetail({
   name,
@@ -10,6 +11,8 @@ export function PostDetail({
   username,
   createdAt,
   content,
+  views,
+  media,
 }: PostResolved) {
   return (
     <div className="flex flex-col gap-3 px-4">
@@ -25,21 +28,27 @@ export function PostDetail({
               <p className="text-sm text-zinc-500">@{username}</p>
             </div>
           </div>
-          {/* {avatar && (
-            <div className="mt-4">
-              <Image
-                src={avatar}
-                alt="Tweet Image"
-                width={500}
-                height={500}
-                className="rounded-lg"
-              />
-            </div>
-          )} */}
         </div>
       </div>
       <p>{content}</p>
-      <div className="text-sm text-zinc-500">{createdAt.toDateString()}</div>
+      {media.length > 0 && <ThumbGrid srcs={media} />}
+      <div className="flex flex-row items-center gap-1">
+        <div className="text-sm text-zinc-500">
+          {Intl.DateTimeFormat(undefined, {
+            hour: "numeric",
+            minute: "numeric",
+          }).format(createdAt)}
+        </div>
+        <div className="text-sm text-zinc-500">·</div>
+        <div className="text-sm text-zinc-500">
+          {Intl.DateTimeFormat(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }).format(createdAt)}
+        </div>
+        <div className="text-sm text-zinc-500">{views} views</div>
+      </div>
       <div className="flex flex-col gap-3">
         <Separator />
         <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">

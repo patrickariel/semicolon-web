@@ -61,6 +61,7 @@ CREATE TABLE "Post" (
     "userId" UUID NOT NULL,
     "content" TEXT NOT NULL,
     "parentId" UUID,
+    "views" INTEGER NOT NULL DEFAULT 0,
     "media" TEXT[],
 
     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
