@@ -5,6 +5,7 @@ import { cn } from "@semicolon/ui/utils";
 import {
   Bell,
   CalendarPlus,
+  CircleEllipsis,
   CircleUser,
   Crown,
   Home,
@@ -47,7 +48,7 @@ export function SideBar({
           <NavItem href="#" icon={CalendarPlus} label="Bookmarks" />
           <NavItem href="#" icon={Crown} label="Communities" />
           <NavItem href="#" icon={CircleUser} label="Profile" />
-          <NavItem href="#" icon={OctagonX} label="Sign Out" />
+          <NavItem href="#" icon={CircleEllipsis} label="More" />
         </div>
         <div className="mt-4 lg:pr-4">
           <Button className="aspect-square h-auto w-full rounded-full lg:aspect-auto lg:min-h-14">
