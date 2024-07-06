@@ -4,7 +4,14 @@ import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Separator } from "@semicolon/ui/separator";
-import { Bookmark, Heart, MessageCircle, Repeat2, Upload } from "lucide-react";
+import {
+  Bookmark,
+  Heart,
+  MessageCircle,
+  Repeat2,
+  Upload,
+  User,
+} from "lucide-react";
 
 export function PostDetail({
   name,
@@ -23,7 +30,9 @@ export function PostDetail({
       <div className="flex flex-row items-center gap-3">
         <Avatar className="size-11">
           {avatar && <AvatarImage width={300} height={300} src={avatar} />}
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>
+            <User />
+          </AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
           <div className="flex items-center justify-between">
