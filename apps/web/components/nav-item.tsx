@@ -5,11 +5,8 @@ import Link from "next/link";
 import React from "react";
 
 interface NavItemProps {
-  href: string;
   icon?: LucideIcon;
   label?: string;
-  children?: React.ReactNode;
-  className?: string;
 }
 
 export function NavItem({
@@ -18,7 +15,7 @@ export function NavItem({
   label,
   children,
   className,
-}: NavItemProps) {
+}: Parameters<typeof Link>[0] & NavItemProps) {
   return (
     <Button
       variant="ghost"
