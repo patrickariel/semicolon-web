@@ -1,4 +1,3 @@
-import { Logo } from "./logo";
 import { NavItem } from "./nav-item";
 import { ProfileIndicator } from "./profile-indicator";
 import { Button } from "@semicolon/ui/button";
@@ -52,7 +51,7 @@ export function SideBar({
         </div>
         <div className="mt-4 lg:pr-4">
           <Button className="aspect-square h-auto w-full rounded-full lg:aspect-auto lg:min-h-14">
-            <span className="hidden text-base font-bold lg:block">Post</span>
+            <span className="hidden text-lg font-bold lg:block">Post</span>
             <SquarePen className="lg:hidden" />
           </Button>
         </div>
