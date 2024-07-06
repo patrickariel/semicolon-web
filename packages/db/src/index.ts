@@ -11,7 +11,6 @@ import {
 import kyselyExtension from "prisma-extension-kysely";
 
 export type {
-  Prisma,
   PrismaPromise,
   User,
   Post,
@@ -19,7 +18,7 @@ export type {
   Session,
   VerificationToken,
 } from "@prisma/client";
-export { PrismaClient } from "@prisma/client";
+export { PrismaClient, Prisma } from "@prisma/client";
 export { UserSchema } from "@semicolon/db/zod";
 
 const prisma = new PrismaClient(
@@ -40,7 +39,6 @@ if (
   (process.env.NODE_ENV ?? "development") === "development" &&
   process.env.PRISMA_LOG_QUERY
 ) {
-  console.log("logging");
   prisma.$on("query", (e) => {
     const query = highlight(e.query, { language: "sql", ignoreIllegals: true });
     const params = highlight(e.params, {

@@ -4,6 +4,7 @@ import { TRPCError, initTRPC } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import superjson from "superjson";
 import { OpenApiMeta } from "trpc-openapi";
+import { ZodError } from "zod";
 
 export const createContext = async ({
   req: _req,
@@ -13,10 +14,9 @@ export const createContext = async ({
   return { session };
 };
 
-const t = initTRPC
-  .meta<OpenApiMeta>()
-  .context<Context>()
-  .create({ transformer: superjson });
+const t = initTRPC.meta<OpenApiMeta>().context<Context>().create({
+  transformer: superjson,
+});
 
 type Context = Awaited<ReturnType<typeof createContext>>;
 

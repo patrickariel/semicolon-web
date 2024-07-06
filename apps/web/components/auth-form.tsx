@@ -172,11 +172,16 @@ function PreAuthForm({
 }
 
 function PostAuthForm() {
-  const { update } = useSession();
+  const { data: session, update } = useSession();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
+    defaultValues: session?.user?.name
+      ? {
+          name: session.user.name,
+        }
+      : undefined,
   });
 
   const { mutate } = trpc.user.register.useMutation({
@@ -184,13 +189,26 @@ function PostAuthForm() {
       await update();
       router.push("/");
     },
+    onError: (error) => {
+      switch (error.data?.code) {
+        case "CONFLICT":
+          form.setError("username", {
+            message: "The username is already taken",
+          });
+          break;
+        default:
+          break;
+      }
+    },
   });
 
   const onSubmit = (data: z.infer<typeof RegisterSchema>) => mutate(data);
 
   return (
     <>
-      <h1 className="text-3xl font-bold">Complete registration</h1>
+      <h1 className="text-nowrap text-xl font-bold sm:text-2xl md:text-3xl">
+        Complete registration
+      </h1>
       <p className="mb-12 mt-5 text-zinc-400">
         Just one more thing before we{"'"}re done.
       </p>

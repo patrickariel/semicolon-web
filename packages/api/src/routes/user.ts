@@ -11,7 +11,7 @@ import {
   newUserProcedure,
 } from "@semicolon/api/trpc";
 import { update } from "@semicolon/auth";
-import { db } from "@semicolon/db";
+import { Prisma, db } from "@semicolon/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -73,16 +73,6 @@ export const user = router({
         });
       }
 
-      const huh = PublicUserResolvedSchema.safeParse({
-        ...user,
-        name: user.name!,
-        username: user.username!,
-        registered: user.registered!,
-        following: user._count.following,
-        followers: user._count.followedBy,
-      });
-      console.log(huh.error);
-
       return {
         ...user,
         name: user.name!,
@@ -107,10 +97,23 @@ export const user = router({
       }),
     )
     .mutation(async ({ ctx: { user }, input }) => {
-      const { name, username, image, registered } = await db.user.update({
-        where: { email: user.email },
-        data: { ...input, registered: new Date() },
-      });
+      const { name, username, image, registered } = await db.user
+        .update({
+          where: { email: user.email },
+          data: { ...input, registered: new Date() },
+        })
+        .catch((e: unknown) => {
+          if (
+            e instanceof Prisma.PrismaClientKnownRequestError &&
+            e.code === "P2002"
+          ) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "The username is already taken",
+            });
+          }
+          throw e;
+        });
 
       await update({ user: { name, username, image, registered } });
     }),

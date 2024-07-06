@@ -27,10 +27,10 @@ declare module "next-auth/jwt" {
 }
 
 const UpdateSchema = z.object({
-  name: z.string(),
-  username: z.string(),
-  image: z.string().url().optional(),
-  registered: z.date(),
+  name: z.string().nullish(),
+  username: z.string().nullish(),
+  image: z.string().url().nullish(),
+  registered: z.coerce.date().nullish(),
 });
 
 export const {
