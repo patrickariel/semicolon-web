@@ -1,6 +1,5 @@
 "use client";
 
-import { FeedHeader } from "@/components/feed-header";
 import { Post } from "@/components/post";
 import { PostForm } from "@/components/post-form";
 import { NavTab, TabItem } from "@/components/tab";

@@ -9,7 +9,7 @@ import {
 } from "@semicolon/ui/dropdown-menu";
 import { cn } from "@semicolon/ui/utils";
 import { Ellipsis, User } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 
 export function ProfileIndicator({
