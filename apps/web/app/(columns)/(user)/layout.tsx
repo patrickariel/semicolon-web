@@ -11,7 +11,7 @@ export default function Layout({
 }>) {
   return (
     <>
-      <div className="w-full min-w-[257px] md:max-w-[600px]">{children}</div>
+      <div className="w-full min-w-[257px] md:max-w-[650px]">{children}</div>
       <Separator orientation="vertical" className="h-auto min-h-screen" />
       <div className="hidden min-h-full w-1/4 min-w-[300px] flex-none shrink-0 flex-col justify-start pl-[30px] pt-0 md:flex">
         <div id="search-bar" className="bg-card sticky top-0 z-10 py-4">
