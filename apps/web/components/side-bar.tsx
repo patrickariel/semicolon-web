@@ -10,7 +10,6 @@ import {
   Crown,
   Home,
   Mail,
-  OctagonX,
   Search,
   SquarePen,
 } from "lucide-react";

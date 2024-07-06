@@ -41,7 +41,7 @@ export default function Page({ params: { id } }: { params: { id: string } }) {
         <h3 className="text-xl font-semibold">Post</h3>
       </div>
       <PostDetail {...tweet} />
-      <PostForm avatar={session?.user?.image} />
+      <PostForm avatar={session?.user?.image} placeholder="Post your reply" />
       <Separator />
       <div className="mb-4 flex flex-col">
         {replies ? (

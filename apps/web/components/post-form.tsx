@@ -8,33 +8,33 @@ import {
   Form,
 } from "@semicolon/ui/form";
 import { Input } from "@semicolon/ui/input";
-import { Label } from "@semicolon/ui/label";
 import { Textarea } from "@semicolon/ui/textarea";
 import { cn } from "@semicolon/ui/utils";
-import { User } from "lucide-react";
+import { Smile, User, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { MdFileUpload } from "react-icons/md";
 
 interface FormValues {
-  twittContent: string;
+  content: string;
   upload: FileList | null;
 }
 
 export function PostForm({
   className,
   avatar,
+  placeholder = "What is happening?!",
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   avatar?: string | null;
+  placeholder?: string;
 }) {
   const form = useForm<FormValues>();
   const [preview, setPreview] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState<boolean>(false);
 
   const handleSubmit = (data: FormValues) => {
-    console.log("Tweet posted:", data.twittContent);
+    console.log("Tweet posted:", data.content);
     if (data.upload && data.upload.length > 0) {
       const file = data.upload[0];
       const reader = new FileReader();
@@ -53,13 +53,7 @@ export function PostForm({
   };
 
   return (
-    <div
-      className={cn(
-        "flex w-full flex-row gap-3 px-4 pb-[16px] pt-[20px]",
-        className,
-      )}
-      {...props}
-    >
+    <div className={cn("flex w-full flex-row gap-3 p-3", className)} {...props}>
       <div className="pt-2">
         <Avatar className="size-11">
           <AvatarImage src={avatar ?? undefined} />
@@ -69,18 +63,21 @@ export function PostForm({
         </Avatar>
       </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full">
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="flex w-full flex-col gap-3"
+        >
           <FormItem className="flex w-full items-start justify-start">
             <FormField
-              name="twittContent"
+              name="content"
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full flex-grow">
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder="What is happening ?!"
-                      className="h-[100px] w-full resize-none overflow-hidden py-3 text-base text-white placeholder:text-sm focus:border-transparent focus:font-semibold focus:outline-none focus:ring-0"
+                      placeholder={placeholder}
+                      className="h-[80px] w-full resize-none border-none p-2 text-lg text-white placeholder:text-lg focus-visible:outline-none focus-visible:ring-0"
                       maxLength={200}
                     />
                   </FormControl>
@@ -108,12 +105,15 @@ export function PostForm({
             </div>
           )}
 
-          <div className="flex items-center justify-between gap-4 pt-[17px]">
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center justify-center gap-2.5">
-              <div className="item-feeling border-line flex cursor-pointer items-center justify-center gap-1.5 rounded-full border px-3 py-1.5">
-                <p>🤩</p>
-                <p className="hidden text-sm font-semibold sm:block">Emotes</p>
-              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full hover:bg-sky-400/10"
+              >
+                <Smile className="stroke-sky-400" />
+              </Button>
               <FormField
                 name="upload"
                 control={form.control}
@@ -122,7 +122,7 @@ export function PostForm({
                     <Input
                       type="file"
                       id="upload"
-                      accept="image/*,video/*"
+                      accept="image/*"
                       className="hidden"
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const files = e.target.files;
@@ -137,22 +137,22 @@ export function PostForm({
                       }}
                     />
 
-                    <Label
-                      htmlFor="upload"
-                      className="flex cursor-pointer items-center text-white"
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full hover:bg-sky-400/10"
                     >
-                      <MdFileUpload size={24} className="mr-2" />
-                      <p className="hidden sm:block">Media</p>
-                    </Label>
+                      <ImageIcon className="stroke-sky-400" />
+                    </Button>
                   </div>
                 )}
               />
             </div>
             <Button
               type="submit"
-              className="w-full max-w-36 cursor-pointer rounded-full font-bold"
+              className="text-foreground w-fit max-w-36 cursor-pointer rounded-full bg-sky-500 px-6 font-bold"
             >
-              Post
+              <p className="text-base font-bold">Post</p>
             </Button>
           </div>
         </form>
