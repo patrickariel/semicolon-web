@@ -188,7 +188,7 @@ export function PostAuthForm({ defaultName }: { defaultName?: string | null }) {
   const { mutate } = trpc.user.register.useMutation({
     onSuccess: async () => {
       await update();
-      router.push("/");
+      router.push("/home");
     },
     onMutate: () => {
       setDisabled((d) => {
