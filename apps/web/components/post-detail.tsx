@@ -41,7 +41,7 @@ export function PostDetail({
           {formatLongDate(createdAt)}
           {" · "}
           <b className="text-foreground text-base font-extrabold">
-            {new Intl.NumberFormat(undefined, { notation: "compact" }).format(
+            {new Intl.NumberFormat("en-US", { notation: "compact" }).format(
               views,
             )}{" "}
           </b>

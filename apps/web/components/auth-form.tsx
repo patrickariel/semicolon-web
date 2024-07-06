@@ -280,7 +280,7 @@ export function PostAuthForm({ defaultName }: { defaultName?: string | null }) {
                         {...disabled}
                       >
                         {field.value ? ( // eslint-disable-line @typescript-eslint/no-unnecessary-condition
-                          Intl.DateTimeFormat(undefined, {
+                          Intl.DateTimeFormat("en-US", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
