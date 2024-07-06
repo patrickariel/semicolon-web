@@ -1,4 +1,4 @@
-import { SearchBar } from "@/components/search";
+import { SearchBar } from "@/components/search-bar";
 import { Sticky } from "@/components/sticky";
 import { Suggestions } from "@/components/suggestions";
 import { Trends } from "@/components/trends";

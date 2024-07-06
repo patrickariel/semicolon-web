@@ -3,6 +3,7 @@
 import { FeedHeader } from "@/components/feed-header";
 import { Post } from "@/components/post";
 import { PostForm } from "@/components/post-form";
+import { NavTab, TabItem } from "@/components/tab";
 import { trpc } from "@/lib/trpc-client";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
@@ -17,7 +18,12 @@ export default function Page() {
   return (
     <div className="flex flex-col">
       <div className="bg-card sticky top-0 z-50">
-        <FeedHeader />
+        <NavTab>
+          <TabItem href="#" active>
+            For You
+          </TabItem>
+          <TabItem href="#">Following</TabItem>
+        </NavTab>
         <Separator />
       </div>
       <PostForm avatar={session?.user?.image} />

@@ -1,6 +1,7 @@
 "use client";
 
-import { SearchBar, SearchTabs } from "@/components/search";
+import { SearchBar } from "@/components/search-bar";
+import { NavTab, TabItem } from "@/components/tab";
 import { Button } from "@semicolon/ui/button";
 import { Separator } from "@semicolon/ui/separator";
 import { ArrowLeft } from "lucide-react";
@@ -23,7 +24,13 @@ export default function Page() {
           </Button>
           <SearchBar />
         </div>
-        <SearchTabs />
+        <NavTab>
+          <TabItem href="#" active>
+            Top
+          </TabItem>
+          <TabItem href="#">Latest</TabItem>
+          <TabItem href="#">People</TabItem>
+        </NavTab>
         <Separator />
       </div>
       <div className="mb-4 flex flex-col"></div>
