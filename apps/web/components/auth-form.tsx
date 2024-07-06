@@ -16,13 +16,12 @@ import {
 } from "@semicolon/ui/form";
 import { Input } from "@semicolon/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@semicolon/ui/popover";
-import Spinner from "@semicolon/ui/spinner";
 import { cn } from "@semicolon/ui/utils";
 import { CalendarIcon } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaDiscord } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
@@ -41,25 +40,20 @@ const RegisterSchema = z.object({
   birthday: z.date({ required_error: "Date of birth is required" }),
 });
 
-export enum AuthVariant {
-  SignUp = "Sign up",
-  LogIn = "Log in",
-}
-
 function SuggestionMessage({
-  variant = AuthVariant.SignUp,
+  variant = "signup",
 }: {
-  variant?: AuthVariant;
+  variant?: "signup" | "login";
 }) {
   const { message, action, href } = (() => {
     switch (variant) {
-      case AuthVariant.SignUp:
+      case "login":
         return {
           message: "Already have an account? ",
           action: "Sign in",
           href: "/flow/login",
         };
-      case AuthVariant.LogIn:
+      case "signup":
         return {
           message: "Don't have an account? ",
           action: "Sign up",
@@ -81,14 +75,20 @@ function SuggestionMessage({
   );
 }
 
-function PreAuthForm({
-  variant = AuthVariant.SignUp,
+export function PreAuthForm({
+  variant = "signup",
 }: {
-  variant?: AuthVariant;
+  variant?: "signup" | "login";
 }) {
   const form = useForm<z.infer<typeof EmailSchema>>({
     resolver: zodResolver(EmailSchema),
   });
+
+  const [verb, setVerb] = useState(variant === "login" ? "Log in" : "Sign up");
+
+  useEffect(() => {
+    setVerb(variant === "login" ? "Log in" : "Sign up");
+  }, [variant]);
 
   const onSubmit = async (data: z.infer<typeof EmailSchema>) => {
     await signIn("resend", data);
@@ -96,16 +96,16 @@ function PreAuthForm({
 
   const flavorText = (() => {
     switch (variant) {
-      case AuthVariant.SignUp:
+      case "signup":
         return "Come and build the next social phenomenon with us.";
-      case AuthVariant.LogIn:
+      case "login":
         return "Catch up on everything you've missed.";
     }
   })();
 
   return (
     <>
-      <h1 className="text-3xl font-bold">{variant}</h1>
+      <h1 className="text-3xl font-bold">{verb}</h1>
       <p className="mb-12 mt-5 text-zinc-400">{flavorText}</p>
 
       <Form {...form}>
@@ -124,7 +124,7 @@ function PreAuthForm({
             )}
           />
           <Button type="submit" className="w-full">
-            <span className="font-2xl ml-2">{variant}</span>
+            <span className="font-2xl ml-2">{verb}</span>
           </Button>
         </form>
       </Form>
@@ -144,7 +144,7 @@ function PreAuthForm({
           onClick={() => signIn("google", { callbackUrl: "/" })}
         >
           <FcGoogle className="size-6" />
-          <span>{variant} with Google</span>
+          <span>{verb} with Google</span>
         </Button>
       </div>
       <div className="my-2">
@@ -154,7 +154,7 @@ function PreAuthForm({
           onClick={() => signIn("discord", { callbackUrl: "/" })}
         >
           <FaDiscord className="size-6 fill-[#536dfe]" />
-          <span>{variant} with Discord</span>
+          <span>{verb} with Discord</span>
         </Button>
       </div>
       <div className="my-2">
@@ -164,22 +164,23 @@ function PreAuthForm({
           onClick={() => signIn("github", { callbackUrl: "/" })}
         >
           <IoLogoGithub className="size-6" />
-          <span>{variant} with GitHub</span>
+          <span>{verb} with GitHub</span>
         </Button>
       </div>
     </>
   );
 }
 
-function PostAuthForm() {
-  const { data: session, update } = useSession();
+export function PostAuthForm({ defaultName }: { defaultName?: string | null }) {
+  const { update } = useSession();
   const router = useRouter();
+  const [disabled, setDisabled] = useState<{ disabled?: boolean }>({});
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
-    defaultValues: session?.user?.name
+    defaultValues: defaultName
       ? {
-          name: session.user.name,
+          name: defaultName,
         }
       : undefined,
   });
@@ -189,7 +190,18 @@ function PostAuthForm() {
       await update();
       router.push("/");
     },
+    onMutate: () => {
+      setDisabled((d) => {
+        d.disabled = true;
+        return d;
+      });
+    },
     onError: (error) => {
+      setDisabled((d) => {
+        delete d.disabled;
+        return d;
+      });
+
       switch (error.data?.code) {
         case "CONFLICT":
           form.setError("username", {
@@ -225,7 +237,7 @@ function PostAuthForm() {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="john.smith" {...field} />
+                  <Input placeholder="john.smith" {...field} {...disabled} />
                 </FormControl>
                 <FormDescription className={error ? "hidden" : ""}>
                   Your username should be unique.
@@ -241,7 +253,7 @@ function PostAuthForm() {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Smith" {...field} />
+                  <Input placeholder="John Smith" {...field} {...disabled} />
                 </FormControl>
                 <FormDescription className={error ? "hidden" : ""}>
                   However you want yourself to be called.
@@ -265,6 +277,7 @@ function PostAuthForm() {
                           "w-full pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground", // eslint-disable-line @typescript-eslint/no-unnecessary-condition
                         )}
+                        {...disabled}
                       >
                         {field.value ? ( // eslint-disable-line @typescript-eslint/no-unnecessary-condition
                           Intl.DateTimeFormat(undefined, {
@@ -305,39 +318,11 @@ function PostAuthForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="mt-10 w-full">
+          <Button type="submit" className="mt-10 w-full" {...disabled}>
             <span className="font-2xl ml-2">Confirm</span>
           </Button>
         </form>
       </Form>
     </>
-  );
-}
-
-export function AuthForm({
-  variant = AuthVariant.SignUp,
-}: {
-  variant?: AuthVariant;
-}) {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  return (
-    <div className="flex h-full max-h-[720px] min-h-[660px] w-full min-w-[280px] flex-row items-center justify-center rounded-lg px-5 sm:border sm:px-10 lg:px-14">
-      <div className="flex h-full w-full flex-col justify-center lg:min-w-[400px]">
-        {(() => {
-          if (status === "loading") {
-            return <Spinner className="self-center" />;
-          } else if (status === "unauthenticated") {
-            return <PreAuthForm variant={variant} />;
-          } else if (!session?.user?.registered) {
-            return <PostAuthForm />;
-          } else {
-            router.push("/");
-            return <Spinner className="self-center" />;
-          }
-        })()}
-      </div>
-    </div>
   );
 }
