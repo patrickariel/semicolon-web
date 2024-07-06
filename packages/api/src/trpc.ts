@@ -4,7 +4,6 @@ import { TRPCError, initTRPC } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import superjson from "superjson";
 import { OpenApiMeta } from "trpc-openapi";
-import { ZodError } from "zod";
 
 export const createContext = async ({
   req: _req,
