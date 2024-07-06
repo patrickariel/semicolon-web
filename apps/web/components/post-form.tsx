@@ -1,24 +1,32 @@
+"use client";
+
+import { uploadMedia } from "@/lib/actions";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
-import {
-  FormField,
-  FormItem,
-  FormControl,
-  FormMessage,
-  Form,
-} from "@semicolon/ui/form";
+import { FormField, FormItem, FormControl, Form } from "@semicolon/ui/form";
 import { Input } from "@semicolon/ui/input";
 import { Textarea } from "@semicolon/ui/textarea";
+import { useToast } from "@semicolon/ui/use-toast";
 import { cn } from "@semicolon/ui/utils";
+import _ from "lodash";
 import { Smile, User, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-interface FormValues {
-  content: string;
-  upload: FileList | null;
-}
+const PostSchema = z.object({
+  content: z.string().optional(),
+  media: z.record(
+    z.string(),
+    z.object({
+      file: z.instanceof(File),
+      url: z.string().optional(),
+      isUploading: z.boolean(),
+    }),
+  ),
+});
 
 export function PostForm({
   className,
@@ -29,27 +37,35 @@ export function PostForm({
   avatar?: string | null;
   placeholder?: string;
 }) {
-  const form = useForm<FormValues>();
-  const [preview, setPreview] = useState<string | null>(null);
-  const [isVideo, setIsVideo] = useState<boolean>(false);
+  const { toast } = useToast();
+  const form = useForm<z.infer<typeof PostSchema>>({
+    resolver: zodResolver(PostSchema),
+  });
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
 
-  const handleSubmit = (data: FormValues) => {
-    console.log("Tweet posted:", data.content);
-    if (data.upload && data.upload.length > 0) {
-      const file = data.upload[0];
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const fileURL = reader.result as string;
-        setPreview(fileURL);
-        setIsVideo(file !== undefined ? file.type.startsWith("video") : false);
-      };
-
-      if (file) {
-        reader.readAsDataURL(file);
+  useEffect(() => {
+    const subscription = form.watch(({ content, media }) => {
+      if (media && Object.keys(media).length > 0) {
+        setSubmitDisabled(
+          Object.entries(media).some(([_, info]) => info?.isUploading),
+        );
+      } else {
+        setSubmitDisabled((content?.length ?? 0) === 0);
       }
-      console.log("File uploaded:", file);
-    }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, form.watch]);
+
+  const handleSubmit = (data: z.infer<typeof PostSchema>) => {
+    toast({
+      title: "You submitted the following values:",
+      description: (
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+    });
   };
 
   return (
@@ -67,43 +83,89 @@ export function PostForm({
           onSubmit={form.handleSubmit(handleSubmit)}
           className="flex w-full flex-col gap-3"
         >
-          <FormItem className="flex w-full items-start justify-start">
-            <FormField
-              name="content"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="w-full flex-grow">
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder={placeholder}
-                      className="h-[80px] w-full resize-none border-none p-2 text-lg text-white placeholder:text-lg focus-visible:outline-none focus-visible:ring-0"
-                      maxLength={200}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </FormItem>
+          <FormField
+            name="content"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem className="w-full flex-grow">
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder={placeholder}
+                    className="h-[80px] w-full resize-none border-none p-2 text-lg text-white placeholder:text-lg focus-visible:outline-none focus-visible:ring-0"
+                    maxLength={200}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-          {preview && (
-            <div className="ml-14 mt-4">
-              {isVideo ? (
-                <video width={300} height={200} controls>
-                  <source src={preview} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
+          {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            Object.entries(form.getValues("media") ?? {}).map(
+              ([blobUrl], i) => (
                 <Image
-                  src={preview}
-                  alt="image-preview"
+                  key={i}
+                  src={blobUrl}
+                  alt={`Media upload preview (${i})`}
                   width={300}
                   height={200}
                 />
-              )}
-            </div>
-          )}
+              ),
+            )
+          }
+
+          <FormField
+            name="media"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem className="space-y-0">
+                <Input
+                  {..._.omit(field, "value")}
+                  type="file"
+                  id="upload"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  className="hidden"
+                  multiple
+                  onChange={async (e) => {
+                    if (e.target.files) {
+                      const fileMap: typeof field.value = {};
+                      for (const file of [...e.target.files]) {
+                        const blobUrl = URL.createObjectURL(file);
+                        fileMap[blobUrl] = {
+                          file,
+                          isUploading: true,
+                        };
+                      }
+
+                      field.onChange({
+                        ...field.value,
+                        ...fileMap,
+                      });
+
+                      await Promise.allSettled(
+                        Object.entries(fileMap).map(
+                          async ([objUrl, { file }]) => {
+                            const uploadForm = new FormData();
+                            uploadForm.append("media", file);
+                            const { url } = await uploadMedia(uploadForm);
+
+                            fileMap[objUrl]!.isUploading = false;
+                            fileMap[objUrl]!.url = url;
+                            field.onChange({
+                              ...field.value,
+                              ...fileMap,
+                            });
+                          },
+                        ),
+                      );
+                    }
+                  }}
+                />
+              </FormItem>
+            )}
+          />
 
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center justify-center gap-2.5">
@@ -114,43 +176,23 @@ export function PostForm({
               >
                 <Smile className="stroke-sky-400" />
               </Button>
-              <FormField
-                name="upload"
-                control={form.control}
-                render={({ field }) => (
-                  <div className="flex items-center">
-                    <Input
-                      type="file"
-                      id="upload"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const files = e.target.files;
-                        if (files && files.length > 0) {
-                          field.onChange(files);
-                          const file = files[0];
-                          if (file) {
-                            setPreview(URL.createObjectURL(file));
-                            setIsVideo(file.type.startsWith("video"));
-                          }
-                        }
-                      }}
-                    />
-
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full hover:bg-sky-400/10"
-                    >
-                      <ImageIcon className="stroke-sky-400" />
-                    </Button>
-                  </div>
-                )}
-              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="m-0 rounded-full hover:bg-sky-400/10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  fileInputRef.current?.click();
+                }}
+              >
+                <ImageIcon className="stroke-sky-400" />
+              </Button>
             </div>
+
             <Button
               type="submit"
-              className="text-foreground w-fit max-w-36 cursor-pointer rounded-full bg-sky-500 px-6 font-bold"
+              className="text-foreground w-fit max-w-36 cursor-pointer rounded-full bg-sky-500 px-6 font-bold hover:bg-sky-600"
+              disabled={submitDisabled}
             >
               <p className="text-base font-bold">Post</p>
             </Button>

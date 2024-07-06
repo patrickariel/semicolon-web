@@ -2,6 +2,7 @@ import { BottomBar } from "@/components/bottom-bar";
 import { SideBar } from "@/components/side-bar";
 import { auth } from "@semicolon/auth";
 import { Separator } from "@semicolon/ui/separator";
+import { Toaster } from "@semicolon/ui/toaster";
 import { redirect } from "next/navigation";
 
 export default async function Layout({
@@ -29,6 +30,7 @@ export default async function Layout({
         {children}
       </div>
       <BottomBar />
+      <Toaster />
     </div>
   );
 }

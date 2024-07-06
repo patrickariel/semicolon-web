@@ -109,14 +109,26 @@ export const post = router({
         nextCursor,
       };
     }),
-  create: userProcedure
+  new: userProcedure
     .meta({ openapi: { method: "POST", path: "/posts/new" } })
-    .input(z.object({ content: z.string(), to: z.string().uuid().optional() }))
-    .mutation(async ({ ctx: { user }, input: { content, to } }) => {
+    .input(
+      z
+        .object({
+          content: z.string().optional(),
+          to: z.string().uuid().optional(),
+          media: z.array(z.string().url()),
+        })
+        .refine(
+          ({ content, media }) => media.length > 0 || content !== undefined,
+          { message: "Post must either contain content or media" },
+        ),
+    )
+    .mutation(async ({ ctx: { user }, input: { content, to, media } }) => {
       await db.post.create({
         data: {
           userId: user.id,
           parentId: to,
+          media,
           content,
         },
       });

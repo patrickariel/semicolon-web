@@ -83,7 +83,7 @@ model Post {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   userId    String   @db.Uuid
-  content   String
+  content   String?
   parentId  String?  @db.Uuid
   parent    Post?    @relation("PostHierarchy", fields: [parentId], references: [id])
   children  Post[]   @relation("PostHierarchy")

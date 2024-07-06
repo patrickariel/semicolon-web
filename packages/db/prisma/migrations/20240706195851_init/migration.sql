@@ -59,7 +59,7 @@ CREATE TABLE "Post" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" UUID NOT NULL,
-    "content" TEXT NOT NULL,
+    "content" TEXT,
     "parentId" UUID,
     "views" INTEGER NOT NULL DEFAULT 0,
     "media" TEXT[],
