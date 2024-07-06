@@ -7,10 +7,12 @@ import { trpc } from "@/lib/trpc-client";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
 import _ from "lodash";
+import { useSession } from "next-auth/react";
 import React, { Fragment } from "react";
 
 export default function Page() {
   const { data } = trpc.post.search.useQuery({ reply: false });
+  const { data: session } = useSession();
 
   return (
     <div className="flex flex-col">
@@ -18,7 +20,7 @@ export default function Page() {
         <FeedHeader />
         <Separator />
       </div>
-      <PostForm />
+      <PostForm avatar={session?.user?.image} />
       <Separator />
       {data ? (
         <div className="mb-4 flex flex-col">

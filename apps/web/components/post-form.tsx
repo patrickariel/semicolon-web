@@ -10,6 +10,8 @@ import {
 import { Input } from "@semicolon/ui/input";
 import { Label } from "@semicolon/ui/label";
 import { Textarea } from "@semicolon/ui/textarea";
+import { cn } from "@semicolon/ui/utils";
+import { User } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -20,7 +22,13 @@ interface FormValues {
   upload: FileList | null;
 }
 
-export function PostForm() {
+export function PostForm({
+  className,
+  avatar,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & {
+  avatar?: string | null;
+}) {
   const form = useForm<FormValues>();
   const [preview, setPreview] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState<boolean>(false);
@@ -45,15 +53,19 @@ export function PostForm() {
   };
 
   return (
-    <div className="flex w-full flex-row gap-3 px-4 pb-[16px] pt-[20px]">
+    <div
+      className={cn(
+        "flex w-full flex-row gap-3 px-4 pb-[16px] pt-[20px]",
+        className,
+      )}
+      {...props}
+    >
       <div className="pt-2">
         <Avatar className="size-11">
-          <AvatarImage
-            width={300}
-            height={300}
-            src="https://avatars.githubusercontent.com/u/28171661"
-          />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarImage src={avatar ?? undefined} />
+          <AvatarFallback>
+            <User />
+          </AvatarFallback>
         </Avatar>
       </div>
       <Form {...form}>
