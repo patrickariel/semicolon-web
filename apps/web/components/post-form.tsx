@@ -1,6 +1,7 @@
 "use client";
 
 import { uploadMedia } from "@/lib/actions";
+import { trpc } from "@/lib/trpc-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AspectRatio } from "@semicolon/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
@@ -35,16 +36,24 @@ const PostSchema = z.object({
   content: z.string().optional(),
 });
 
+type PostCallbacks = Parameters<
+  ReturnType<(typeof trpc)["post"]["new"]["useMutation"]>["mutate"]
+>[1];
+
 export function PostForm({
   className,
   avatar,
   placeholder = "What is happening?!",
+  onError,
+  onSuccess,
+  onSettled,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   avatar?: string | null;
   placeholder?: string;
-}) {
+} & PostCallbacks) {
   const { toast } = useToast();
+  const postApi = trpc.post.new.useMutation();
   const form = useForm<z.infer<typeof PostSchema>>({
     resolver: zodResolver(PostSchema),
   });
@@ -85,10 +94,21 @@ export function PostForm({
       title: "You submitted the following values:",
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          <code className="text-white">
+            {JSON.stringify({ ...data, ...media }, null, 2)}
+          </code>
         </pre>
       ),
     });
+    postApi.mutate(
+      {
+        content,
+        media: Object.entries(media)
+          .map(([_, { url }]) => url)
+          .filter((v): v is string => v !== undefined),
+      },
+      { onError, onSuccess, onSettled },
+    );
   };
 
   return (
