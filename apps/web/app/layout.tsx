@@ -1,5 +1,6 @@
 import "./globals.css";
 import { TrpcProvider } from "@/components/providers";
+import { TooltipProvider } from "@semicolon/ui/tooltip";
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Poppins } from "next/font/google";
@@ -20,7 +21,9 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={font.className}>
         <SessionProvider>
-          <TrpcProvider>{children}</TrpcProvider>
+          <TrpcProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </TrpcProvider>
         </SessionProvider>
       </body>
     </html>

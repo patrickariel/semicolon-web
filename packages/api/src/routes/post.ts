@@ -1,9 +1,13 @@
 import { router, publicProcedure, userProcedure } from "../trpc";
-import { Username } from "@semicolon/api/schema";
+import {
+  PostResolvedSchema,
+  ShortToUUID,
+  UsernameSchema,
+} from "@semicolon/api/schema";
 import { db } from "@semicolon/db";
-import { PostSchema } from "@semicolon/db/zod";
 import { TRPCError } from "@trpc/server";
-import { Expression, SqlBool } from "kysely";
+import { BlobNotFoundError, head } from "@vercel/blob";
+import { Expression, NotNull, SqlBool } from "kysely";
 import { sql } from "kysely";
 import _ from "lodash";
 import { z } from "zod";
@@ -11,11 +15,20 @@ import { z } from "zod";
 export const post = router({
   id: publicProcedure
     .meta({ openapi: { method: "GET", path: "/posts/id/{id}" } })
-    .input(z.object({ id: z.string().uuid() }))
-    .output(PostSchema.omit({ createdAt: true }))
+    .input(z.object({ id: ShortToUUID }))
+    .output(PostResolvedSchema)
     .query(async ({ input: { id } }) => {
       const post = await db.post.findUnique({
         where: { id },
+        include: {
+          user: true,
+          _count: {
+            select: {
+              likes: true,
+              children: true,
+            },
+          },
+        },
       });
 
       if (!post) {
@@ -24,16 +37,112 @@ export const post = router({
           message: "The requested post does not exist",
         });
       }
-      return post;
+
+      return {
+        ...post,
+        name: post.user.name!,
+        username: post.user.username!,
+        verified: post.user.verified,
+        avatar: post.user.image,
+        likeCount: post._count.likes,
+        replyCount: post._count.children,
+      };
     }),
-  create: userProcedure
+  replies: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/posts/id/{id}/replies" } })
+    .input(
+      z.object({
+        id: ShortToUUID,
+        cursor: z.string().uuid().nullish(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        replies: z.array(PostResolvedSchema),
+        nextCursor: z.string().uuid().nullish(),
+      }),
+    )
+    .query(async ({ input: { id, maxResults, cursor } }) => {
+      const post = await db.post.findUnique({
+        where: { id },
+        include: {
+          children: {
+            ...(cursor && { cursor: { id: cursor } }),
+            take: maxResults + 1,
+            include: {
+              user: true,
+              _count: {
+                select: {
+                  likes: true,
+                  children: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The requested post does not exist",
+        });
+      }
+
+      let nextCursor: typeof cursor | undefined;
+
+      if (post.children.length > maxResults) {
+        const nextItem = post.children.pop();
+        nextCursor = nextItem!.id;
+      }
+
+      return {
+        replies: post.children.map((child) => ({
+          ...child,
+          name: child.user.name!,
+          username: child.user.username!,
+          verified: child.user.verified,
+          avatar: child.user.image,
+          likeCount: child._count.likes,
+          replyCount: child._count.children,
+        })),
+        nextCursor,
+      };
+    }),
+  new: userProcedure
     .meta({ openapi: { method: "POST", path: "/posts/new" } })
-    .input(z.object({ content: z.string(), to: z.string().uuid().optional() }))
-    .mutation(async ({ ctx: { user }, input: { content, to } }) => {
+    .input(
+      z
+        .object({
+          content: z.string().optional(),
+          to: z.string().uuid().optional(),
+          media: z.array(z.string().url()).max(4),
+        })
+        .refine(
+          ({ content, media }) => media.length > 0 || content !== undefined,
+          { message: "Post must either contain content or media" },
+        ),
+    )
+    .mutation(async ({ ctx: { user }, input: { content, to, media } }) => {
+      try {
+        await Promise.all(media.map(async (blobUrl) => await head(blobUrl)));
+      } catch (error) {
+        if (error instanceof BlobNotFoundError) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "External media URLs are forbidden",
+          });
+        } else {
+          throw error;
+        }
+      }
+
       await db.post.create({
         data: {
           userId: user.id,
           parentId: to,
+          media,
           content,
         },
       });
@@ -116,8 +225,9 @@ export const post = router({
           query: z.string().optional(),
           since: z.date().optional(),
           until: z.date().optional(),
-          from: Username.optional(),
-          to: Username.optional(),
+          from: UsernameSchema.optional(),
+          to: UsernameSchema.optional(),
+          reply: z.boolean().optional(),
           minLikes: z.number().optional(),
           minReplies: z.number().optional(),
           sortBy: z
@@ -133,11 +243,7 @@ export const post = router({
     )
     .output(
       z.object({
-        results: z.array(
-          PostSchema.merge(
-            z.object({ likeCount: z.number(), replyCount: z.number() }),
-          ),
-        ),
+        results: z.array(PostResolvedSchema),
         nextCursor: z.string().uuid().nullish(),
       }),
     )
@@ -147,6 +253,7 @@ export const post = router({
           query,
           since,
           until,
+          reply,
           from,
           to,
           minLikes,
@@ -164,8 +271,25 @@ export const post = router({
           .leftJoin(
             (eb) =>
               eb
+                .selectFrom("User")
+                .select([
+                  "User.id",
+                  "User.name",
+                  "User.username",
+                  "User.image",
+                  "User.verified",
+                ])
+                .as("Author"),
+            (join) => join.onRef("Post.userId", "=", "Author.id"),
+          )
+          .leftJoin(
+            (eb) =>
+              eb
                 .selectFrom("_Like")
-                .select(["_Like.A", sql<number>`COUNT(*)::int`.as("count")])
+                .select((eb) => [
+                  "_Like.A",
+                  eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
+                ])
                 .groupBy("_Like.A")
                 .as("AggrLike"),
             (join) => join.onRef("Post.id", "=", "AggrLike.A"),
@@ -174,9 +298,9 @@ export const post = router({
             (eb) =>
               eb
                 .selectFrom("Post")
-                .select([
+                .select((eb) => [
                   "Post.parentId",
-                  sql<number>`COUNT(*)::int`.as("count"),
+                  eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
                 ])
                 .groupBy("Post.parentId")
                 .as("AggrReply"),
@@ -188,6 +312,12 @@ export const post = router({
             "Post.userId",
             "Post.content",
             "Post.parentId",
+            "Post.media",
+            "Post.views",
+            "Author.name",
+            "Author.username",
+            "Author.verified",
+            "Author.image as avatar",
             (eb) =>
               eb.fn.coalesce("AggrLike.count", sql<number>`0`).as("likeCount"),
             (eb) =>
@@ -195,6 +325,11 @@ export const post = router({
                 .coalesce("AggrReply.count", sql<number>`0`)
                 .as("replyCount"),
           ])
+          .$narrowType<{
+            name: NotNull;
+            username: NotNull;
+            verified: NotNull;
+          }>()
           .limit(maxResults + 1);
 
         const toTsvector = sql`to_tsvector(concat_ws(' ', "Post"."content"))`;
@@ -218,17 +353,19 @@ export const post = router({
           });
         }
 
+        if (reply !== undefined) {
+          dbQuery = dbQuery.where(({ eb }) =>
+            eb("Post.parentId", reply ? "is not" : "is", null),
+          );
+        }
+
         if (from) {
-          dbQuery = dbQuery
-            .leftJoin("User as Author", (join) =>
-              join.onRef("Author.id", "=", "Post.userId"),
-            )
-            .where(({ eb, and }) =>
-              and([
-                eb("Author.username", "=", from),
-                eb("Author.id", "is not", null),
-              ]),
-            );
+          dbQuery = dbQuery.where(({ eb, and }) =>
+            and([
+              eb("Author.username", "=", from),
+              eb("Author.id", "is not", null),
+            ]),
+          );
         }
 
         if (to) {

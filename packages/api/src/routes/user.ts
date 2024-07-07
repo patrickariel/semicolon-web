@@ -1,4 +1,9 @@
-import { Username } from "../schema";
+import {
+  BirthdaySchema,
+  PublicUserResolvedSchema,
+  UserResolvedSchema,
+  UsernameSchema,
+} from "../schema";
 import {
   router,
   publicProcedure,
@@ -6,90 +11,143 @@ import {
   newUserProcedure,
 } from "@semicolon/api/trpc";
 import { update } from "@semicolon/auth";
-import { db } from "@semicolon/db";
-import { UserSchema } from "@semicolon/db";
+import { Prisma, db } from "@semicolon/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const user = router({
   id: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/users/id/{id}" } })
+    .meta({ openapi: { method: "GET", path: "/users/by/id/{id}" } })
     .input(z.object({ id: z.string().uuid() }))
-    .output(
-      UserSchema.omit({
-        email: true,
-        emailVerified: true,
-        updatedAt: true,
-        birthday: true,
-      }),
-    )
+    .output(PublicUserResolvedSchema)
     .query(async ({ input: { id } }) => {
       const user = await db.user.findUnique({
-        where: { id },
+        where: { id, registered: { not: null } },
+        include: {
+          _count: {
+            select: {
+              followedBy: true,
+              following: true,
+            },
+          },
+        },
       });
 
-      if (!user?.registered) {
+      if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "The requested user does not exist",
         });
       }
 
-      return user;
+      return {
+        ...user,
+        name: user.name!,
+        username: user.username!,
+        registered: user.registered!,
+        following: user._count.following,
+        followers: user._count.followedBy,
+      };
+    }),
+  username: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/users/by/username/{username}" } })
+    .input(z.object({ username: UsernameSchema }))
+    .output(PublicUserResolvedSchema)
+    .query(async ({ input: { username } }) => {
+      const user = await db.user.findUnique({
+        where: { username, registered: { not: null } },
+        include: {
+          _count: {
+            select: {
+              followedBy: true,
+              following: true,
+            },
+          },
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The requested user does not exist",
+        });
+      }
+
+      return {
+        ...user,
+        name: user.name!,
+        username: user.username!,
+        registered: user.registered!,
+        following: user._count.following,
+        followers: user._count.followedBy,
+      };
     }),
   me: userProcedure
     .meta({ openapi: { method: "GET", path: "/users/me" } })
     .input(z.void())
-    .output(
-      UserSchema.merge(
-        z.object({
-          name: z.string(),
-          username: z.string(),
-          birthday: z.date(),
-        }),
-      ),
-    )
+    .output(UserResolvedSchema)
     .query(({ ctx: { user } }) => user),
   register: newUserProcedure
     .input(
       z.object({
         name: z.string(),
-        username: Username,
+        username: UsernameSchema,
         image: z.string().url().optional(),
-        birthday: z.date(),
+        birthday: BirthdaySchema,
       }),
     )
     .mutation(async ({ ctx: { user }, input }) => {
-      const { name, username, image, registered } = await db.user.update({
-        where: { email: user.email },
-        data: { ...input, registered: true },
-      });
+      const { name, username, image, registered } = await db.user
+        .update({
+          where: { email: user.email },
+          data: { ...input, registered: new Date() },
+        })
+        .catch((e: unknown) => {
+          if (
+            e instanceof Prisma.PrismaClientKnownRequestError &&
+            e.code === "P2002"
+          ) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "The username is already taken",
+            });
+          }
+          throw e;
+        });
 
       await update({ user: { name, username, image, registered } });
     }),
   search: publicProcedure
     .input(z.object({ query: z.string() }))
-    .output(
-      z.array(
-        UserSchema.omit({
-          email: true,
-          emailVerified: true,
-          updatedAt: true,
-          birthday: true,
-        }),
-      ),
-    )
-    .query(
-      async ({ input: { query } }) =>
-        await db.user.findMany({
-          where: {
-            username: {
-              search: query,
-            },
-            bio: {
-              search: query,
+    .output(z.array(PublicUserResolvedSchema))
+    .query(async ({ input: { query } }) => {
+      const users = await db.user.findMany({
+        where: {
+          username: {
+            search: query,
+          },
+          bio: {
+            search: query,
+          },
+          NOT: { registered: null },
+        },
+        include: {
+          _count: {
+            select: {
+              followedBy: true,
+              following: true,
             },
           },
-        }),
-    ),
+        },
+      });
+
+      return users.map((user) => ({
+        ...user,
+        name: user.name!,
+        username: user.username!,
+        registered: user.registered!,
+        following: user._count.following,
+        followers: user._count.followedBy,
+      }));
+    }),
 });

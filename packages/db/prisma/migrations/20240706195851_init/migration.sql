@@ -4,7 +4,9 @@ CREATE TABLE "User" (
     "username" TEXT,
     "name" TEXT,
     "email" TEXT NOT NULL,
-    "registered" BOOLEAN NOT NULL DEFAULT false,
+    "registered" TIMESTAMP(3),
+    "location" TEXT,
+    "verified" BOOLEAN NOT NULL DEFAULT false,
     "emailVerified" TIMESTAMP(3),
     "birthday" TIMESTAMP(3),
     "image" TEXT,
@@ -57,20 +59,12 @@ CREATE TABLE "Post" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" UUID NOT NULL,
-    "content" TEXT NOT NULL,
+    "content" TEXT,
     "parentId" UUID,
+    "views" INTEGER NOT NULL DEFAULT 0,
+    "media" TEXT[],
 
     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Media" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "postId" UUID NOT NULL,
-    "mediaUrl" TEXT NOT NULL,
-    "mediaType" TEXT NOT NULL,
-
-    CONSTRAINT "Media_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -117,9 +111,6 @@ ALTER TABLE "Post" ADD CONSTRAINT "Post_userId_fkey" FOREIGN KEY ("userId") REFE
 
 -- AddForeignKey
 ALTER TABLE "Post" ADD CONSTRAINT "Post_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Post"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Media" ADD CONSTRAINT "Media_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_UserFollow" ADD CONSTRAINT "_UserFollow_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

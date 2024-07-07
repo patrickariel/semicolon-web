@@ -1,7 +1,18 @@
-"use client";
+import { PostAuthForm, PreAuthForm } from "@/components/auth-form";
+import { auth } from "@semicolon/auth";
+import { redirect } from "next/navigation";
+import React from "react";
 
-import { AuthForm, AuthVariant } from "@/components/auth-form";
+export default async function Page() {
+  const session = await auth();
 
-export default function Page() {
-  return <AuthForm variant={AuthVariant.LogIn} />;
+  if (session?.user?.registered) {
+    redirect("/home");
+  }
+
+  return !session ? (
+    <PreAuthForm variant="login" />
+  ) : (
+    <PostAuthForm defaultName={session.user?.name} />
+  );
 }

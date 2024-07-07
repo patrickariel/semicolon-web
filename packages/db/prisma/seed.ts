@@ -1,14 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { Prisma } from "@prisma/client";
 import { db } from "@semicolon/db";
-import { sql } from "kysely";
 import _ from "lodash";
-
-function randomExcluded(min: number, max: number, exclude: number) {
-  let n = Math.floor(Math.random() * (max - min) + min);
-  if (n >= exclude) n++;
-  return n;
-}
 
 async function main() {
   await db.user.create({
@@ -18,25 +11,52 @@ async function main() {
       username: "john.smith",
       email: "john.smith@example.com",
       bio: "Software developer.",
+      location: faker.location.country(),
+      verified: true,
+      image: faker.image.avatar(),
+      birthday: faker.date.between({
+        from: "1990-01-01",
+        to: "2007-01-01",
+      }),
+      registered: faker.date.between({
+        from: "2020-01-01",
+        to: "2024-01-01",
+      }),
     },
   });
 
   const users = await db.user.createManyAndReturn({
     data: _.range(0, 50).map(() => ({
       name: faker.person.fullName(),
-      username: faker.internet.userName(),
+      username: faker.internet.userName().substring(0, 15),
       email: faker.internet.email(),
+      location: faker.location.country(),
+      verified: _.sample([true, false]),
       bio: faker.person.bio(),
+      image: faker.image.avatar(),
+      birthday: faker.date.between({
+        from: "1990-01-01",
+        to: "2007-01-01",
+      }),
+      registered: faker.date.between({
+        from: "2020-01-01",
+        to: "2024-01-01",
+      }),
     })),
   });
 
   await db.$kysely
     .insertInto("_UserFollow")
-    .values(
-      users.map(({ id }, i) => ({
-        A: sql`${users[randomExcluded(0, users.length - 1, i)]!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        B: sql`${id}::uuid`,
-      })),
+    .values((eb) =>
+      users.flatMap(({ id }, i) => {
+        const otherUsers = users.slice();
+        otherUsers.splice(i, 1);
+        const sampledUsers = _.sampleSize(otherUsers, _.random(5, 50));
+        return sampledUsers.map((user) => ({
+          A: eb.cast(eb.val(user.id), "uuid"),
+          B: eb.cast(eb.val(id), "uuid"),
+        }));
+      }),
     )
     .execute();
 
@@ -51,21 +71,33 @@ async function main() {
           }),
           createdAt: faker.date.between({
             from: "2020-01-01",
-            to: "2024-01-01",
+            to: new Date(),
           }),
+          views: _.random(5, 500),
+          media: _.sample([
+            [],
+            _.range(0, _.random(1, 4)).map(() =>
+              faker.image.urlPicsumPhotos({
+                width: _.random(800, 1600),
+                height: _.random(800, 1600),
+              }),
+            ),
+          ]),
         })),
       ),
     ),
   });
 
-  for (const chunk of _.chunk(posts, 32767 / 2)) {
+  for (const chunk of _.chunk(posts, 32767 / (2 * 150))) {
     await db.$kysely
       .insertInto("_Like")
-      .values(
-        chunk.map((post) => ({
-          A: sql`${post.id}::uuid`,
-          B: sql`${_.sample(users)!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        })),
+      .values((eb) =>
+        chunk.flatMap((post) =>
+          _.sampleSize(users, _.random(5, users.length)).map((user) => ({
+            A: eb.cast(eb.val(post.id), "uuid"),
+            B: eb.cast(eb.val(user.id), "uuid"),
+          })),
+        ),
       )
       .execute();
   }
@@ -75,28 +107,40 @@ async function main() {
       posts.map((post) =>
         _.range(0, 5).map((): Prisma.PostCreateManyAndReturnArgs["data"] => ({
           parentId: post.id,
-          userId: _.sample(users)!.id, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          userId: _.sample(users)!.id,
           content: faker.lorem.paragraph({
             min: 1,
             max: 4,
           }),
           createdAt: faker.date.between({
             from: post.createdAt,
-            to: "2024-01-01",
+            to: new Date(),
           }),
+          views: _.random(5, 500),
+          media: _.sample([
+            [],
+            _.range(0, _.random(1, 4)).map(() =>
+              faker.image.urlPicsumPhotos({
+                width: _.random(800, 1600),
+                height: _.random(800, 1600),
+              }),
+            ),
+          ]),
         })),
       ),
     ),
   });
 
-  for (const posts of _.chunk(replies, 32767 / 2)) {
+  for (const chunk of _.chunk(replies, 32767 / (2 * 150))) {
     await db.$kysely
       .insertInto("_Like")
-      .values(
-        posts.map((post) => ({
-          A: sql`${post.id}::uuid`,
-          B: sql`${_.sample(users)!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        })),
+      .values((eb) =>
+        chunk.flatMap((post) =>
+          _.sampleSize(users, _.random(5, users.length)).map((user) => ({
+            A: eb.cast(eb.val(post.id), "uuid"),
+            B: eb.cast(eb.val(user.id), "uuid"),
+          })),
+        ),
       )
       .execute();
   }
@@ -106,28 +150,40 @@ async function main() {
       replies.map((reply) =>
         _.range(0, 5).map((): Prisma.PostCreateManyAndReturnArgs["data"] => ({
           parentId: reply.id,
-          userId: _.sample(users)!.id, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          userId: _.sample(users)!.id,
           content: faker.lorem.paragraph({
             min: 1,
             max: 4,
           }),
           createdAt: faker.date.between({
             from: reply.createdAt,
-            to: "2024-01-01",
+            to: new Date(),
           }),
+          views: _.random(5, 500),
+          media: _.sample([
+            [],
+            _.range(0, _.random(1, 4)).map(() =>
+              faker.image.urlPicsumPhotos({
+                width: _.random(800, 1600),
+                height: _.random(800, 1600),
+              }),
+            ),
+          ]),
         })),
       ),
     ),
   });
 
-  for (const replies of _.chunk(moreReplies, 32767 / 2)) {
+  for (const chunk of _.chunk(moreReplies, 32767 / (2 * 150))) {
     await db.$kysely
       .insertInto("_Like")
-      .values(
-        replies.map((post) => ({
-          A: sql`${post.id}::uuid`,
-          B: sql`${_.sample(users)!.id}::uuid`, // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        })),
+      .values((eb) =>
+        chunk.flatMap((post) =>
+          _.sampleSize(users, _.random(5, users.length)).map((user) => ({
+            A: eb.cast(eb.val(post.id), "uuid"),
+            B: eb.cast(eb.val(user.id), "uuid"),
+          })),
+        ),
       )
       .execute();
   }
