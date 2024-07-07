@@ -1,3 +1,4 @@
+import { feed } from "./routes/feed";
 import { post } from "./routes/post";
 import { user } from "./routes/user";
 import { router } from "./trpc";
@@ -6,6 +7,7 @@ import { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 export const appRouter = router({
   user,
   post,
+  feed,
 });
 
 export type AppRouter = typeof appRouter;
