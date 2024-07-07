@@ -4,28 +4,34 @@ import { uploadMedia } from "@/lib/actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@semicolon/ui/carousel";
 import { FormField, FormItem, FormControl, Form } from "@semicolon/ui/form";
-import { Input } from "@semicolon/ui/input";
+import Spinner from "@semicolon/ui/spinner";
 import { Textarea } from "@semicolon/ui/textarea";
 import { useToast } from "@semicolon/ui/use-toast";
 import { cn } from "@semicolon/ui/utils";
 import _ from "lodash";
-import { Smile, User, Image as ImageIcon } from "lucide-react";
+import {
+  Smile,
+  User,
+  Image as ImageIcon,
+  CircleX,
+  RotateCw,
+} from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useImmer } from "use-immer";
 import { z } from "zod";
 
 const PostSchema = z.object({
   content: z.string().optional(),
-  media: z.record(
-    z.string(),
-    z.object({
-      file: z.instanceof(File),
-      url: z.string().optional(),
-      isUploading: z.boolean(),
-    }),
-  ),
 });
 
 export function PostForm({
@@ -41,21 +47,32 @@ export function PostForm({
   const form = useForm<z.infer<typeof PostSchema>>({
     resolver: zodResolver(PostSchema),
   });
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const mediaInputRef = useRef<HTMLInputElement | null>(null);
+  const [media, updateMedia] = useImmer<
+    Record<
+      string,
+      { file: File; status: "uploading" | "success" | "failed"; url?: string }
+    >
+  >({});
+  const [content, setContent] = useState<string | undefined>();
   const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
 
   useEffect(() => {
-    const subscription = form.watch(({ content, media }) => {
-      if (media && Object.keys(media).length > 0) {
-        setSubmitDisabled(
-          Object.entries(media).some(([_, info]) => info?.isUploading),
-        );
-      } else {
-        setSubmitDisabled((content?.length ?? 0) === 0);
-      }
+    const subscription = form.watch(({ content }) => {
+      setContent(content);
     });
     return () => subscription.unsubscribe();
   }, [form, form.watch]);
+
+  useEffect(() => {
+    if (Object.keys(media).length > 0) {
+      setSubmitDisabled(
+        Object.entries(media).some(([_, { status }]) => status !== "success"),
+      );
+    } else {
+      setSubmitDisabled(!!!content);
+    }
+  }, [content, media]);
 
   const handleSubmit = (data: z.infer<typeof PostSchema>) => {
     toast({
@@ -78,6 +95,41 @@ export function PostForm({
           </AvatarFallback>
         </Avatar>
       </div>
+
+      <input
+        ref={mediaInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        multiple
+        onChange={async (e) => {
+          await Promise.allSettled(
+            [...(e.currentTarget.files ?? [])].map(async (file) => {
+              const blobUrl = URL.createObjectURL(file);
+
+              updateMedia((media) => {
+                media[blobUrl] = {
+                  file,
+                  status: "uploading",
+                };
+              });
+
+              const form = new FormData();
+              form.set("media", file);
+              const result = await uploadMedia(form);
+
+              updateMedia((media) => {
+                const target = media[blobUrl];
+                if (target) {
+                  target.status = result ? "success" : "failed";
+                  target.url = result ? result.url : undefined;
+                }
+              });
+            }),
+          );
+        }}
+      />
+
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
@@ -100,72 +152,84 @@ export function PostForm({
             )}
           />
 
-          {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            Object.entries(form.getValues("media") ?? {}).map(
-              ([blobUrl], i) => (
-                <Image
-                  key={i}
-                  src={blobUrl}
-                  alt={`Media upload preview (${i})`}
-                  width={300}
-                  height={200}
-                />
-              ),
-            )
-          }
+          {Object.keys(media).length > 0 && (
+            <Carousel
+              opts={{ align: "end", startIndex: Object.keys(media).length }}
+              className="mr-14"
+            >
+              <CarouselContent>
+                {Object.entries(media).map(([blobUrl, { status, file }], i) => (
+                  <CarouselItem
+                    className={Object.keys(media).length > 1 ? "basis-1/2" : ""}
+                    key={i}
+                  >
+                    <div className="relative mx-auto w-fit">
+                      <Image
+                        src={blobUrl}
+                        alt={`Media upload preview (${i})`}
+                        className={`mx-auto rounded-lg ${status !== "success" ? "brightness-50" : ""}`}
+                        width={300}
+                        height={200}
+                      />
+                      {status === "uploading" && (
+                        <Spinner className="absolute inset-0 m-auto block" />
+                      )}
+                      {status === "failed" && (
+                        <div className="absolute inset-0 m-auto flex size-fit flex-col items-center justify-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="flex items-center justify-center mix-blend-lighten brightness-75 transition-all hover:bg-transparent hover:brightness-100"
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              updateMedia((media) => {
+                                const target = media[blobUrl];
+                                if (target) {
+                                  target.status = "uploading";
+                                }
+                              });
 
-          <FormField
-            name="media"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem className="space-y-0">
-                <Input
-                  {..._.omit(field, "value")}
-                  type="file"
-                  id="upload"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  className="hidden"
-                  multiple
-                  onChange={async (e) => {
-                    if (e.target.files) {
-                      const fileMap: typeof field.value = {};
-                      for (const file of [...e.target.files]) {
-                        const blobUrl = URL.createObjectURL(file);
-                        fileMap[blobUrl] = {
-                          file,
-                          isUploading: true,
-                        };
-                      }
+                              const form = new FormData();
+                              form.set("media", file);
+                              const result = await uploadMedia(form);
 
-                      field.onChange({
-                        ...field.value,
-                        ...fileMap,
-                      });
-
-                      await Promise.allSettled(
-                        Object.entries(fileMap).map(
-                          async ([objUrl, { file }]) => {
-                            const uploadForm = new FormData();
-                            uploadForm.append("media", file);
-                            const { url } = await uploadMedia(uploadForm);
-
-                            fileMap[objUrl]!.isUploading = false;
-                            fileMap[objUrl]!.url = url;
-                            field.onChange({
-                              ...field.value,
-                              ...fileMap,
-                            });
-                          },
-                        ),
-                      );
-                    }
-                  }}
-                />
-              </FormItem>
-            )}
-          />
+                              updateMedia((media) => {
+                                const target = media[blobUrl];
+                                if (target) {
+                                  target.status = result ? "success" : "failed";
+                                  target.url = result ? result.url : undefined;
+                                }
+                              });
+                            }}
+                          >
+                            <RotateCw />
+                          </Button>
+                          <p className="font-black text-red-400">Error</p>
+                        </div>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 flex items-center justify-center mix-blend-difference brightness-75 transition-all hover:bg-transparent hover:brightness-100"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          updateMedia((media) => _.omit(media, blobUrl));
+                        }}
+                      >
+                        <CircleX />
+                      </Button>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {Object.keys(media).length > 2 && (
+                <>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </>
+              )}
+            </Carousel>
+          )}
 
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center justify-center gap-2.5">
@@ -182,7 +246,7 @@ export function PostForm({
                 className="m-0 rounded-full hover:bg-sky-400/10"
                 onClick={(e) => {
                   e.preventDefault();
-                  fileInputRef.current?.click();
+                  mediaInputRef.current?.click();
                 }}
               >
                 <ImageIcon className="stroke-sky-400" />
