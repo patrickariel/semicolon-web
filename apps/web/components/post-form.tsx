@@ -237,8 +237,8 @@ export function PostForm({
               </CarouselContent>
               {Object.keys(media).length > 2 && (
                 <>
-                  <CarouselPrevious className="hover:bg-background left-3 top-1/2 -translate-y-1/2 opacity-45 transition-opacity hover:opacity-85" />
-                  <CarouselNext className="hover:bg-background right-3 top-1/2 -translate-y-1/2 opacity-45 transition-opacity hover:opacity-85" />
+                  <CarouselPrevious className="hover:bg-background left-3 top-1/2 -translate-y-1/2 opacity-45 transition-opacity hover:opacity-85 disabled:opacity-10" />
+                  <CarouselNext className="hover:bg-background right-3 top-1/2 -translate-y-1/2 opacity-45 transition-opacity hover:opacity-85 disabled:opacity-10" />
                 </>
               )}
             </Carousel>
