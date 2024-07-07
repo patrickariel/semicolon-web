@@ -9,15 +9,29 @@ import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
 import _ from "lodash";
 import { useSession } from "next-auth/react";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 
 export default function Page() {
-  const { data: feed } = trpc.feed.recommend.useInfiniteQuery(
+  const {
+    data: feed,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = trpc.feed.recommend.useInfiniteQuery(
     { maxResults: 25 },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
   const [myPosts, setMyPosts] = useState<PostResolved[]>([]);
   const { data: session } = useSession();
+  const { ref, inView } = useInView({
+    threshold: 0.9,
+  });
+
+  useEffect(() => {
+    if (feed && inView && !isFetchingNextPage) {
+      void fetchNextPage();
+    }
+  }, [feed, inView, isFetchingNextPage, fetchNextPage]);
 
   return (
     <div className="flex flex-col">
@@ -36,7 +50,7 @@ export default function Page() {
       />
       <Separator />
       {feed ? (
-        <div className="mb-4 flex flex-col">
+        <div className="flex flex-col">
           {myPosts
             .concat(feed.pages.flatMap((page) => page.results))
             .map((tweet, i) => (
@@ -49,6 +63,15 @@ export default function Page() {
       ) : (
         <div className="flex min-h-20 items-center justify-center">
           <Spinner size={30} />
+        </div>
+      )}
+      {feed && (
+        <div className="flex h-20 flex-row items-center justify-center">
+          {isFetchingNextPage ? (
+            <Spinner />
+          ) : (
+            <div ref={ref} className="h-full"></div>
+          )}
         </div>
       )}
     </div>
