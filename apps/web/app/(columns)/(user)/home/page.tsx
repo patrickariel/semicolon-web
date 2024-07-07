@@ -10,7 +10,6 @@ import { Alert, AlertDescription, AlertTitle } from "@semicolon/ui/alert";
 import { Button } from "@semicolon/ui/button";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
-import { cn } from "@semicolon/ui/utils";
 import _ from "lodash";
 import { RotateCw } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -27,7 +26,7 @@ export default function Page() {
     isFetchNextPageError,
     refetch,
   } = trpc.feed.recommend.useInfiniteQuery(
-    { maxResults: 25 },
+    { maxResults: 15 },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
   const [myPosts, setMyPosts] = useState<PostResolved[]>([]);
@@ -97,14 +96,23 @@ export default function Page() {
       )}
       {!isLoadingError && (
         <div className="flex min-h-20 flex-row items-center justify-center">
-          {(isFetchNextPageError as boolean) ? (
+          {(isFetchNextPageError as boolean) && !isFetchingNextPage ? (
             <div className="border-destructive m-5 flex flex-grow flex-row items-center justify-between rounded-lg border p-0">
               <Alert variant="destructive" className="border-none">
                 <ExclamationTriangleIcon className="h-4 w-4" />
-                <AlertTitle>Failed to fetch next page</AlertTitle>
-                <AlertDescription>We will continue to retry.</AlertDescription>
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                  There was a problem fetching your posts.
+                </AlertDescription>
               </Alert>
-              <Spinner className="stroke-destructive mr-4" />
+              <Button
+                size={"icon"}
+                variant={"ghost"}
+                className="hover:bg-destructive/30 mr-4 aspect-square rounded-full"
+                onClick={() => refetch()}
+              >
+                <RotateCw className="stroke-destructive" />
+              </Button>
             </div>
           ) : isFetchingNextPage ? (
             <Spinner />
