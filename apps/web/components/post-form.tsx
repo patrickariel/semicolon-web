@@ -109,7 +109,7 @@ export function PostForm({
         ref={mediaInputRef}
         disabled={mediaDisabled}
         type="file"
-        accept="image/*"
+        accept="image/png, image/jpeg, image/webp"
         className="hidden"
         multiple
         onChange={async (e) => {

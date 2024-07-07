@@ -5,18 +5,19 @@ import { auth } from "@semicolon/auth";
 import { PutBlobResult, put } from "@vercel/blob";
 import _ from "lodash";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 export async function uploadMedia(
   formData: FormData,
 ): Promise<PutBlobResult | null> {
   if (!(await auth())) {
-    redirect("/flow/signup");
+    return null;
   }
 
   const media = formData.get("media") as File | null;
 
   if (!(media instanceof File)) {
+    return null;
+  } else if (!["image/png", "image/jpeg", "image/webp"].includes(media.type)) {
     return null;
   }
 
