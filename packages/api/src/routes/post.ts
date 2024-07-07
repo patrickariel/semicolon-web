@@ -116,7 +116,7 @@ export const post = router({
         .object({
           content: z.string().optional(),
           to: z.string().uuid().optional(),
-          media: z.array(z.string().url()),
+          media: z.array(z.string().url()).max(4),
         })
         .refine(
           ({ content, media }) => media.length > 0 || content !== undefined,

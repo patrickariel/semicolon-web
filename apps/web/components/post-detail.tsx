@@ -12,6 +12,7 @@ import {
   Upload,
   User,
 } from "lucide-react";
+import Link from "next/link";
 
 export function PostDetail({
   name,
@@ -28,17 +29,23 @@ export function PostDetail({
   return (
     <div className="flex flex-col gap-3 px-4">
       <div className="flex flex-row items-center gap-3">
-        <Avatar className="size-11">
-          {avatar && <AvatarImage width={300} height={300} src={avatar} />}
-          <AvatarFallback>
-            <User />
-          </AvatarFallback>
-        </Avatar>
+        <Link href={`/${username}`} className="hover:underline">
+          <Avatar className="size-11">
+            {avatar && <AvatarImage width={300} height={300} src={avatar} />}
+            <AvatarFallback>
+              <User />
+            </AvatarFallback>
+          </Avatar>
+        </Link>
         <div className="flex flex-col">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-md font-semibold">{name}</h4>
-              <p className="text-sm text-zinc-500">@{username}</p>
+              <Link href={`/${username}`} className="hover:underline">
+                <h4 className="text-md font-semibold">{name}</h4>
+              </Link>
+              <Link href={`/${username}`}>
+                <p className="text-sm text-zinc-500">@{username}</p>
+              </Link>
             </div>
           </div>
         </div>
@@ -47,7 +54,9 @@ export function PostDetail({
       {media.length > 0 && <ThumbGrid srcs={media} />}
       <div className="flex flex-row items-center gap-1">
         <div className="text-sm text-zinc-500">
-          {formatLongDate(createdAt)}
+          <Link href={`/post/${id}`} className="hover:underline">
+            {formatLongDate(createdAt)}
+          </Link>
           {" · "}
           <b className="text-foreground text-base font-extrabold">
             {new Intl.NumberFormat("en-US", { notation: "compact" }).format(
@@ -57,7 +66,7 @@ export function PostDetail({
           views
         </div>
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Separator />
         <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
           <PostButton
