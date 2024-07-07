@@ -20,6 +20,7 @@ import {
   MessageCircle,
   Repeat2,
   Upload,
+  User,
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
@@ -62,7 +63,9 @@ export function Post({
         >
           <Avatar className="size-11">
             {avatar && <AvatarImage width={300} height={300} src={avatar} />}
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback>
+              <User />
+            </AvatarFallback>
           </Avatar>{" "}
         </Link>
       </div>

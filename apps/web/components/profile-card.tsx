@@ -1,7 +1,7 @@
 import { NavTab, NavTabItem } from "./nav-tab";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
-import { BadgeCheck, CalendarDays, MapPin } from "lucide-react";
+import { BadgeCheck, CalendarDays, MapPin, User } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
@@ -56,7 +56,9 @@ const ProfileCard = ({
               {profileImage && (
                 <AvatarImage src={profileImage} alt="Profile Photo" />
               )}
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback>
+                <User />
+              </AvatarFallback>
             </Avatar>
 
             {isOwner ? (
