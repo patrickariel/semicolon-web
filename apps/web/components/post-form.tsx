@@ -2,6 +2,7 @@
 
 import { uploadMedia } from "@/lib/actions";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AspectRatio } from "@semicolon/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
 import {
@@ -163,14 +164,16 @@ export function PostForm({
                     className={Object.keys(media).length > 1 ? "basis-1/2" : ""}
                     key={i}
                   >
-                    <div className="relative mx-auto w-fit">
-                      <Image
-                        src={blobUrl}
-                        alt={`Media upload preview (${i})`}
-                        className={`mx-auto rounded-lg ${status !== "success" ? "brightness-50" : ""}`}
-                        width={300}
-                        height={200}
-                      />
+                    <div className="relative">
+                      <AspectRatio ratio={1 / 1}>
+                        <Image
+                          src={blobUrl}
+                          alt={`Media upload preview (${i})`}
+                          className={`rounded-lg ${status !== "success" ? "brightness-50" : ""} object-cover`}
+                          fill
+                        />
+                      </AspectRatio>
+
                       {status === "uploading" && (
                         <Spinner className="absolute inset-0 m-auto block" />
                       )}
