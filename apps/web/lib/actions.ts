@@ -33,7 +33,7 @@ export async function uploadMedia(
       return null;
     }
   } else {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     const url = faker.image.urlPicsumPhotos({
       width: _.random(800, 1600),

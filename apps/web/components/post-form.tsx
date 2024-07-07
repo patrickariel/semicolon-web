@@ -57,6 +57,7 @@ export function PostForm({
   >({});
   const [content, setContent] = useState<string | undefined>();
   const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
+  const [mediaDisabled, setMediaDisabled] = useState<boolean>(true);
 
   useEffect(() => {
     const subscription = form.watch(({ content }) => {
@@ -75,6 +76,10 @@ export function PostForm({
     }
   }, [content, media]);
 
+  useEffect(() => {
+    setMediaDisabled(Object.keys(media).length > 3);
+  }, [media]);
+
   const handleSubmit = (data: z.infer<typeof PostSchema>) => {
     toast({
       title: "You submitted the following values:",
@@ -87,7 +92,10 @@ export function PostForm({
   };
 
   return (
-    <div className={cn("flex w-full flex-row gap-3 p-3", className)} {...props}>
+    <div
+      className={cn("flex w-full flex-row gap-3 p-3 pr-5", className)}
+      {...props}
+    >
       <div className="pt-2">
         <Avatar className="size-11">
           <AvatarImage src={avatar ?? undefined} />
@@ -99,6 +107,7 @@ export function PostForm({
 
       <input
         ref={mediaInputRef}
+        disabled={mediaDisabled}
         type="file"
         accept="image/*"
         className="hidden"
@@ -156,7 +165,6 @@ export function PostForm({
           {Object.keys(media).length > 0 && (
             <Carousel
               opts={{ align: "end", startIndex: Object.keys(media).length }}
-              className="mr-14"
             >
               <CarouselContent>
                 {Object.entries(media).map(([blobUrl, { status, file }], i) => (
@@ -165,7 +173,9 @@ export function PostForm({
                     key={i}
                   >
                     <div className="relative">
-                      <AspectRatio ratio={1 / 1}>
+                      <AspectRatio
+                        ratio={Object.keys(media).length > 1 ? 4 / 5 : 1}
+                      >
                         <Image
                           src={blobUrl}
                           alt={`Media upload preview (${i})`}
@@ -227,8 +237,8 @@ export function PostForm({
               </CarouselContent>
               {Object.keys(media).length > 2 && (
                 <>
-                  <CarouselPrevious />
-                  <CarouselNext />
+                  <CarouselPrevious className="hover:bg-background left-3 top-1/2 -translate-y-1/2 opacity-45 transition-opacity hover:opacity-85" />
+                  <CarouselNext className="hover:bg-background right-3 top-1/2 -translate-y-1/2 opacity-45 transition-opacity hover:opacity-85" />
                 </>
               )}
             </Carousel>
@@ -247,6 +257,7 @@ export function PostForm({
                 variant="ghost"
                 size="icon"
                 className="m-0 rounded-full hover:bg-sky-400/10"
+                disabled={mediaDisabled}
                 onClick={(e) => {
                   e.preventDefault();
                   mediaInputRef.current?.click();
