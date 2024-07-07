@@ -6,6 +6,7 @@ import {
 } from "@semicolon/api/schema";
 import { db } from "@semicolon/db";
 import { TRPCError } from "@trpc/server";
+import { BlobNotFoundError, head } from "@vercel/blob";
 import { Expression, NotNull, SqlBool } from "kysely";
 import { sql } from "kysely";
 import _ from "lodash";
@@ -124,6 +125,19 @@ export const post = router({
         ),
     )
     .mutation(async ({ ctx: { user }, input: { content, to, media } }) => {
+      try {
+        await Promise.all(media.map(async (blobUrl) => await head(blobUrl)));
+      } catch (error) {
+        if (error instanceof BlobNotFoundError) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "External media URLs are forbidden",
+          });
+        } else {
+          throw error;
+        }
+      }
+
       await db.post.create({
         data: {
           userId: user.id,
