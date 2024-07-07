@@ -1,7 +1,7 @@
 import { cn } from "@semicolon/ui/utils";
 import Link from "next/link";
 
-export function TabItem({
+export function NavTabItem({
   children,
   href,
   className,

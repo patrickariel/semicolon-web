@@ -1,8 +1,8 @@
 "use client";
 
+import { NavTab, NavTabItem } from "@/components/nav-tab";
 import { Post } from "@/components/post";
 import { PostForm } from "@/components/post-form";
-import { NavTab, TabItem } from "@/components/tab";
 import { trpc } from "@/lib/trpc-client";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
@@ -18,10 +18,10 @@ export default function Page() {
     <div className="flex flex-col">
       <div className="bg-card sticky top-0 z-50">
         <NavTab>
-          <TabItem href="#" active>
+          <NavTabItem href="#" active>
             For You
-          </TabItem>
-          <TabItem href="#">Following</TabItem>
+          </NavTabItem>
+          <NavTabItem href="#">Following</NavTabItem>
         </NavTab>
         <Separator />
       </div>
