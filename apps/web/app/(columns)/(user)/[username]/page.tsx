@@ -35,7 +35,7 @@ export default function Page({
         bio={user.bio}
         following={user.following}
         followers={user.followers}
-        coverImage="https://cdn.pixabay.com/photo/2017/08/05/12/58/computer-2583383_1280.jpg"
+        coverImage="https://picsum.photos/seed/picsum/1280/720"
         profileImage={user.image}
         location={user.location}
         createdAt={user.registered}
