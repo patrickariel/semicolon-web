@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@semicolon/ui/card";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, User } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -38,7 +38,9 @@ export function Suggestions() {
               <div className="flex min-w-0">
                 <Avatar className="size-11">
                   <AvatarImage width={300} height={300} src={user.avatar} />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarFallback>
+                    <User />
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex min-w-0 flex-col pl-2">
                   <span className="flex flex-row items-center gap-2 text-base font-bold">

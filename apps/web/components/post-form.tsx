@@ -1,6 +1,7 @@
 "use client";
 
 import { uploadMedia } from "@/lib/actions";
+import { trpc } from "@/lib/trpc-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AspectRatio } from "@semicolon/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
@@ -15,7 +16,6 @@ import {
 import { FormField, FormItem, FormControl, Form } from "@semicolon/ui/form";
 import Spinner from "@semicolon/ui/spinner";
 import { Textarea } from "@semicolon/ui/textarea";
-import { useToast } from "@semicolon/ui/use-toast";
 import { cn } from "@semicolon/ui/utils";
 import _ from "lodash";
 import {
@@ -35,18 +35,44 @@ const PostSchema = z.object({
   content: z.string().optional(),
 });
 
+type PostCallbacks = Parameters<(typeof trpc)["post"]["new"]["useMutation"]>[0];
+
 export function PostForm({
   className,
   avatar,
   placeholder = "What is happening?!",
+  onError,
+  onSuccess,
+  onSettled,
+  onMutate,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   avatar?: string | null;
   placeholder?: string;
-}) {
-  const { toast } = useToast();
+} & PostCallbacks) {
+  const postMutation = trpc.post.new.useMutation({
+    onMutate: (variables) => {
+      setSubmitDisabled(true);
+      onMutate?.(variables);
+    },
+    onError: (error, variables, context) => {
+      setSubmitDisabled(false);
+      onError?.(error, variables, context);
+    },
+    onSuccess: (data, variables, context) => {
+      form.reset();
+      if (mediaInputRef.current) {
+        mediaInputRef.current.value = "";
+      }
+      updateMedia(() => ({}));
+      onSuccess?.(data, variables, context);
+    },
+  });
   const form = useForm<z.infer<typeof PostSchema>>({
     resolver: zodResolver(PostSchema),
+    defaultValues: {
+      content: "",
+    },
   });
   const mediaInputRef = useRef<HTMLInputElement | null>(null);
   const [media, updateMedia] = useImmer<
@@ -80,14 +106,12 @@ export function PostForm({
     setMediaDisabled(Object.keys(media).length > 3);
   }, [media]);
 
-  const handleSubmit = (data: z.infer<typeof PostSchema>) => {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+  const handleSubmit = ({ content }: z.infer<typeof PostSchema>) => {
+    postMutation.mutate({
+      content,
+      media: Object.entries(media)
+        .map(([_, { url }]) => url)
+        .filter((v): v is string => v !== undefined),
     });
   };
 

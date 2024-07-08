@@ -124,6 +124,7 @@ export const post = router({
           { message: "Post must either contain content or media" },
         ),
     )
+    .output(PostResolvedSchema)
     .mutation(async ({ ctx: { user }, input: { content, to, media } }) => {
       try {
         await Promise.all(media.map(async (blobUrl) => await head(blobUrl)));
@@ -138,7 +139,7 @@ export const post = router({
         }
       }
 
-      await db.post.create({
+      const post = await db.post.create({
         data: {
           userId: user.id,
           parentId: to,
@@ -146,6 +147,16 @@ export const post = router({
           content,
         },
       });
+
+      return {
+        ...post,
+        name: user.name,
+        username: user.username,
+        verified: user.verified,
+        avatar: user.image,
+        likeCount: 0,
+        replyCount: 0,
+      };
     }),
   update: userProcedure
     .meta({ openapi: { method: "PUT", path: "/posts/id/{id}" } })
