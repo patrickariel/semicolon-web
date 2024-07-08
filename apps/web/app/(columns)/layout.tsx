@@ -7,8 +7,12 @@ import { redirect } from "next/navigation";
 
 export default async function Layout({
   children,
+  center,
+  right,
 }: Readonly<{
   children: React.ReactNode;
+  center: React.ReactNode;
+  right: React.ReactNode;
 }>) {
   const session = await auth();
 
@@ -27,7 +31,14 @@ export default async function Layout({
       <div className="flex min-h-full w-full flex-row justify-center">
         <SideBar {...{ username, name, image }} />
         <Separator orientation="vertical" className="h-auto min-h-screen" />
-        {children}
+        <div className="w-full min-w-[257px] md:max-w-[650px]">
+          {center}
+          {children}
+        </div>
+        <Separator orientation="vertical" className="h-auto min-h-screen" />
+        <div className="hidden min-h-full w-1/4 min-w-[300px] flex-none shrink-0 flex-col justify-start pl-[30px] pt-0 md:flex">
+          {right}
+        </div>
       </div>
       <BottomBar />
       <Toaster />
