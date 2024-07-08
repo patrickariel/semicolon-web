@@ -28,10 +28,7 @@ export function SideBar({
 }) {
   return (
     <div
-      className={cn(
-        "sticky top-0 hidden h-screen max-w-[300px] flex-col justify-between p-2 py-3 min-[500px]:flex lg:w-full lg:py-7 lg:pr-3",
-        className,
-      )}
+      className={cn("flex h-full flex-col justify-between", className)}
       {...props}
     >
       <div className="flex flex-col gap-4">

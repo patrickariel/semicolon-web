@@ -19,8 +19,10 @@ export default async function Layout({
   }
 
   return (
-    <div className="relative flex min-h-full w-full flex-row justify-center lg:container">
-      {left}
+    <div className="flex min-h-screen w-full flex-row justify-center lg:container">
+      <div className="sticky top-0 hidden h-screen max-w-[300px] overflow-hidden p-2 py-3 min-[500px]:block lg:w-full lg:py-7 lg:pr-3">
+        {left}
+      </div>
       <Separator orientation="vertical" className="h-auto min-h-screen" />
       <div className="w-full min-w-[257px] md:max-w-[650px]">{children}</div>
       <Separator orientation="vertical" className="h-auto min-h-screen" />
