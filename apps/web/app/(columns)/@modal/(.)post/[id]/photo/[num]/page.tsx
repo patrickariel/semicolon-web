@@ -2,6 +2,7 @@
 
 import { PostButton } from "@/components/post-button";
 import { PostDetail } from "@/components/post-detail";
+import { PostFeed } from "@/components/post-feed";
 import { PostForm } from "@/components/post-form";
 import { trpc } from "@/lib/trpc-client";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -14,6 +15,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@semicolon/ui/carousel";
+import { ScrollArea } from "@semicolon/ui/scroll-area";
+import { Separator } from "@semicolon/ui/separator";
+import Spinner from "@semicolon/ui/spinner";
 import _ from "lodash";
 import {
   Bookmark,
@@ -37,6 +41,18 @@ export default function Page({
   const { data: session } = useSession();
   const [api, setApi] = React.useState<CarouselApi>();
   const { data: post } = trpc.post.id.useQuery({ id });
+  const {
+    data: replies,
+    fetchNextPage,
+    isLoading,
+    isLoadingError,
+    isFetchingNextPage,
+    isFetchNextPageError,
+    refetch,
+  } = trpc.post.replies.useInfiniteQuery(
+    { id, maxResults: 15 },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
+  );
 
   const [startIndex, setStartIndex] = useState(() => {
     const int = parseInt(num);
@@ -66,7 +82,20 @@ export default function Page({
   }, [id, startIndex]);
 
   if (!post) {
-    return <div>loading...</div>;
+    return (
+      <Dialog.Root defaultOpen={true}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />
+          <Dialog.Content
+            className="fixed inset-0 z-50 flex h-screen flex-row items-center justify-center"
+            onEscapeKeyDown={() => router.back()}
+            onPointerDownOutside={() => router.back()}
+          >
+            <Spinner />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
   }
 
   const { replyCount, likeCount } = post;
@@ -137,13 +166,23 @@ export default function Page({
               <PostButton icon={Upload} onClick={() => undefined} />
             </div>
           </div>
-          <div className="bg-background hidden h-full w-[350px] flex-none flex-col py-4 lg:flex">
-            <PostDetail showMedia={false} {...post} />
-            <PostForm
-              avatar={session?.user?.image}
-              placeholder="Post your reply"
-            />
-          </div>
+          <ScrollArea className="h-full">
+            <div className="bg-background hidden h-full w-[350px] flex-none flex-col py-4 lg:flex">
+              <PostDetail showMedia={false} {...post} />
+              <PostForm
+                avatar={session?.user?.image}
+                placeholder="Post your reply"
+              />
+              <Separator />
+              <PostFeed
+                posts={(replies?.pages ?? []).flatMap((page) => page.replies)}
+                loading={isLoading || isFetchingNextPage}
+                error={isLoadingError || isFetchNextPageError}
+                fetchNextPage={fetchNextPage}
+                refetch={refetch}
+              />
+            </div>
+          </ScrollArea>
           <Button
             className="bg-background/50 hover:bg-background/80 fixed left-5 top-5 rounded-full"
             size="icon"
