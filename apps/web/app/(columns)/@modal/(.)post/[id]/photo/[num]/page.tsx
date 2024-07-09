@@ -67,7 +67,7 @@ export default function Page({
           onPointerDownOutside={() => router.back()}
         >
           <div className="flex h-full min-h-0 min-w-0 flex-grow flex-col justify-between">
-            <div className="flex min-h-0 min-w-0 flex-grow flex-col px-16">
+            <div className="flex min-h-0 min-w-0 flex-grow flex-col">
               <Carousel
                 opts={{ startIndex: initialStartIndex }}
                 setApi={setApi}
@@ -88,8 +88,8 @@ export default function Page({
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
+                <CarouselPrevious className="left-3 top-1/2 -translate-y-1/2" />
+                <CarouselNext className="right-3 top-1/2 -translate-y-1/2" />
               </Carousel>
             </div>
             <div className="flex h-14 w-full flex-none flex-row justify-between px-5 sm:px-16">
