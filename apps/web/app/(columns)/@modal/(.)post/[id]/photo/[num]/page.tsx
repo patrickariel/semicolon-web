@@ -49,12 +49,12 @@ export default function Page({
       return;
     }
     api.on("select", () => {
-      setStartIndex(api.selectedScrollSnap() + 1);
+      setStartIndex(api.selectedScrollSnap());
     });
   }, [api]);
 
   useEffect(() => {
-    window.history.pushState(null, "", `/post/${id}/photo/${startIndex}`);
+    window.history.pushState(null, "", `/post/${id}/photo/${startIndex + 1}`);
   }, [id, startIndex]);
 
   if (!post) {
