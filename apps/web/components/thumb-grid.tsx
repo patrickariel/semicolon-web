@@ -22,7 +22,7 @@ export function ThumbGrid({
           {media.map((src, i) => (
             <AspectRatio ratio={4 / 3} className="bg-muted w-full" key={i}>
               <Link
-                href={`/post/${id}/photo/${i + 1}`}
+                href={`/${username}/post/${id}/photo/${i + 1}`}
                 onClick={(e) => e.stopPropagation()}
                 scroll={false}
               >
@@ -50,7 +50,7 @@ export function ThumbGrid({
             <>
               <AspectRatio ratio={3 / 2} className="bg-muted w-full" key={i}>
                 <Link
-                  href={`/post/${id}/photo/${i + 1}`}
+                  href={`/${username}/post/${id}/photo/${i + 1}`}
                   onClick={(e) => e.stopPropagation()}
                   scroll={false}
                 >
@@ -78,7 +78,7 @@ export function ThumbGrid({
         >
           <AspectRatio ratio={4 / 3} className="bg-muted w-full">
             <Link
-              href={`/post/${id}/photo/1`}
+              href={`/${username}/post/${id}/photo/1`}
               onClick={(e) => e.stopPropagation()}
               scroll={false}
             >
@@ -102,7 +102,7 @@ export function ThumbGrid({
                     key={i}
                   >
                     <Link
-                      href={`/post/${id}/photo/${i + 2}`}
+                      href={`/${username}/post/${id}/photo/${i + 2}`}
                       onClick={(e) => e.stopPropagation()}
                       scroll={false}
                     >
@@ -136,7 +136,7 @@ export function ThumbGrid({
                 <>
                   <AspectRatio ratio={1} className="bg-muted h-full" key={i}>
                     <Link
-                      href={`/post/${id}/photo/${i + 1}`}
+                      href={`/${username}/post/${id}/photo/${i + 1}`}
                       onClick={(e) => e.stopPropagation()}
                       scroll={false}
                     >
@@ -161,7 +161,7 @@ export function ThumbGrid({
                 <>
                   <AspectRatio ratio={1} className="bg-muted h-full" key={i}>
                     <Link
-                      href={`/post/${id}/photo/${i + 3}`}
+                      href={`/${username}/post/${id}/photo/${i + 3}`}
                       onClick={(e) => e.stopPropagation()}
                       scroll={false}
                     >

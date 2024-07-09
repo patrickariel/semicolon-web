@@ -62,7 +62,7 @@ export function PostDetail({
       {showMedia && media.length > 0 && <ThumbGrid {...post} />}
       <div className="flex flex-row items-center gap-1">
         <div className="text-sm text-zinc-500">
-          <Link href={`/post/${id}`} className="hover:underline">
+          <Link href={`/${username}/post/${id}`} className="hover:underline">
             {formatLongDate(createdAt)}
           </Link>
           {" · "}
@@ -77,33 +77,21 @@ export function PostDetail({
       <div className="flex flex-col gap-2">
         <Separator />
         <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
-          <PostButton
-            icon={MessageCircle}
-            iconSize="big"
-            href={`/post/${id}`}
-            label={replyCount}
-          />
+          <PostButton icon={MessageCircle} iconSize="big" label={replyCount} />
           <PostButton
             icon={Repeat2}
             iconSize="big"
             highlight="green"
-            onClick={() => undefined}
             label={15}
           />
           <PostButton
             icon={Heart}
             iconSize="big"
             highlight="pink"
-            onClick={() => undefined}
             label={likeCount}
           />
-          <PostButton
-            icon={Bookmark}
-            iconSize="big"
-            onClick={() => undefined}
-            label={15}
-          />
-          <PostButton icon={Upload} onClick={() => undefined} />
+          <PostButton icon={Bookmark} iconSize="big" label={15} />
+          <PostButton icon={Upload} />
         </div>
         <Separator />
       </div>

@@ -41,11 +41,11 @@ export function Post(post: PostResolved) {
       tabIndex={0}
       onClick={() => {
         if (document.getSelection()?.type !== "Range") {
-          router.push(`/post/${id}`);
+          router.push(`/${username}/post/${id}`);
         }
       }}
       onKeyUp={(e) => {
-        e.key === "Enter" ? router.push(`/post/${id}`) : null;
+        e.key === "Enter" ? router.push(`/${username}/post/${id}`) : null;
       }}
     >
       <div className="pt-2">
@@ -92,7 +92,7 @@ export function Post(post: PostResolved) {
                 <Tooltip>
                   <TooltipTrigger>
                     <Link
-                      href={`/post/${id}`}
+                      href={`/${username}/post/${id}`}
                       className="text-muted-foreground text-nowrap align-middle text-sm hover:underline"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -113,31 +113,13 @@ export function Post(post: PostResolved) {
         {media.length > 0 && <ThumbGrid {...post} />}
 
         <div className="flex w-full min-w-0 items-center justify-between">
-          <PostButton
-            icon={MessageCircle}
-            href={`/post/${id}`}
-            label={replyCount}
-          />
-          <PostButton
-            icon={Repeat2}
-            highlight="green"
-            onClick={() => undefined}
-            label={15}
-          />
-          <PostButton
-            icon={Heart}
-            highlight="pink"
-            onClick={() => undefined}
-            label={likeCount}
-          />
-          <PostButton
-            icon={BarChart2}
-            onClick={() => undefined}
-            label={views}
-          />
+          <PostButton icon={MessageCircle} label={replyCount} />
+          <PostButton icon={Repeat2} highlight="green" label={15} />
+          <PostButton icon={Heart} highlight="pink" label={likeCount} />
+          <PostButton icon={BarChart2} label={views} />
           <div className="flex flex-row">
-            <PostButton icon={Bookmark} onClick={() => undefined} />
-            <PostButton icon={Upload} onClick={() => undefined} />
+            <PostButton icon={Bookmark} />
+            <PostButton icon={Upload} />
           </div>
         </div>
       </div>

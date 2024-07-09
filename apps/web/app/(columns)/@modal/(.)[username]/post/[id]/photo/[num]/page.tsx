@@ -33,9 +33,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export default function Page({
-  params: { id, num },
+  params: { username, id, num },
 }: {
-  params: { id: string; num: string };
+  params: { username: string; id: string; num: string };
 }) {
   const router = useRouter();
   const { data: session } = useSession();
@@ -77,9 +77,9 @@ export default function Page({
     window.history.replaceState(
       null,
       "",
-      `/post/${id}/photo/${startIndex + 1}`,
+      `/${username}/post/${id}/photo/${startIndex + 1}`,
     );
-  }, [id, startIndex]);
+  }, [username, id, startIndex]);
 
   if (!post) {
     return (
@@ -140,30 +140,22 @@ export default function Page({
               <PostButton
                 icon={MessageCircle}
                 iconSize="big"
-                href={`/post/${id}`}
                 label={replyCount}
               />
               <PostButton
                 icon={Repeat2}
                 iconSize="big"
                 highlight="green"
-                onClick={() => undefined}
                 label={15}
               />
               <PostButton
                 icon={Heart}
                 iconSize="big"
                 highlight="pink"
-                onClick={() => undefined}
                 label={likeCount}
               />
-              <PostButton
-                icon={Bookmark}
-                iconSize="big"
-                onClick={() => undefined}
-                label={15}
-              />
-              <PostButton icon={Upload} onClick={() => undefined} />
+              <PostButton icon={Bookmark} iconSize="big" label={15} />
+              <PostButton icon={Upload} />
             </div>
           </div>
           <ScrollArea className="h-full">
