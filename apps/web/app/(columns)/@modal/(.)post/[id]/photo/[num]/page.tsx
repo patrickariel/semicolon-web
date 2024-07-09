@@ -1,6 +1,8 @@
 "use client";
 
 import { PostButton } from "@/components/post-button";
+import { PostDetail } from "@/components/post-detail";
+import { PostForm } from "@/components/post-form";
 import { trpc } from "@/lib/trpc-client";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "@semicolon/ui/button";
@@ -21,6 +23,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -31,6 +34,7 @@ export default function Page({
   params: { id: string; num: string };
 }) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [api, setApi] = React.useState<CarouselApi>();
   const { data: post } = trpc.post.id.useQuery({ id });
 
@@ -132,7 +136,13 @@ export default function Page({
               <PostButton icon={Upload} onClick={() => undefined} />
             </div>
           </div>
-          <div className="bg-background hidden h-full w-[350px] flex-none lg:flex"></div>
+          <div className="bg-background hidden h-full w-[350px] flex-none flex-col py-4 lg:flex">
+            <PostDetail showMedia={false} {...post} />
+            <PostForm
+              avatar={session?.user?.image}
+              placeholder="Post your reply"
+            />
+          </div>
           <Button
             className="bg-background/50 hover:bg-background/80 fixed left-5 top-5 rounded-full"
             size="icon"

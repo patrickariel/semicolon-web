@@ -14,7 +14,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export function PostDetail(post: PostResolved) {
+export function PostDetail({
+  showMedia = true,
+  ...post
+}: PostResolved & { showMedia?: boolean }) {
   const {
     name,
     avatar,
@@ -52,7 +55,7 @@ export function PostDetail(post: PostResolved) {
         </div>
       </div>
       <p>{content}</p>
-      {media.length > 0 && <ThumbGrid {...post} />}
+      {showMedia && media.length > 0 && <ThumbGrid {...post} />}
       <div className="flex flex-row items-center gap-1">
         <div className="text-sm text-zinc-500">
           <Link href={`/post/${id}`} className="hover:underline">
