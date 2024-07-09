@@ -3,7 +3,7 @@
 import { PostButton } from "@/components/post-button";
 import { trpc } from "@/lib/trpc-client";
 import * as Dialog from "@radix-ui/react-dialog";
-import { AspectRatio } from "@semicolon/ui/aspect-ratio";
+import { Button } from "@semicolon/ui/button";
 import {
   Carousel,
   CarouselApi,
@@ -12,9 +12,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@semicolon/ui/carousel";
-import { Separator } from "@semicolon/ui/separator";
 import _ from "lodash";
-import { Bookmark, Heart, MessageCircle, Repeat2, Upload } from "lucide-react";
+import {
+  Bookmark,
+  Heart,
+  MessageCircle,
+  Repeat2,
+  Upload,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -88,8 +94,8 @@ export default function Page({
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="left-3 top-1/2 -translate-y-1/2" />
-                <CarouselNext className="right-3 top-1/2 -translate-y-1/2" />
+                <CarouselPrevious className="left-5 top-1/2 -translate-y-1/2" />
+                <CarouselNext className="right-5 top-1/2 -translate-y-1/2" />
               </Carousel>
             </div>
             <div className="flex h-14 w-full flex-none flex-row justify-between px-5 sm:px-16">
@@ -122,7 +128,15 @@ export default function Page({
               <PostButton icon={Upload} onClick={() => undefined} />
             </div>
           </div>
-          <div className="bg-background hidden h-full w-1/4 lg:flex"></div>
+          <div className="bg-background hidden h-full w-[350px] flex-none lg:flex"></div>
+          <Button
+            className="bg-background/50 hover:bg-background/80 fixed left-5 top-5 rounded-full"
+            size="icon"
+            variant="ghost"
+            onClick={() => router.back()}
+          >
+            <X />
+          </Button>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
