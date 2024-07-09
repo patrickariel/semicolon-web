@@ -11,15 +11,25 @@ import _ from "lodash";
 import { ArrowLeft } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 
-export default function Page({ params: { id } }: { params: { id: string } }) {
+export default function Page({
+  params: { username, id },
+}: {
+  params: { username: string; id: string };
+}) {
   const router = useRouter();
-  const { data: tweet } = trpc.post.id.useQuery({ id });
+  const { data: post } = trpc.post.id.useQuery({ id });
   const { data: session } = useSession();
   const { data: replies } = trpc.post.replies.useQuery({ id });
 
-  if (!tweet) {
+  useEffect(() => {
+    if (post && username !== post.username) {
+      window.history.replaceState(null, "", `/${post.username}/post/${id}`);
+    }
+  }, [username, post, id]);
+
+  if (!post) {
     return (
       <div className="flex min-h-20 items-center justify-center">
         <Spinner size={30} />
@@ -40,7 +50,7 @@ export default function Page({ params: { id } }: { params: { id: string } }) {
         </Button>
         <h3 className="text-xl font-semibold">Post</h3>
       </div>
-      <PostDetail {...tweet} />
+      <PostDetail {...post} />
       <PostForm avatar={session?.user?.image} placeholder="Post your reply" />
       <Separator />
       <div className="mb-4 flex flex-col">

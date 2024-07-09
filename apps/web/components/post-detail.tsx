@@ -1,4 +1,5 @@
 import { PostButton } from "./post-button";
+import { PostDropdown } from "./post-dropdown";
 import { ThumbGrid } from "./thumb-grid";
 import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
@@ -15,46 +16,53 @@ import {
 import Link from "next/link";
 
 export function PostDetail({
-  name,
-  avatar,
-  username,
-  createdAt,
-  content,
-  views,
-  media,
-  replyCount,
-  likeCount,
-  id,
-}: PostResolved) {
+  showMedia = true,
+  ...post
+}: PostResolved & { showMedia?: boolean }) {
+  const {
+    name,
+    avatar,
+    username,
+    createdAt,
+    content,
+    views,
+    media,
+    replyCount,
+    likeCount,
+    id,
+  } = post;
   return (
     <div className="flex flex-col gap-3 px-4">
-      <div className="flex flex-row items-center gap-3">
-        <Link href={`/${username}`} className="hover:underline">
-          <Avatar className="size-11">
-            {avatar && <AvatarImage width={300} height={300} src={avatar} />}
-            <AvatarFallback>
-              <User />
-            </AvatarFallback>
-          </Avatar>
-        </Link>
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between">
-            <div>
-              <Link href={`/${username}`} className="hover:underline">
-                <h4 className="text-md font-semibold">{name}</h4>
-              </Link>
-              <Link href={`/${username}`}>
-                <p className="text-sm text-zinc-500">@{username}</p>
-              </Link>
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row items-center gap-3">
+          <Link href={`/${username}`} className="hover:underline">
+            <Avatar className="size-11">
+              {avatar && <AvatarImage width={300} height={300} src={avatar} />}
+              <AvatarFallback>
+                <User />
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between">
+              <div>
+                <Link href={`/${username}`} className="hover:underline">
+                  <h4 className="text-md font-semibold">{name}</h4>
+                </Link>
+                <Link href={`/${username}`}>
+                  <p className="text-sm text-zinc-500">@{username}</p>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
+        <PostDropdown {...post} />
       </div>
       <p>{content}</p>
-      {media.length > 0 && <ThumbGrid srcs={media} />}
+      {showMedia && media.length > 0 && <ThumbGrid {...post} />}
       <div className="flex flex-row items-center gap-1">
         <div className="text-sm text-zinc-500">
-          <Link href={`/post/${id}`} className="hover:underline">
+          <Link href={`/${username}/post/${id}`} className="hover:underline">
             {formatLongDate(createdAt)}
           </Link>
           {" · "}
@@ -69,33 +77,21 @@ export function PostDetail({
       <div className="flex flex-col gap-2">
         <Separator />
         <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
-          <PostButton
-            icon={MessageCircle}
-            iconSize="big"
-            href={`/post/${id}`}
-            label={replyCount}
-          />
+          <PostButton icon={MessageCircle} iconSize="big" label={replyCount} />
           <PostButton
             icon={Repeat2}
             iconSize="big"
             highlight="green"
-            onClick={() => undefined}
             label={15}
           />
           <PostButton
             icon={Heart}
             iconSize="big"
             highlight="pink"
-            onClick={() => undefined}
             label={likeCount}
           />
-          <PostButton
-            icon={Bookmark}
-            iconSize="big"
-            onClick={() => undefined}
-            label={15}
-          />
-          <PostButton icon={Upload} onClick={() => undefined} />
+          <PostButton icon={Bookmark} iconSize="big" label={15} />
+          <PostButton icon={Upload} />
         </div>
         <Separator />
       </div>

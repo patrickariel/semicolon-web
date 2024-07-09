@@ -9,7 +9,7 @@ import React from "react";
 type PostButtonProps = ButtonProps &
   (
     | {
-        onClick: React.MouseEventHandler<HTMLButtonElement>;
+        onClick?: React.MouseEventHandler<HTMLButtonElement>;
         href?: never;
       }
     | {

@@ -1,31 +1,39 @@
+import type { PostResolved } from "@semicolon/api/schema";
 import { AspectRatio } from "@semicolon/ui/aspect-ratio";
 import { Separator } from "@semicolon/ui/separator";
 import { cn } from "@semicolon/ui/utils";
 import Image from "next/image";
+import Link from "next/link";
 
 export function ThumbGrid({
   className,
-  srcs,
-}: React.HTMLAttributes<HTMLDivElement> & {
-  srcs: string[];
-}) {
-  if (srcs.length === 0) {
+  id,
+  media,
+  username,
+}: PostResolved & Omit<React.HTMLAttributes<HTMLDivElement>, "content">) {
+  if (media.length === 0) {
     throw new Error(`ThumbGrid must be supplied at least one image URL.`);
   }
 
-  switch (srcs.length) {
+  switch (media.length) {
     case 1:
       return (
         <div className={cn("w-full overflow-hidden rounded-lg", className)}>
-          {srcs.map((src, i) => (
+          {media.map((src, i) => (
             <AspectRatio ratio={4 / 3} className="bg-muted w-full" key={i}>
-              <Image
-                src={src}
-                alt="Photo by Drew Beamer"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="rounded-md object-cover"
-              />
+              <Link
+                href={`/${username}/post/${id}/photo/${i + 1}`}
+                onClick={(e) => e.stopPropagation()}
+                scroll={false}
+              >
+                <Image
+                  src={src}
+                  alt={`${username}'s image (${i + 1})`}
+                  fill
+                  sizes="(max-width: 768px) 75vw, (max-width: 1024px) 50vw, (max-width: 1280px) 40vw, 35vw"
+                  className="rounded-md object-cover"
+                />
+              </Link>
             </AspectRatio>
           ))}
         </div>
@@ -38,16 +46,22 @@ export function ThumbGrid({
             className,
           )}
         >
-          {srcs.map((src, i) => (
+          {media.map((src, i) => (
             <>
               <AspectRatio ratio={3 / 2} className="bg-muted w-full" key={i}>
-                <Image
-                  src={src}
-                  alt="Photo by Drew Beamer"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover"
-                />
+                <Link
+                  href={`/${username}/post/${id}/photo/${i + 1}`}
+                  onClick={(e) => e.stopPropagation()}
+                  scroll={false}
+                >
+                  <Image
+                    src={src}
+                    alt={`${username}'s image (${i + 1})`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                </Link>
               </AspectRatio>
               {i === 0 && <Separator orientation="vertical" />}
             </>
@@ -63,31 +77,43 @@ export function ThumbGrid({
           )}
         >
           <AspectRatio ratio={4 / 3} className="bg-muted w-full">
-            <Image
-              src={srcs[0]!} // eslint-disable-line @typescript-eslint/no-non-null-assertion
-              alt="Photo by Drew Beamer"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover"
-            />
+            <Link
+              href={`/${username}/post/${id}/photo/1`}
+              onClick={(e) => e.stopPropagation()}
+              scroll={false}
+            >
+              <Image
+                src={media[0]!} // eslint-disable-line @typescript-eslint/no-non-null-assertion
+                alt={`${username}'s image (1)`}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover"
+              />
+            </Link>
           </AspectRatio>
           <Separator orientation="vertical" />
           <AspectRatio ratio={4 / 3} className="bg-muted w-full">
             <div className="flex flex-col">
-              {srcs.slice(1).map((src, i) => (
+              {media.slice(1).map((src, i) => (
                 <>
                   <AspectRatio
                     ratio={4 / 3}
                     className="bg-muted w-full"
                     key={i}
                   >
-                    <Image
-                      src={src}
-                      alt="Photo by Drew Beamer"
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover"
-                    />
+                    <Link
+                      href={`/${username}/post/${id}/photo/${i + 2}`}
+                      onClick={(e) => e.stopPropagation()}
+                      scroll={false}
+                    >
+                      <Image
+                        src={src}
+                        alt={`${username}'s image (${i + 2})`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                      />
+                    </Link>
                   </AspectRatio>
                   {i === 0 && <Separator />}
                 </>
@@ -100,51 +126,55 @@ export function ThumbGrid({
       return (
         <div
           className={cn(
-            "flex w-full flex-row overflow-hidden rounded-lg",
+            "flex w-full flex-col overflow-hidden rounded-lg",
             className,
           )}
         >
-          <AspectRatio ratio={4 / 3} className="bg-muted w-full">
-            <div className="flex flex-col">
-              {srcs.slice(0, 2).map((src, i) => (
+          <AspectRatio ratio={2} className="bg-muted w-full">
+            <div className="flex flex-row">
+              {media.slice(0, 2).map((src, i) => (
                 <>
-                  <AspectRatio
-                    ratio={4 / 3}
-                    className="bg-muted w-full"
-                    key={i}
-                  >
-                    <Image
-                      src={src}
-                      alt="Photo by Drew Beamer"
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover"
-                    />
+                  <AspectRatio ratio={1} className="bg-muted h-full" key={i}>
+                    <Link
+                      href={`/${username}/post/${id}/photo/${i + 1}`}
+                      onClick={(e) => e.stopPropagation()}
+                      scroll={false}
+                    >
+                      <Image
+                        src={src}
+                        alt={`${username}'s image (${i + 1})`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                      />
+                    </Link>
                   </AspectRatio>
-                  {i === 0 && <Separator />}
+                  {i === 0 && <Separator orientation="vertical" />}
                 </>
               ))}
             </div>
           </AspectRatio>
-          <Separator orientation="vertical" />
-          <AspectRatio ratio={4 / 3} className="bg-muted w-full">
-            <div className="flex flex-col">
-              {srcs.slice(2, 4).map((src, i) => (
+          <Separator orientation="horizontal" />
+          <AspectRatio ratio={2} className="bg-muted w-full">
+            <div className="flex flex-row">
+              {media.slice(2, 4).map((src, i) => (
                 <>
-                  <AspectRatio
-                    ratio={4 / 3}
-                    className="bg-muted w-full"
-                    key={i}
-                  >
-                    <Image
-                      src={src}
-                      alt="Photo by Drew Beamer"
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover"
-                    />
+                  <AspectRatio ratio={1} className="bg-muted h-full" key={i}>
+                    <Link
+                      href={`/${username}/post/${id}/photo/${i + 3}`}
+                      onClick={(e) => e.stopPropagation()}
+                      scroll={false}
+                    >
+                      <Image
+                        src={src}
+                        alt={`${username}'s image (${i + 3})`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                      />
+                    </Link>
                   </AspectRatio>
-                  {i === 0 && <Separator />}
+                  {i === 0 && <Separator orientation="vertical" />}
                 </>
               ))}
             </div>
