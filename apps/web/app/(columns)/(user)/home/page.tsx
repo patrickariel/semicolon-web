@@ -13,8 +13,8 @@ import Spinner from "@semicolon/ui/spinner";
 import _ from "lodash";
 import { RotateCw } from "lucide-react";
 import { useSession } from "next-auth/react";
-import React, { Fragment, useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
+import React, { Fragment, useState } from "react";
+import { InView } from "react-intersection-observer";
 
 export default function Page() {
   const {
@@ -31,15 +31,6 @@ export default function Page() {
   );
   const [myPosts, setMyPosts] = useState<PostResolved[]>([]);
   const { data: session } = useSession();
-  const { ref, inView } = useInView({
-    threshold: 0.9,
-  });
-
-  useEffect(() => {
-    if (feed && inView && !isFetchingNextPage) {
-      void fetchNextPage();
-    }
-  }, [feed, inView, isFetchingNextPage, fetchNextPage]);
 
   return (
     <div className="flex flex-col">
@@ -57,7 +48,23 @@ export default function Page() {
         onSuccess={(post) => setMyPosts((posts) => [post, ...posts])}
       />
       <Separator />
-      {isLoadingError && (
+      {feed && (
+        <div className="flex flex-col">
+          {myPosts
+            .concat(feed.pages.flatMap((page) => page.results))
+            .map((tweet, i) => (
+              <Fragment key={i}>
+                <Post {...tweet} />
+                <Separator />
+              </Fragment>
+            ))}
+        </div>
+      )}
+      {isLoading || isFetchingNextPage ? (
+        <div className="flex h-20 items-center justify-center">
+          <Spinner size={30} />
+        </div>
+      ) : isLoadingError || (isFetchNextPageError as boolean) ? (
         <div className="border-destructive m-5 flex flex-grow flex-row items-center justify-between rounded-lg border p-0">
           <Alert variant="destructive" className="border-none">
             <ExclamationTriangleIcon className="h-4 w-4" />
@@ -70,56 +77,23 @@ export default function Page() {
             size={"icon"}
             variant={"ghost"}
             className="hover:bg-destructive/30 mr-4 aspect-square rounded-full"
-            onClick={() => refetch()}
+            onClick={async () => refetch()}
           >
             <RotateCw className="stroke-destructive" />
           </Button>
         </div>
-      )}
-      {feed ? (
-        <div className="flex flex-col">
-          {myPosts
-            .concat(feed.pages.flatMap((page) => page.results))
-            .map((tweet, i) => (
-              <Fragment key={i}>
-                <Post {...tweet} />
-                <Separator />
-              </Fragment>
-            ))}
-        </div>
       ) : (
-        isLoading && (
-          <div className="flex min-h-20 items-center justify-center">
-            <Spinner size={30} />
-          </div>
-        )
-      )}
-      {!isLoadingError && (
-        <div className="flex min-h-20 flex-row items-center justify-center">
-          {(isFetchNextPageError as boolean) && !isFetchingNextPage ? (
-            <div className="border-destructive m-5 flex flex-grow flex-row items-center justify-between rounded-lg border p-0">
-              <Alert variant="destructive" className="border-none">
-                <ExclamationTriangleIcon className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>
-                  There was a problem fetching your posts.
-                </AlertDescription>
-              </Alert>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:bg-destructive/30 mr-4 aspect-square rounded-full"
-                onClick={() => refetch()}
-              >
-                <RotateCw className="stroke-destructive" />
-              </Button>
-            </div>
-          ) : isFetchingNextPage ? (
-            <Spinner />
-          ) : (
-            <div ref={ref} className="h-full" />
-          )}
-        </div>
+        <InView
+          as="div"
+          threshold={0.9}
+          onChange={async (inView, _) => {
+            if (inView) {
+              await fetchNextPage();
+            }
+          }}
+        >
+          <div className="flex h-20 flex-row items-center justify-center" />
+        </InView>
       )}
     </div>
   );
