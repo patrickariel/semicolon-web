@@ -54,7 +54,11 @@ export default function Page({
   }, [api]);
 
   useEffect(() => {
-    window.history.pushState(null, "", `/post/${id}/photo/${startIndex + 1}`);
+    window.history.replaceState(
+      null,
+      "",
+      `/post/${id}/photo/${startIndex + 1}`,
+    );
   }, [id, startIndex]);
 
   if (!post) {
