@@ -15,11 +15,11 @@ import React, { Fragment } from "react";
 
 export default function Page({ params: { id } }: { params: { id: string } }) {
   const router = useRouter();
-  const { data: tweet } = trpc.post.id.useQuery({ id });
+  const { data: post } = trpc.post.id.useQuery({ id });
   const { data: session } = useSession();
   const { data: replies } = trpc.post.replies.useQuery({ id });
 
-  if (!tweet) {
+  if (!post) {
     return (
       <div className="flex min-h-20 items-center justify-center">
         <Spinner size={30} />
@@ -40,7 +40,7 @@ export default function Page({ params: { id } }: { params: { id: string } }) {
         </Button>
         <h3 className="text-xl font-semibold">Post</h3>
       </div>
-      <PostDetail {...tweet} />
+      <PostDetail {...post} />
       <PostForm avatar={session?.user?.image} placeholder="Post your reply" />
       <Separator />
       <div className="mb-4 flex flex-col">
