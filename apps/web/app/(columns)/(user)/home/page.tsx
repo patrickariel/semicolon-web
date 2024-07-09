@@ -34,7 +34,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col">
-      <div className="bg-card sticky top-0 z-50">
+      <div className="bg-card sticky top-0 z-10">
         <NavTab>
           <NavTabItem href="#" active>
             For You

@@ -7,15 +7,15 @@ import { redirect } from "next/navigation";
 
 export default async function Layout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   const session = await auth();
 
   if (
-    !session ||
-    !session.user ||
-    !(session.user.registered && session.user.name && session.user.username)
+    !(session?.user?.registered && session.user.name && session.user.username)
   ) {
     redirect("/flow/signup");
   }
@@ -31,6 +31,7 @@ export default async function Layout({
       </div>
       <BottomBar />
       <Toaster />
+      {modal}
     </div>
   );
 }
