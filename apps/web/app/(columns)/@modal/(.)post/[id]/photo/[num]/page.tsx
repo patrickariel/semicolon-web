@@ -96,6 +96,7 @@ export default function Page({
                       <Image
                         src={media}
                         alt={`${post.username}'s image (${i + 1})`}
+                        sizes="(max-width: 1024px) 100vw, 75vw"
                         className="my-auto min-w-0 object-contain"
                         fill
                       />

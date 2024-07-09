@@ -30,7 +30,7 @@ export function ThumbGrid({
                   src={src}
                   alt={`${username}'s image (${i + 1})`}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  sizes="(max-width: 768px) 75vw, (max-width: 1024px) 50vw, (max-width: 1280px) 40vw, 35vw"
                   className="rounded-md object-cover"
                 />
               </Link>
