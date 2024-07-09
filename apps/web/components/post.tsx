@@ -27,20 +27,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-export function Post({
-  id,
-  name,
-  avatar,
-  username,
-  verified,
-  createdAt,
-  content,
-  media,
-  views,
-  replyCount,
-  likeCount,
-}: PostResolved) {
+export function Post(post: PostResolved) {
   const router = useRouter();
+  const {
+    id,
+    name,
+    avatar,
+    username,
+    verified,
+    createdAt,
+    content,
+    media,
+    views,
+    replyCount,
+    likeCount,
+  } = post;
 
   return (
     <div
@@ -143,7 +144,7 @@ export function Post({
           <p className="text-wrap text-sm leading-7">{content}</p>
         </div>
 
-        {media.length > 0 && <ThumbGrid srcs={media} />}
+        {media.length > 0 && <ThumbGrid {...post} />}
 
         <div className="flex w-full min-w-0 items-center justify-between">
           <PostButton

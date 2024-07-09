@@ -14,18 +14,19 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export function PostDetail({
-  name,
-  avatar,
-  username,
-  createdAt,
-  content,
-  views,
-  media,
-  replyCount,
-  likeCount,
-  id,
-}: PostResolved) {
+export function PostDetail(post: PostResolved) {
+  const {
+    name,
+    avatar,
+    username,
+    createdAt,
+    content,
+    views,
+    media,
+    replyCount,
+    likeCount,
+    id,
+  } = post;
   return (
     <div className="flex flex-col gap-3 px-4">
       <div className="flex flex-row items-center gap-3">
@@ -51,7 +52,7 @@ export function PostDetail({
         </div>
       </div>
       <p>{content}</p>
-      {media.length > 0 && <ThumbGrid srcs={media} />}
+      {media.length > 0 && <ThumbGrid {...post} />}
       <div className="flex flex-row items-center gap-1">
         <div className="text-sm text-zinc-500">
           <Link href={`/post/${id}`} className="hover:underline">
