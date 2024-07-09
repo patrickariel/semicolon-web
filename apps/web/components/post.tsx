@@ -67,7 +67,7 @@ export function Post(post: PostResolved) {
             <AvatarFallback>
               <User />
             </AvatarFallback>
-          </Avatar>{" "}
+          </Avatar>
         </Link>
       </div>
       <div className="flex w-full min-w-0 flex-col gap-2">

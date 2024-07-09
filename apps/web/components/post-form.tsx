@@ -24,6 +24,7 @@ import {
   Image as ImageIcon,
   CircleX,
   RotateCw,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
@@ -216,7 +217,7 @@ export function PostForm({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="flex items-center justify-center mix-blend-lighten brightness-75 transition-all hover:bg-transparent hover:brightness-100"
+                            className="bg-background/50 hover:bg-background/80 rounded-full"
                             onClick={async (e) => {
                               e.preventDefault();
                               updateMedia((media) => {
@@ -247,13 +248,13 @@ export function PostForm({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute right-0 top-0 flex items-center justify-center mix-blend-difference brightness-75 transition-all hover:bg-transparent hover:brightness-100"
+                        className="bg-background/50 hover:bg-background/80 absolute right-3 top-3 rounded-full"
                         onClick={(e) => {
                           e.preventDefault();
                           updateMedia((media) => _.omit(media, blobUrl));
                         }}
                       >
-                        <CircleX />
+                        <X />
                       </Button>
                     </div>
                   </CarouselItem>
