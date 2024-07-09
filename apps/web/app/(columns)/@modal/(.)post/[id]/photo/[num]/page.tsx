@@ -102,7 +102,7 @@ export default function Page({
                 <CarouselNext className="right-5 top-1/2 -translate-y-1/2" />
               </Carousel>
             </div>
-            <div className="flex h-14 w-full flex-none flex-row justify-between px-5 sm:px-16">
+            <div className="flex h-14 w-full max-w-[600px] flex-none flex-row justify-between self-center px-5 sm:px-16">
               <PostButton
                 icon={MessageCircle}
                 iconSize="big"
