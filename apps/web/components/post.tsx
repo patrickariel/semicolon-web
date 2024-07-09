@@ -1,4 +1,5 @@
 import { PostButton } from "./post-button";
+import { PostDropdown } from "./post-dropdown";
 import { ThumbGrid } from "./thumb-grid";
 import { formatLongDate, formatShortDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
@@ -113,33 +114,7 @@ export function Post(post: PostResolved) {
                 </Tooltip>
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="aspect-square size-fit rounded-full p-2"
-                >
-                  <Ellipsis className="flex-none" size={19} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="flex flex-col gap-2 rounded-3xl px-0 py-4 [&>*]:min-w-40 [&>*]:text-base [&>*]:font-bold">
-                <Button
-                  variant="ghost"
-                  className="justify-start gap-4 rounded-none p-6 px-4"
-                >
-                  <UserPlus size={23} />
-                  <div>Follow {`@${username}`}</div>
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="justify-start gap-4 rounded-none p-6 px-4"
-                >
-                  <Flag size={23} />
-                  <div>Report post</div>
-                </Button>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <PostDropdown {...post} />
           </div>
           <p className="text-wrap text-sm leading-7">{content}</p>
         </div>

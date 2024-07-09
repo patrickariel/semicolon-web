@@ -1,4 +1,5 @@
 import { PostButton } from "./post-button";
+import { PostDropdown } from "./post-dropdown";
 import { ThumbGrid } from "./thumb-grid";
 import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
@@ -32,27 +33,30 @@ export function PostDetail({
   } = post;
   return (
     <div className="flex flex-col gap-3 px-4">
-      <div className="flex flex-row items-center gap-3">
-        <Link href={`/${username}`} className="hover:underline">
-          <Avatar className="size-11">
-            {avatar && <AvatarImage width={300} height={300} src={avatar} />}
-            <AvatarFallback>
-              <User />
-            </AvatarFallback>
-          </Avatar>
-        </Link>
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between">
-            <div>
-              <Link href={`/${username}`} className="hover:underline">
-                <h4 className="text-md font-semibold">{name}</h4>
-              </Link>
-              <Link href={`/${username}`}>
-                <p className="text-sm text-zinc-500">@{username}</p>
-              </Link>
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row items-center gap-3">
+          <Link href={`/${username}`} className="hover:underline">
+            <Avatar className="size-11">
+              {avatar && <AvatarImage width={300} height={300} src={avatar} />}
+              <AvatarFallback>
+                <User />
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between">
+              <div>
+                <Link href={`/${username}`} className="hover:underline">
+                  <h4 className="text-md font-semibold">{name}</h4>
+                </Link>
+                <Link href={`/${username}`}>
+                  <p className="text-sm text-zinc-500">@{username}</p>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
+        <PostDropdown {...post} />
       </div>
       <p>{content}</p>
       {showMedia && media.length > 0 && <ThumbGrid {...post} />}
