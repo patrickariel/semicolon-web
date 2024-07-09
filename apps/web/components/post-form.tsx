@@ -18,14 +18,7 @@ import Spinner from "@semicolon/ui/spinner";
 import { Textarea } from "@semicolon/ui/textarea";
 import { cn } from "@semicolon/ui/utils";
 import _ from "lodash";
-import {
-  Smile,
-  User,
-  Image as ImageIcon,
-  CircleX,
-  RotateCw,
-  X,
-} from "lucide-react";
+import { Smile, User, Image as ImageIcon, RotateCw, X } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";

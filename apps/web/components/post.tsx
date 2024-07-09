@@ -4,25 +4,16 @@ import { ThumbGrid } from "./thumb-grid";
 import { formatLongDate, formatShortDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
-import { Button } from "@semicolon/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@semicolon/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@semicolon/ui/tooltip";
 import {
   BadgeCheck,
   BarChart2,
   Bookmark,
-  Ellipsis,
-  Flag,
   Heart,
   MessageCircle,
   Repeat2,
   Upload,
   User,
-  UserPlus,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
