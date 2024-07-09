@@ -80,8 +80,8 @@ export default function Page({
           onEscapeKeyDown={() => router.back()}
           onPointerDownOutside={() => router.back()}
         >
-          <div className="flex h-full min-h-0 min-w-0 flex-grow flex-col justify-between">
-            <div className="flex min-h-0 min-w-0 flex-grow flex-col">
+          <div className="flex h-full flex-grow flex-col justify-between">
+            <div className="flex flex-grow flex-col">
               <Carousel
                 opts={{ startIndex: initialStartIndex }}
                 setApi={setApi}
@@ -91,7 +91,7 @@ export default function Page({
                   {post.media.map((media, i) => (
                     <CarouselItem
                       key={i}
-                      className="relative h-full min-h-0 min-w-0 pl-0 [&>*]:max-h-full"
+                      className="relative h-full pl-0 [&>*]:max-h-full"
                     >
                       <Image
                         src={media}
