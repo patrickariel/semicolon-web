@@ -158,6 +158,7 @@ export default function Page({
               <PostButton icon={Upload} />
             </div>
           </div>
+          <Separator orientation="vertical" />
           <ScrollArea className="h-full">
             <div className="bg-background hidden h-full w-[350px] flex-none flex-col py-4 lg:flex">
               <PostDetail showMedia={false} {...post} />
