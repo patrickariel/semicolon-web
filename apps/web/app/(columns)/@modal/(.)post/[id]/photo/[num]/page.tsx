@@ -98,8 +98,8 @@ export default function Page({
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="left-5 top-1/2 -translate-y-1/2" />
-                <CarouselNext className="right-5 top-1/2 -translate-y-1/2" />
+                <CarouselPrevious className="left-5 top-1/2 h-11 w-11 -translate-y-1/2 [&>*]:h-5 [&>*]:w-5" />
+                <CarouselNext className="right-5 top-1/2 h-11 w-11 -translate-y-1/2 [&>*]:h-5 [&>*]:w-5" />
               </Carousel>
             </div>
             <div className="flex h-14 w-full max-w-[600px] flex-none flex-row justify-between self-center px-5 sm:px-16">
