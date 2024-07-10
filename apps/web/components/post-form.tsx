@@ -4,6 +4,7 @@ import { uploadMedia } from "@/lib/actions";
 import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { PostResolved } from "@semicolon/api/schema";
 import { AspectRatio } from "@semicolon/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
@@ -36,22 +37,25 @@ export function PostForm({
   avatar,
   placeholder = "What is happening?!",
   to,
+  onPost,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   to?: string;
   avatar?: string | null;
   placeholder?: string;
+  onPost?: (post: PostResolved) => unknown;
 }) {
   const postMutation = trpc.post.new.useMutation({
     onMutate: () => setSubmitDisabled(true),
     onError: () => setSubmitDisabled(false),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       form.reset();
       if (mediaInputRef.current) {
         mediaInputRef.current.value = "";
       }
       updateMedia(() => ({}));
       setMyPosts((myPosts) => [data, ...myPosts]);
+      await onPost?.(data);
     },
   });
   const form = useForm<z.infer<typeof PostSchema>>({
@@ -93,10 +97,10 @@ export function PostForm({
     setMediaDisabled(Object.keys(media).length > 3);
   }, [media]);
 
-  const handleSubmit = ({ content }: z.infer<typeof PostSchema>) => {
+  const handleSubmit = (data: z.infer<typeof PostSchema>) => {
     postMutation.mutate({
       to,
-      content,
+      content: data.content,
       media: Object.entries(media)
         .map(([_, { url }]) => url)
         .filter((v): v is string => v !== undefined),
