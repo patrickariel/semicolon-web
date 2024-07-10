@@ -3,12 +3,13 @@
 import { NavTab, NavTabItem } from "@/components/nav-tab";
 import { PostFeed } from "@/components/post-feed";
 import { PostForm } from "@/components/post-form";
+import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
-import type { PostResolved } from "@semicolon/api/schema";
 import { Separator } from "@semicolon/ui/separator";
+import { useAtomValue } from "jotai";
 import _ from "lodash";
 import { useSession } from "next-auth/react";
-import React, { useState } from "react";
+import React from "react";
 
 export default function Page() {
   const {
@@ -23,7 +24,7 @@ export default function Page() {
     { maxResults: 15 },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
-  const [myPosts, setMyPosts] = useState<PostResolved[]>([]);
+  const myPosts = useAtomValue(myPostsAtom);
   const { data: session } = useSession();
 
   return (
@@ -37,10 +38,7 @@ export default function Page() {
         </NavTab>
         <Separator />
       </div>
-      <PostForm
-        avatar={session?.user?.image}
-        onSuccess={(post) => setMyPosts((posts) => [post, ...posts])}
-      />
+      <PostForm avatar={session?.user?.image} />
       <Separator />
       <PostFeed
         posts={myPosts.concat(

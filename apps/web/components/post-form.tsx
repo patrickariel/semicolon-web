@@ -1,6 +1,7 @@
 "use client";
 
 import { uploadMedia } from "@/lib/actions";
+import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AspectRatio } from "@semicolon/ui/aspect-ratio";
@@ -17,6 +18,7 @@ import { FormField, FormItem, FormControl, Form } from "@semicolon/ui/form";
 import Spinner from "@semicolon/ui/spinner";
 import { Textarea } from "@semicolon/ui/textarea";
 import { cn } from "@semicolon/ui/utils";
+import { useSetAtom } from "jotai";
 import _ from "lodash";
 import { Smile, User, Image as ImageIcon, RotateCw, X } from "lucide-react";
 import Image from "next/image";
@@ -29,37 +31,27 @@ const PostSchema = z.object({
   content: z.string().optional(),
 });
 
-type PostCallbacks = Parameters<(typeof trpc)["post"]["new"]["useMutation"]>[0];
-
 export function PostForm({
   className,
   avatar,
   placeholder = "What is happening?!",
-  onError,
-  onSuccess,
-  onSettled,
-  onMutate,
+  to,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
+  to?: string;
   avatar?: string | null;
   placeholder?: string;
-} & PostCallbacks) {
+}) {
   const postMutation = trpc.post.new.useMutation({
-    onMutate: (variables) => {
-      setSubmitDisabled(true);
-      onMutate?.(variables);
-    },
-    onError: (error, variables, context) => {
-      setSubmitDisabled(false);
-      onError?.(error, variables, context);
-    },
-    onSuccess: (data, variables, context) => {
+    onMutate: () => setSubmitDisabled(true),
+    onError: () => setSubmitDisabled(false),
+    onSuccess: (data) => {
       form.reset();
       if (mediaInputRef.current) {
         mediaInputRef.current.value = "";
       }
       updateMedia(() => ({}));
-      onSuccess?.(data, variables, context);
+      setMyPosts((myPosts) => [data, ...myPosts]);
     },
   });
   const form = useForm<z.infer<typeof PostSchema>>({
@@ -78,6 +70,7 @@ export function PostForm({
   const [content, setContent] = useState<string | undefined>();
   const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
   const [mediaDisabled, setMediaDisabled] = useState<boolean>(true);
+  const setMyPosts = useSetAtom(myPostsAtom);
 
   useEffect(() => {
     const subscription = form.watch(({ content }) => {
@@ -102,6 +95,7 @@ export function PostForm({
 
   const handleSubmit = ({ content }: z.infer<typeof PostSchema>) => {
     postMutation.mutate({
+      to,
       content,
       media: Object.entries(media)
         .map(([_, { url }]) => url)
