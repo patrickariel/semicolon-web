@@ -75,6 +75,7 @@ export const PostResolvedSchema = PostSchema.merge(
     avatar: z.string().nullable(),
     likeCount: z.number(),
     replyCount: z.number(),
+    to: z.string().nullable(),
   }),
 );
 

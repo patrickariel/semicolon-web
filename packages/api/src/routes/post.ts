@@ -21,6 +21,11 @@ export const post = router({
       const post = await db.post.findUnique({
         where: { id },
         include: {
+          parent: {
+            include: {
+              user: true,
+            },
+          },
           user: true,
           _count: {
             select: {
@@ -41,6 +46,7 @@ export const post = router({
       return {
         ...post,
         name: post.user.name!,
+        to: post.parent?.user.username ?? null,
         username: post.user.username!,
         verified: post.user.verified,
         avatar: post.user.image,
@@ -72,6 +78,11 @@ export const post = router({
             take: maxResults + 1,
             include: {
               user: true,
+              parent: {
+                include: {
+                  user: true,
+                },
+              },
               _count: {
                 select: {
                   likes: true,
@@ -102,6 +113,7 @@ export const post = router({
           ...child,
           name: child.user.name!,
           username: child.user.username!,
+          to: child.parent?.user.username ?? null,
           verified: child.user.verified,
           avatar: child.user.image,
           likeCount: child._count.likes,
@@ -146,16 +158,31 @@ export const post = router({
           media,
           content,
         },
+        include: {
+          user: true,
+          parent: {
+            include: {
+              user: true,
+            },
+          },
+          _count: {
+            select: {
+              likes: true,
+              children: true,
+            },
+          },
+        },
       });
 
       return {
         ...post,
         name: user.name,
+        to: post.parent?.user.username ?? null,
         username: user.username,
         verified: user.verified,
         avatar: user.image,
-        likeCount: 0,
-        replyCount: 0,
+        likeCount: post._count.likes,
+        replyCount: post._count.children,
       };
     }),
   update: userProcedure
@@ -317,6 +344,12 @@ export const post = router({
                 .as("AggrReply"),
             (join) => join.onRef("Post.id", "=", "AggrReply.parentId"),
           )
+          .leftJoin("Post as ParentPost", (join) =>
+            join.onRef("ParentPost.id", "=", "Post.parentId"),
+          )
+          .leftJoin("User as ParentAuthor", (join) =>
+            join.onRef("ParentAuthor.id", "=", "ParentPost.userId"),
+          )
           .select([
             "Post.id",
             "Post.createdAt",
@@ -325,6 +358,7 @@ export const post = router({
             "Post.parentId",
             "Post.media",
             "Post.views",
+            "ParentAuthor.username as to",
             "Author.name",
             "Author.username",
             "Author.verified",
@@ -380,20 +414,13 @@ export const post = router({
         }
 
         if (to) {
-          dbQuery = dbQuery
-            .leftJoin("Post as ParentPost", (join) =>
-              join.onRef("ParentPost.id", "=", "Post.parentId"),
-            )
-            .leftJoin("User as ParentAuthor", (join) =>
-              join.onRef("ParentAuthor.id", "=", "ParentPost.userId"),
-            )
-            .where(({ eb, and }) =>
-              and([
-                eb("ParentAuthor.username", "=", to),
-                eb("ParentAuthor.id", "is not", null),
-                eb("ParentPost.id", "is not", null),
-              ]),
-            );
+          dbQuery = dbQuery.where(({ eb, and }) =>
+            and([
+              eb("ParentAuthor.username", "=", to),
+              eb("ParentAuthor.id", "is not", null),
+              eb("ParentPost.id", "is not", null),
+            ]),
+          );
         }
 
         if (minLikes) {

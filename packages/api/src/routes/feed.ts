@@ -49,6 +49,11 @@ export const feed = router({
               children: true,
             },
           },
+          parent: {
+            include: {
+              user: true,
+            },
+          },
         },
       });
 
@@ -63,6 +68,7 @@ export const feed = router({
         results: posts.map((post) => ({
           ...post,
           name: post.user.name!,
+          to: post.parent?.user.username ?? null,
           username: post.user.username!,
           verified: post.user.verified,
           avatar: post.user.image,
