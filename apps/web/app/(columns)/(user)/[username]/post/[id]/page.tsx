@@ -51,7 +51,11 @@ export default function Page({
         <h3 className="text-xl font-semibold">Post</h3>
       </div>
       <PostDetail {...post} />
-      <PostForm avatar={session?.user?.image} placeholder="Post your reply" />
+      <PostForm
+        to={id}
+        avatar={session?.user?.image}
+        placeholder="Post your reply"
+      />
       <Separator />
       <div className="mb-4 flex flex-col">
         {replies ? (
