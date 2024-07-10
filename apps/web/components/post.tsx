@@ -2,6 +2,7 @@ import { PostButton } from "./post-button";
 import { PostDropdown } from "./post-dropdown";
 import { PostForm } from "./post-form";
 import { ThumbGrid } from "./thumb-grid";
+import { trpc } from "@/lib/trpc-client";
 import { formatLongDate, formatShortDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
@@ -23,9 +24,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-function ReplyDialog(post: PostResolved) {
+function ReplyDialog({
+  id,
+  name,
+  avatar,
+  username,
+  verified,
+  createdAt,
+  content,
+}: PostResolved) {
   const { data: session } = useSession();
-  const { name, avatar, username, verified, createdAt, content } = post;
 
   return (
     <div className="flex flex-col">
@@ -79,6 +87,7 @@ function ReplyDialog(post: PostResolved) {
         </div>
       </div>
       <PostForm
+        to={id}
         placeholder="Post your reply"
         avatar={session?.user?.image}
         className="pt-0"
@@ -102,6 +111,7 @@ export function Post(post: PostResolved) {
     replyCount,
     likeCount,
   } = post;
+  const utils = trpc.useUtils();
 
   return (
     <div
@@ -109,6 +119,7 @@ export function Post(post: PostResolved) {
       tabIndex={0}
       onClick={() => {
         if (document.getSelection()?.type !== "Range") {
+          utils.post.id.setData({ id }, post);
           router.push(`/${username}/post/${id}`);
         }
       }}
@@ -162,7 +173,10 @@ export function Post(post: PostResolved) {
                     <Link
                       href={`/${username}/post/${id}`}
                       className="text-muted-foreground text-nowrap align-middle text-sm hover:underline"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        utils.post.id.setData({ id }, post);
+                        e.stopPropagation();
+                      }}
                     >
                       {formatShortDate(createdAt)}
                     </Link>
