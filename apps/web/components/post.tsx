@@ -97,6 +97,7 @@ export function Post(post: PostResolved) {
     views,
     replyCount,
     likeCount,
+    to,
   } = post;
   const utils = trpc.useUtils();
   const [open, setOpen] = React.useState(false);
@@ -178,6 +179,18 @@ export function Post(post: PostResolved) {
             </div>
             <PostDropdown {...post} />
           </div>
+          {to && (
+            <p className="text-sm">
+              <span className="text-muted-foreground">Replying to</span>{" "}
+              <Link
+                href={`/${to}`}
+                className="truncate font-bold text-sky-400 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                @{to}
+              </Link>
+            </p>
+          )}
           <p className="text-wrap text-[15px] leading-7">{content}</p>
         </div>
 
