@@ -188,7 +188,10 @@ export function Post(post: PostResolved) {
             <DialogTrigger asChild>
               <PostButton icon={MessageCircle} label={replyCount} />
             </DialogTrigger>
-            <DialogContent onClick={(e) => e.stopPropagation()}>
+            <DialogContent
+              onClick={(e) => e.stopPropagation()}
+              onKeyUp={(e) => e.stopPropagation()}
+            >
               <div className="flex flex-col">
                 <ReplyIndicator {...post} />
                 <PostForm
