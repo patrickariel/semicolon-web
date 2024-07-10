@@ -94,7 +94,7 @@ export function PostButton({
         </Comp>
       </Button>
       {label !== undefined && (
-        <p className="text-muted-foreground text-xs">{label}</p>
+        <p className="text-muted-foreground text-sm">{label}</p>
       )}
       {children}
     </div>

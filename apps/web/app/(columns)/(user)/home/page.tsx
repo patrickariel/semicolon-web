@@ -3,12 +3,14 @@
 import { NavTab, NavTabItem } from "@/components/nav-tab";
 import { PostFeed } from "@/components/post-feed";
 import { PostForm } from "@/components/post-form";
+import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
-import type { PostResolved } from "@semicolon/api/schema";
+import { PostResolved } from "@semicolon/api/schema";
 import { Separator } from "@semicolon/ui/separator";
+import { useAtomValue } from "jotai";
 import _ from "lodash";
 import { useSession } from "next-auth/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Page() {
   const {
@@ -23,8 +25,19 @@ export default function Page() {
     { maxResults: 15 },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
-  const [myPosts, setMyPosts] = useState<PostResolved[]>([]);
+  const myPosts = useAtomValue(myPostsAtom);
+  const [feedCustom, setFeedCustom] = useState<PostResolved[]>([]);
   const { data: session } = useSession();
+
+  useEffect(() => {
+    setFeedCustom(
+      myPosts.concat(
+        (feed?.pages ?? [])
+          .flatMap((page) => page.results)
+          .filter((post) => !myPosts.find((p) => p.id === post.id)),
+      ),
+    );
+  }, [myPosts, feed]);
 
   return (
     <div className="flex flex-col">
@@ -37,15 +50,10 @@ export default function Page() {
         </NavTab>
         <Separator />
       </div>
-      <PostForm
-        avatar={session?.user?.image}
-        onSuccess={(post) => setMyPosts((posts) => [post, ...posts])}
-      />
+      <PostForm avatar={session?.user?.image} />
       <Separator />
       <PostFeed
-        posts={myPosts.concat(
-          (feed?.pages ?? []).flatMap((page) => page.results),
-        )}
+        posts={feedCustom}
         loading={isLoading || isFetchingNextPage}
         error={isLoadingError || isFetchNextPageError}
         fetchNextPage={fetchNextPage}
