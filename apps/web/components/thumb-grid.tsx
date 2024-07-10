@@ -18,7 +18,9 @@ export function ThumbGrid({
   switch (media.length) {
     case 1:
       return (
-        <div className={cn("w-full overflow-hidden rounded-lg", className)}>
+        <div
+          className={cn("w-full overflow-hidden rounded-lg border", className)}
+        >
           {media.map((src, i) => (
             <AspectRatio ratio={4 / 3} className="bg-muted w-full" key={i}>
               <Link
@@ -42,7 +44,7 @@ export function ThumbGrid({
       return (
         <div
           className={cn(
-            "flex w-full flex-row overflow-hidden rounded-lg",
+            "flex w-full flex-row overflow-hidden rounded-lg border",
             className,
           )}
         >
@@ -63,7 +65,12 @@ export function ThumbGrid({
                   />
                 </Link>
               </AspectRatio>
-              {i === 0 && <Separator orientation="vertical" />}
+              {i === 0 && (
+                <Separator
+                  orientation="vertical"
+                  className="bg-background z-10 w-[4px]"
+                />
+              )}
             </>
           ))}
         </div>
@@ -72,7 +79,7 @@ export function ThumbGrid({
       return (
         <div
           className={cn(
-            "flex w-full flex-row overflow-hidden rounded-lg",
+            "flex w-full flex-row overflow-hidden rounded-lg border",
             className,
           )}
         >
@@ -91,7 +98,10 @@ export function ThumbGrid({
               />
             </Link>
           </AspectRatio>
-          <Separator orientation="vertical" />
+          <Separator
+            orientation="vertical"
+            className="bg-background z-10 w-[4px]"
+          />
           <AspectRatio ratio={4 / 3} className="bg-muted w-full">
             <div className="flex flex-col">
               {media.slice(1).map((src, i) => (
@@ -115,7 +125,7 @@ export function ThumbGrid({
                       />
                     </Link>
                   </AspectRatio>
-                  {i === 0 && <Separator />}
+                  {i === 0 && <Separator className="bg-background h-[4px]" />}
                 </>
               ))}
             </div>
@@ -126,11 +136,11 @@ export function ThumbGrid({
       return (
         <div
           className={cn(
-            "flex w-full flex-col overflow-hidden rounded-lg",
+            "flex w-full flex-col overflow-hidden rounded-lg border",
             className,
           )}
         >
-          <AspectRatio ratio={2} className="bg-muted w-full">
+          <AspectRatio ratio={2} className="bg-background w-full">
             <div className="flex flex-row">
               {media.slice(0, 2).map((src, i) => (
                 <>
@@ -149,13 +159,18 @@ export function ThumbGrid({
                       />
                     </Link>
                   </AspectRatio>
-                  {i === 0 && <Separator orientation="vertical" />}
+                  {i === 0 && (
+                    <Separator
+                      orientation="vertical"
+                      className="bg-background w-[4px]"
+                    />
+                  )}
                 </>
               ))}
             </div>
           </AspectRatio>
-          <Separator orientation="horizontal" />
-          <AspectRatio ratio={2} className="bg-muted w-full">
+          <Separator className="bg-background z-10 h-[4px]" />
+          <AspectRatio ratio={2} className="bg-background w-full">
             <div className="flex flex-row">
               {media.slice(2, 4).map((src, i) => (
                 <>
@@ -174,7 +189,12 @@ export function ThumbGrid({
                       />
                     </Link>
                   </AspectRatio>
-                  {i === 0 && <Separator orientation="vertical" />}
+                  {i === 0 && (
+                    <Separator
+                      orientation="vertical"
+                      className="bg-background w-[4px]"
+                    />
+                  )}
                 </>
               ))}
             </div>
