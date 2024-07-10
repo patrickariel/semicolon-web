@@ -69,6 +69,7 @@ export const PublicUserResolvedSchema = UserResolvedSchema.omit({
 export const PostResolvedSchema = PostSchema.merge(
   z.object({
     id: UUIDToShort,
+    parentId: UUIDToShort.nullable(),
     name: z.string(),
     username: z.string(),
     verified: z.boolean(),
