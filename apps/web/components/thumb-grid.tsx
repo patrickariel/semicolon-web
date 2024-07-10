@@ -1,19 +1,25 @@
+import { trpc } from "@/lib/trpc-client";
 import type { PostResolved } from "@semicolon/api/schema";
 import { AspectRatio } from "@semicolon/ui/aspect-ratio";
 import { Separator } from "@semicolon/ui/separator";
 import { cn } from "@semicolon/ui/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { MouseEventHandler } from "react";
 
-export function ThumbGrid({
-  className,
-  id,
-  media,
-  username,
-}: PostResolved & Omit<React.HTMLAttributes<HTMLDivElement>, "content">) {
+export function ThumbGrid(
+  post: PostResolved & Omit<React.HTMLAttributes<HTMLDivElement>, "content">,
+) {
+  const { className, id, media, username } = post;
+  const utils = trpc.useUtils();
   if (media.length === 0) {
     throw new Error(`ThumbGrid must be supplied at least one image URL.`);
   }
+
+  const onClick: MouseEventHandler<HTMLAnchorElement> = (e) => {
+    utils.post.id.setData({ id }, post);
+    e.stopPropagation();
+  };
 
   switch (media.length) {
     case 1:
@@ -25,7 +31,7 @@ export function ThumbGrid({
             <AspectRatio ratio={4 / 3} className="bg-muted w-full" key={i}>
               <Link
                 href={`/${username}/post/${id}/photo/${i + 1}`}
-                onClick={(e) => e.stopPropagation()}
+                onClick={onClick}
                 scroll={false}
               >
                 <Image
@@ -53,7 +59,7 @@ export function ThumbGrid({
               <AspectRatio ratio={3 / 2} className="bg-muted w-full" key={i}>
                 <Link
                   href={`/${username}/post/${id}/photo/${i + 1}`}
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={onClick}
                   scroll={false}
                 >
                   <Image
@@ -86,7 +92,7 @@ export function ThumbGrid({
           <AspectRatio ratio={4 / 3} className="bg-muted w-full">
             <Link
               href={`/${username}/post/${id}/photo/1`}
-              onClick={(e) => e.stopPropagation()}
+              onClick={onClick}
               scroll={false}
             >
               <Image
@@ -113,7 +119,7 @@ export function ThumbGrid({
                   >
                     <Link
                       href={`/${username}/post/${id}/photo/${i + 2}`}
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={onClick}
                       scroll={false}
                     >
                       <Image
@@ -147,7 +153,7 @@ export function ThumbGrid({
                   <AspectRatio ratio={1} className="bg-muted h-full" key={i}>
                     <Link
                       href={`/${username}/post/${id}/photo/${i + 1}`}
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={onClick}
                       scroll={false}
                     >
                       <Image
@@ -177,7 +183,7 @@ export function ThumbGrid({
                   <AspectRatio ratio={1} className="bg-muted h-full" key={i}>
                     <Link
                       href={`/${username}/post/${id}/photo/${i + 3}`}
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={onClick}
                       scroll={false}
                     >
                       <Image
