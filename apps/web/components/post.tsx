@@ -99,6 +99,8 @@ export function Post(post: PostResolved) {
     likeCount,
   } = post;
   const utils = trpc.useUtils();
+  const [open, setOpen] = React.useState(false);
+  const { data: session } = useSession();
 
   return (
     <div
@@ -182,7 +184,7 @@ export function Post(post: PostResolved) {
         {media.length > 0 && <ThumbGrid {...post} />}
 
         <div className="flex w-full min-w-0 items-center justify-between">
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <PostButton icon={MessageCircle} label={replyCount} />
             </DialogTrigger>
@@ -194,6 +196,7 @@ export function Post(post: PostResolved) {
                   placeholder="Post your reply"
                   avatar={session?.user?.image}
                   className="pt-0"
+                  onPost={() => setOpen(false)}
                 />
               </div>
             </DialogContent>
