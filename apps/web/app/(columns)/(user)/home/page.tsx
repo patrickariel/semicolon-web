@@ -5,11 +5,12 @@ import { PostFeed } from "@/components/post-feed";
 import { PostForm } from "@/components/post-form";
 import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
+import { PostResolved } from "@semicolon/api/schema";
 import { Separator } from "@semicolon/ui/separator";
 import { useAtomValue } from "jotai";
 import _ from "lodash";
 import { useSession } from "next-auth/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Page() {
   const {
@@ -25,7 +26,18 @@ export default function Page() {
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
   const myPosts = useAtomValue(myPostsAtom);
+  const [feedCustom, setFeedCustom] = useState<PostResolved[]>([]);
   const { data: session } = useSession();
+
+  useEffect(() => {
+    setFeedCustom(
+      myPosts.concat(
+        (feed?.pages ?? [])
+          .flatMap((page) => page.results)
+          .filter((post) => !myPosts.find((p) => p.id === post.id)),
+      ),
+    );
+  }, [myPosts, feed]);
 
   return (
     <div className="flex flex-col">
@@ -41,9 +53,7 @@ export default function Page() {
       <PostForm avatar={session?.user?.image} />
       <Separator />
       <PostFeed
-        posts={myPosts.concat(
-          (feed?.pages ?? []).flatMap((page) => page.results),
-        )}
+        posts={feedCustom}
         loading={isLoading || isFetchingNextPage}
         error={isLoadingError || isFetchNextPageError}
         fetchNextPage={fetchNextPage}

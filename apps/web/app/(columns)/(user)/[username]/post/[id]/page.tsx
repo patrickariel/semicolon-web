@@ -36,19 +36,28 @@ export default function Page({
     { id, maxResults: 15 },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
-  const [myReplies, setMyReplies] = useState<PostResolved[]>([]);
+  const [repliesCustom, setRepliesCustom] = useState<PostResolved[]>([]);
   const myPosts = useAtomValue(myPostsAtom);
 
   useEffect(() => {
-    setMyReplies(
-      myPosts
-        .filter((post) => post.parentId === id)
-        .map((reply) => {
-          reply.to = null;
-          return reply;
-        }),
+    // We need to filter twice because our query result is not necessarily up-to-date
+    const myReplies = myPosts
+      .filter((post) => post.parentId === id)
+      .map((reply) => ({
+        ...reply,
+        to: null as string | null,
+      }));
+
+    setRepliesCustom(
+      myReplies.concat(
+        replies
+          ? replies.pages
+              .flatMap((page) => page.replies)
+              .filter((reply) => !myReplies.find((r) => r.id === reply.id))
+          : [],
+      ),
     );
-  }, [id, myPosts]);
+  }, [id, myPosts, replies]);
 
   useEffect(() => {
     if (post && username !== post.username) {
@@ -86,9 +95,7 @@ export default function Page({
       <Separator />
       <div className="mb-4 flex flex-col">
         <PostFeed
-          posts={myReplies.concat(
-            (replies?.pages ?? []).flatMap((page) => page.replies),
-          )}
+          posts={repliesCustom}
           loading={isLoading || isFetchingNextPage}
           error={isLoadingError || isFetchNextPageError}
           fetchNextPage={fetchNextPage}
