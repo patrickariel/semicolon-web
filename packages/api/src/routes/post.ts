@@ -116,7 +116,7 @@ export const post = router({
       z
         .object({
           content: z.string().optional(),
-          to: z.string().uuid().optional(),
+          to: ShortToUUID.optional(),
           media: z.array(z.string().url()).max(4),
         })
         .refine(
