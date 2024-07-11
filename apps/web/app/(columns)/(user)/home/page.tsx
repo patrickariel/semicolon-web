@@ -1,18 +1,18 @@
 "use client";
 
-import { NavTab, NavTabItem } from "@/components/nav-tab";
 import { PostFeed } from "@/components/post-feed";
 import { PostForm } from "@/components/post-form";
 import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import { PostResolved } from "@semicolon/api/schema";
 import { Separator } from "@semicolon/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@semicolon/ui/tabs";
 import { useAtomValue } from "jotai";
 import _ from "lodash";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
-export default function Page() {
+function Recommended() {
   const {
     data: feed,
     fetchNextPage,
@@ -27,7 +27,6 @@ export default function Page() {
   );
   const myPosts = useAtomValue(myPostsAtom);
   const [feedCustom, setFeedCustom] = useState<PostResolved[]>([]);
-  const { data: session } = useSession();
 
   useEffect(() => {
     setFeedCustom(
@@ -40,25 +39,43 @@ export default function Page() {
   }, [myPosts, feed]);
 
   return (
+    <PostFeed
+      posts={feedCustom}
+      loading={isLoading || isFetchingNextPage}
+      error={isLoadingError || isFetchNextPageError}
+      fetchNextPage={fetchNextPage}
+      refetch={refetch}
+    />
+  );
+}
+
+enum ActiveTab {
+  Recommended = "recommended",
+  Chronological = "chronological",
+}
+
+export default function Page() {
+  const { data: session } = useSession();
+
+  return (
     <div className="flex flex-col">
-      <div className="bg-card sticky top-0 z-10">
-        <NavTab>
-          <NavTabItem href="#" active>
-            For You
-          </NavTabItem>
-          <NavTabItem href="#">Following</NavTabItem>
-        </NavTab>
+      <Tabs defaultValue={ActiveTab.Recommended}>
+        <div className="bg-card sticky top-0 z-10">
+          <TabsList>
+            <TabsTrigger value={ActiveTab.Recommended}>For You</TabsTrigger>
+            <TabsTrigger value={ActiveTab.Chronological}>Following</TabsTrigger>
+          </TabsList>
+          <Separator />
+        </div>
+        <PostForm avatar={session?.user?.image} />
         <Separator />
-      </div>
-      <PostForm avatar={session?.user?.image} />
-      <Separator />
-      <PostFeed
-        posts={feedCustom}
-        loading={isLoading || isFetchingNextPage}
-        error={isLoadingError || isFetchNextPageError}
-        fetchNextPage={fetchNextPage}
-        refetch={refetch}
-      />
+        <TabsContent value={ActiveTab.Recommended}>
+          <Recommended />
+        </TabsContent>
+        <TabsContent value={ActiveTab.Chronological}>
+          Put content here
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
