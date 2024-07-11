@@ -18,10 +18,12 @@ export function PostFeed({
   error,
   fetchNextPage,
   refetch,
+  hasNextPage,
 }: {
   posts: PostResolved[];
   loading: boolean;
   error: boolean;
+  hasNextPage: boolean;
   fetchNextPage: () => Promise<unknown>;
   refetch: () => Promise<unknown>;
 }) {
@@ -59,7 +61,7 @@ export function PostFeed({
             <RotateCw className="stroke-destructive" />
           </Button>
         </div>
-      ) : (
+      ) : hasNextPage ? (
         <InView
           as="div"
           threshold={0.9}
@@ -71,7 +73,7 @@ export function PostFeed({
         >
           <div className="flex h-20 flex-row items-center justify-center" />
         </InView>
-      )}
+      ) : undefined}
     </>
   );
 }
