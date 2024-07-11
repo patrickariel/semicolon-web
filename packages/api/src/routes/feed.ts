@@ -4,8 +4,8 @@ import { db } from "@semicolon/db";
 import { z } from "zod";
 
 export const feed = router({
-  recommend: userProcedure
-    .meta({ openapi: { method: "GET", path: "/users/me" } })
+  recommended: userProcedure
+    .meta({ openapi: { method: "GET", path: "/feed/recommended" } })
     .input(
       z.object({
         cursor: z.string().uuid().nullish(),
@@ -78,4 +78,76 @@ export const feed = router({
         nextCursor,
       };
     }),
+  following: userProcedure
+    .meta({ openapi: { method: "GET", path: "/feed/following" } })
+    .input(
+      z.object({
+        cursor: z.string().uuid().nullish(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        results: z.array(PostResolvedSchema),
+        nextCursor: z.string().nullish(),
+      }),
+    )
+    .query(
+      async ({
+        ctx: {
+          user: { id },
+        },
+        input: { cursor, maxResults },
+      }) => {
+        const posts = await db.post.findMany({
+          where: {
+            user: {
+              followedBy: {
+                some: {
+                  id,
+                },
+              },
+            },
+          },
+          include: {
+            user: true,
+            _count: {
+              select: {
+                likes: true,
+                children: true,
+              },
+            },
+            parent: {
+              include: {
+                user: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+
+        let nextCursor: typeof cursor | undefined;
+
+        if (posts.length > maxResults) {
+          const nextItem = posts.pop();
+          nextCursor = nextItem!.id;
+        }
+
+        return {
+          results: posts.map((post) => ({
+            ...post,
+            name: post.user.name!,
+            to: post.parent?.user.username ?? null,
+            username: post.user.username!,
+            verified: post.user.verified,
+            avatar: post.user.image,
+            likeCount: post._count.likes,
+            replyCount: post._count.children,
+          })),
+          nextCursor,
+        };
+      },
+    ),
 });
