@@ -112,7 +112,7 @@ export default function Page() {
   return (
     <div className="flex flex-col">
       <Tabs defaultValue={ActiveTab.Recommended}>
-        <div className="bg-card sticky top-0 z-10">
+        <div className="bg-card sticky top-0 z-20">
           <TabsList>
             <TabsTrigger value={ActiveTab.Recommended}>For You</TabsTrigger>
             <TabsTrigger value={ActiveTab.Following}>Following</TabsTrigger>
