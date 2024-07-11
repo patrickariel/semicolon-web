@@ -12,16 +12,22 @@ import _ from "lodash";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
+enum ActiveTab {
+  Recommended = "recommended",
+  Following = "following",
+}
+
 function Recommended() {
   const {
     data: feed,
     fetchNextPage,
+    hasNextPage,
     isLoading,
     isLoadingError,
     isFetchingNextPage,
     isFetchNextPageError,
     refetch,
-  } = trpc.feed.recommend.useInfiniteQuery(
+  } = trpc.feed.recommended.useInfiniteQuery(
     { maxResults: 15 },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
@@ -41,6 +47,7 @@ function Recommended() {
   return (
     <PostFeed
       posts={feedCustom}
+      hasNextPage={hasNextPage}
       loading={isLoading || isFetchingNextPage}
       error={isLoadingError || isFetchNextPageError}
       fetchNextPage={fetchNextPage}
@@ -49,9 +56,54 @@ function Recommended() {
   );
 }
 
-enum ActiveTab {
-  Recommended = "recommended",
-  Chronological = "chronological",
+function Following() {
+  const {
+    data: feed,
+    fetchNextPage,
+    isLoading,
+    isLoadingError,
+    isFetchingNextPage,
+    isFetchNextPageError,
+    hasNextPage,
+    refetch,
+  } = trpc.feed.following.useInfiniteQuery(
+    { maxResults: 15 },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
+  );
+  const myPosts = useAtomValue(myPostsAtom);
+  const [feedCustom, setFeedCustom] = useState<PostResolved[]>([]);
+
+  useEffect(() => {
+    setFeedCustom(
+      myPosts.concat(
+        (feed?.pages ?? [])
+          .flatMap((page) => page.results)
+          .filter((post) => !myPosts.find((p) => p.id === post.id)),
+      ),
+    );
+  }, [myPosts, feed]);
+
+  return (
+    <>
+      <PostFeed
+        posts={feedCustom}
+        loading={isLoading || isFetchingNextPage}
+        error={isLoadingError || isFetchNextPageError}
+        fetchNextPage={fetchNextPage}
+        refetch={refetch}
+        hasNextPage={hasNextPage}
+      />
+      {feed?.pages[0] && feed.pages[0]?.results.length === 0 && (
+        <article className="flex flex-col gap-3 p-9">
+          <p className="text-2xl font-black">Welcome back</p>
+          <p className="text-muted-foreground text-base">
+            Select some topics you{"'"}re interested in to help personalize your
+            X experience, starting with finding people to follow.
+          </p>
+        </article>
+      )}
+    </>
+  );
 }
 
 export default function Page() {
@@ -63,7 +115,7 @@ export default function Page() {
         <div className="bg-card sticky top-0 z-10">
           <TabsList>
             <TabsTrigger value={ActiveTab.Recommended}>For You</TabsTrigger>
-            <TabsTrigger value={ActiveTab.Chronological}>Following</TabsTrigger>
+            <TabsTrigger value={ActiveTab.Following}>Following</TabsTrigger>
           </TabsList>
           <Separator />
         </div>
@@ -72,8 +124,8 @@ export default function Page() {
         <TabsContent value={ActiveTab.Recommended}>
           <Recommended />
         </TabsContent>
-        <TabsContent value={ActiveTab.Chronological}>
-          Put content here
+        <TabsContent value={ActiveTab.Following}>
+          <Following />
         </TabsContent>
       </Tabs>
     </div>
