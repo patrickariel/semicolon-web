@@ -30,6 +30,7 @@ export default function Page({
     isLoading,
     isLoadingError,
     isFetchingNextPage,
+    hasNextPage,
     isFetchNextPageError,
     refetch,
   } = trpc.post.replies.useInfiniteQuery(
@@ -100,6 +101,7 @@ export default function Page({
           error={isLoadingError || isFetchNextPageError}
           fetchNextPage={fetchNextPage}
           refetch={refetch}
+          hasNextPage={hasNextPage}
         />
       </div>
     </div>

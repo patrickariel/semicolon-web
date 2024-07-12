@@ -4,8 +4,10 @@ import { PostButton } from "@/components/post-button";
 import { PostDetail } from "@/components/post-detail";
 import { PostFeed } from "@/components/post-feed";
 import { PostForm } from "@/components/post-form";
+import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import * as Dialog from "@radix-ui/react-dialog";
+import type { PostResolved } from "@semicolon/api/schema";
 import { Button } from "@semicolon/ui/button";
 import {
   Carousel,
@@ -18,6 +20,7 @@ import {
 import { ScrollArea } from "@semicolon/ui/scroll-area";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
+import { useAtomValue } from "jotai";
 import _ from "lodash";
 import {
   Bookmark,
@@ -49,10 +52,33 @@ export default function Page({
     isFetchingNextPage,
     isFetchNextPageError,
     refetch,
+    hasNextPage,
   } = trpc.post.replies.useInfiniteQuery(
     { id, maxResults: 15 },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
+  const [repliesCustom, setRepliesCustom] = useState<PostResolved[]>([]);
+  const myPosts = useAtomValue(myPostsAtom);
+
+  useEffect(() => {
+    // We need to filter twice because our query result is not necessarily up-to-date
+    const myReplies = myPosts
+      .filter((post) => post.parentId === id)
+      .map((reply) => ({
+        ...reply,
+        to: null as string | null,
+      }));
+
+    setRepliesCustom(
+      myReplies.concat(
+        replies
+          ? replies.pages
+              .flatMap((page) => page.replies)
+              .filter((reply) => !myReplies.find((r) => r.id === reply.id))
+          : [],
+      ),
+    );
+  }, [id, myPosts, replies]);
 
   const [startIndex, setStartIndex] = useState(() => {
     const int = parseInt(num);
@@ -168,11 +194,12 @@ export default function Page({
               />
               <Separator />
               <PostFeed
-                posts={(replies?.pages ?? []).flatMap((page) => page.replies)}
+                posts={repliesCustom}
                 loading={isLoading || isFetchingNextPage}
                 error={isLoadingError || isFetchNextPageError}
                 fetchNextPage={fetchNextPage}
                 refetch={refetch}
+                hasNextPage={hasNextPage}
               />
             </div>
           </ScrollArea>

@@ -36,11 +36,7 @@ function Recommended() {
 
   useEffect(() => {
     setFeedCustom(
-      myPosts.concat(
-        (feed?.pages ?? [])
-          .flatMap((page) => page.results)
-          .filter((post) => !myPosts.find((p) => p.id === post.id)),
-      ),
+      myPosts.concat((feed?.pages ?? []).flatMap((page) => page.posts)),
     );
   }, [myPosts, feed]);
 
@@ -93,12 +89,12 @@ function Following() {
         refetch={refetch}
         hasNextPage={hasNextPage}
       />
-      {feed?.pages[0] && feed.pages[0]?.results.length === 0 && (
+      {feed?.pages[0]?.results.length === 0 && (
         <article className="flex flex-col gap-3 p-9">
           <p className="text-2xl font-black">Welcome back</p>
           <p className="text-muted-foreground text-base">
             Select some topics you{"'"}re interested in to help personalize your
-            X experience, starting with finding people to follow.
+            Semicolon experience, starting with finding people to follow.
           </p>
         </article>
       )}
