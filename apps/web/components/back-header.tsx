@@ -12,7 +12,7 @@ export function BackHeader({
   return (
     <div
       className={cn(
-        "bg-background/65 sticky top-0 z-10 flex flex-row items-center gap-7 p-2 backdrop-blur-md",
+        "bg-background/65 sticky top-0 z-50 flex flex-row items-center gap-7 p-2 backdrop-blur-md",
         className,
       )}
       {...props}
