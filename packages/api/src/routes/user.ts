@@ -158,16 +158,29 @@ export const user = router({
     .meta({
       openapi: { method: "GET", path: "/users/{username}/posts" },
     })
-    .input(z.object({ username: z.string().uuid() }))
-    .output(z.array(PostResolvedSchema))
-    .query(async ({ input: { username } }) => {
+    .input(
+      z.object({
+        username: z.string(),
+        cursor: z.string().uuid().optional(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        posts: z.array(PostResolvedSchema),
+        nextCursor: z.string().uuid().optional(),
+      }),
+    )
+    .query(async ({ input: { username, cursor, maxResults } }) => {
       const posts = await db.post.findMany({
         where: {
           user: {
             username,
           },
+          parentId: { equals: null },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+        take: maxResults + 1,
         include: {
           parent: {
             include: {
@@ -182,26 +195,48 @@ export const user = router({
             },
           },
         },
+        ...(cursor && { cursor: { id: cursor } }),
       });
 
-      return posts.map((post) => ({
-        ...post,
-        name: post.user.name!,
-        to: post.parent?.user.username ?? null,
-        username: post.user.username!,
-        verified: post.user.verified,
-        avatar: post.user.image,
-        likeCount: post._count.likes,
-        replyCount: post._count.children,
-      }));
+      let nextCursor: typeof cursor | undefined;
+
+      if (posts.length > maxResults) {
+        const nextItem = posts.pop();
+        nextCursor = nextItem!.id; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      }
+
+      return {
+        posts: posts.map((post) => ({
+          ...post,
+          name: post.user.name!,
+          to: post.parent?.user.username ?? null,
+          username: post.user.username!,
+          verified: post.user.verified,
+          avatar: post.user.image,
+          likeCount: post._count.likes,
+          replyCount: post._count.children,
+        })),
+        nextCursor,
+      };
     }),
   replies: publicProcedure
     .meta({
       openapi: { method: "GET", path: "/users/{username}/replies" },
     })
-    .input(z.object({ username: z.string() }))
-    .output(z.array(PostResolvedSchema))
-    .query(async ({ input: { username } }) => {
+    .input(
+      z.object({
+        username: z.string(),
+        cursor: z.string().uuid().optional(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        posts: z.array(PostResolvedSchema),
+        nextCursor: z.string().uuid().optional(),
+      }),
+    )
+    .query(async ({ input: { username, cursor, maxResults } }) => {
       const posts = await db.post.findMany({
         where: {
           user: {
@@ -209,7 +244,8 @@ export const user = router({
           },
           parentId: { not: null },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+        take: maxResults + 1,
         include: {
           parent: {
             include: {
@@ -224,17 +260,28 @@ export const user = router({
             },
           },
         },
+        ...(cursor && { cursor: { id: cursor } }),
       });
 
-      return posts.map((post) => ({
-        ...post,
-        name: post.user.name!,
-        to: post.parent?.user.username ?? null,
-        username: post.user.username!,
-        verified: post.user.verified,
-        avatar: post.user.image,
-        likeCount: post._count.likes,
-        replyCount: post._count.children,
-      }));
+      let nextCursor: typeof cursor | undefined;
+
+      if (posts.length > maxResults) {
+        const nextItem = posts.pop();
+        nextCursor = nextItem!.id; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      }
+
+      return {
+        posts: posts.map((post) => ({
+          ...post,
+          name: post.user.name!,
+          to: post.parent?.user.username ?? null,
+          username: post.user.username!,
+          verified: post.user.verified,
+          avatar: post.user.image,
+          likeCount: post._count.likes,
+          replyCount: post._count.children,
+        })),
+        nextCursor,
+      };
     }),
 });
