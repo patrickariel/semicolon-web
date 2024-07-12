@@ -26,7 +26,7 @@ export const feed = router({
         },
         input: { cursor, maxResults },
       }) => {
-        const rank = sql<number>`"AggrLike".count * "Post".views / (EXTRACT(epoch from AGE("Post"."createdAt")) / 3600)`;
+        const rank = sql<number>`"AggrLike".count * "Post".views / (((EXTRACT(epoch from AGE("Post"."createdAt")) / 3600) + 2) ^ 1.8)`;
 
         let dbQuery = db.$kysely
           .selectFrom("Post")
