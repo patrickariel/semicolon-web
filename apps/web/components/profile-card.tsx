@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
-import { TabsList, TabsTrigger } from "@semicolon/ui/tabs";
 import { BadgeCheck, CalendarDays, MapPin, User } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -18,13 +17,6 @@ interface ProfileCardProps {
   verified?: boolean;
   isOwner: boolean;
   isFollowing: boolean;
-}
-
-enum ActiveTab {
-  Posts = "posts",
-  Replies = "replies",
-  Media = "media",
-  Likes = "likes",
 }
 
 const ProfileCard = ({
@@ -101,10 +93,12 @@ const ProfileCard = ({
           {bio && <p className="text-sm leading-[26px]">{bio}</p>}
 
           <div className="flex gap-5">
-            <div className="flex gap-1.5">
-              <MapPin className="stroke-muted-foreground h-[18px] w-[18px]" />
-              <p className="text-muted-foreground text-sm">{location}</p>
-            </div>
+            {location && (
+              <div className="flex gap-1.5">
+                <MapPin className="stroke-muted-foreground h-[18px] w-[18px]" />
+                <p className="text-muted-foreground text-sm">{location}</p>
+              </div>
+            )}
             <div className="flex gap-1.5">
               <CalendarDays className="stroke-muted-foreground h-[18px] w-[18px]" />
               <p className="text-muted-foreground text-sm">{joinDate}</p>
@@ -123,21 +117,6 @@ const ProfileCard = ({
             </div>
           </div>
         </div>
-
-        <TabsList className="flex justify-between gap-2 overflow-x-auto sm:gap-0">
-          <TabsTrigger value={ActiveTab.Posts} className="px-2.5 pb-3.5">
-            Posts
-          </TabsTrigger>
-          <TabsTrigger value={ActiveTab.Replies} className="px-2.5 pb-3.5">
-            Replies
-          </TabsTrigger>
-          <TabsTrigger value={ActiveTab.Media} className="px-2.5 pb-3.5">
-            Media
-          </TabsTrigger>
-          <TabsTrigger value={ActiveTab.Likes} className="px-2.5 pb-3.5">
-            Likes
-          </TabsTrigger>
-        </TabsList>
       </div>
     </div>
   );

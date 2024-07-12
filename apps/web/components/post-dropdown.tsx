@@ -1,13 +1,34 @@
+import { myPostsAtom } from "@/lib/atom";
+import { trpc } from "@/lib/trpc-client";
 import { PostResolved } from "@semicolon/api/schema";
 import { Button } from "@semicolon/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@semicolon/ui/dropdown-menu";
-import { Ellipsis, Flag, UserPlus } from "lucide-react";
+import { useSetAtom } from "jotai";
+import { Ellipsis, Flag, Trash2, UserPlus } from "lucide-react";
 
-export function PostDropdown({ username }: PostResolved) {
+export function PostDropdown({
+  username,
+  id,
+  isOwner = false,
+  content: _content,
+  ...props
+}: Omit<React.HtmlHTMLAttributes<HTMLDivElement>, "content"> &
+  PostResolved & { isOwner?: boolean }) {
+  const setMyPosts = useSetAtom(myPostsAtom);
+  const utils = trpc.useUtils();
+  const deletePost = trpc.post.delete.useMutation({
+    onSuccess: async (_data, { id }) => {
+      setMyPosts((myPosts) => myPosts.filter((post) => post.id !== id));
+      await utils.post.search.refetch();
+      await utils.post.replies.refetch();
+    },
+  });
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -19,21 +40,37 @@ export function PostDropdown({ username }: PostResolved) {
           <Ellipsis className="flex-none" size={19} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="flex flex-col gap-2 rounded-3xl px-0 py-4 [&>*]:min-w-40 [&>*]:text-base [&>*]:font-bold">
-        <Button
-          variant="ghost"
-          className="justify-start gap-4 rounded-none p-6 px-4"
-        >
-          <UserPlus size={23} />
-          <div>Follow {`@${username}`}</div>
-        </Button>
-        <Button
-          variant="ghost"
-          className="justify-start gap-4 rounded-none p-6 px-4"
-        >
-          <Flag size={23} />
-          <div>Report post</div>
-        </Button>
+      <DropdownMenuContent
+        className="flex flex-col gap-0 rounded-3xl px-0 py-2 [&>*]:min-w-44 [&>*]:text-sm [&>*]:font-black"
+        onClick={(e) => e.stopPropagation()}
+        {...props}
+      >
+        {isOwner ? (
+          <DropdownMenuItem
+            className="focus:bg-destructive/20 cursor-pointer justify-start gap-4 rounded-none px-4 py-4"
+            onSelect={() => deletePost.mutate({ id })}
+          >
+            <Trash2 size={20} className="stroke-destructive" />
+            <div className="text-destructive">Delete</div>
+          </DropdownMenuItem>
+        ) : (
+          <>
+            <DropdownMenuItem
+              className="cursor-pointer justify-start gap-4 rounded-none px-4 py-4"
+              onSelect={() => deletePost.mutate({ id })}
+            >
+              <UserPlus size={20} />
+              <div>Follow {`@${username}`}</div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer justify-start gap-4 rounded-none px-4 py-4"
+              onSelect={() => deletePost.mutate({ id })}
+            >
+              <Flag size={20} />
+              <div>Report post</div>
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

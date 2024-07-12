@@ -231,7 +231,7 @@ export const post = router({
     .meta({ openapi: { method: "DELETE", path: "/posts/id/{id}" } })
     .input(
       z.object({
-        id: z.string(),
+        id: ShortToUUID,
       }),
     )
     .mutation(async ({ ctx: { user }, input: { id } }) => {
