@@ -7,14 +7,11 @@ import { PostForm } from "@/components/post-form";
 import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import { PostResolved } from "@semicolon/api/schema";
-import { Button } from "@semicolon/ui/button";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
 import { useAtomValue } from "jotai";
 import _ from "lodash";
-import { ArrowLeft } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export default function Page({
@@ -22,7 +19,6 @@ export default function Page({
 }: {
   params: { username: string; id: string };
 }) {
-  const router = useRouter();
   const { data: post } = trpc.post.id.useQuery({ id });
   const { data: session } = useSession();
   const {
