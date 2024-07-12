@@ -3,6 +3,7 @@
 import { faker } from "@faker-js/faker";
 import { auth } from "@semicolon/auth";
 import { PutBlobResult, put } from "@vercel/blob";
+import imageType from "image-type";
 import _ from "lodash";
 import { revalidatePath } from "next/cache";
 
@@ -21,9 +22,18 @@ export async function uploadMedia(
     return null;
   }
 
+  const arrayBuffer = await media.arrayBuffer();
+  const type = await imageType(new Uint8Array(arrayBuffer));
+
+  if (!type) {
+    return null;
+  } else if (!["image/png", "image/jpeg", "image/webp"].includes(type.mime)) {
+    return null;
+  }
+
   if (process.env.NODE_ENV === "production") {
     try {
-      const blob = await put(media.name, media, {
+      const blob = await put(media.name, arrayBuffer, {
         access: "public",
       });
 
