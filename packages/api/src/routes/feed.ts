@@ -1,4 +1,4 @@
-import { PostResolvedSchema, ShortToUUID, UUIDToShort } from "../schema";
+import { PostResolvedSchema } from "../schema";
 import { router, userProcedure } from "../trpc";
 import { db } from "@semicolon/db";
 import { NotNull, sql } from "kysely";
@@ -9,14 +9,14 @@ export const feed = router({
     .meta({ openapi: { method: "GET", path: "/feed/recommended" } })
     .input(
       z.object({
-        cursor: ShortToUUID.nullish(),
+        cursor: z.string().uuid().optional(),
         maxResults: z.number().min(1).max(100).default(50),
       }),
     )
     .output(
       z.object({
         posts: z.array(PostResolvedSchema),
-        nextCursor: UUIDToShort.nullish(),
+        nextCursor: z.string().uuid().optional(),
       }),
     )
     .query(
@@ -162,14 +162,14 @@ export const feed = router({
     .meta({ openapi: { method: "GET", path: "/feed/following" } })
     .input(
       z.object({
-        cursor: ShortToUUID.nullish(),
+        cursor: z.string().uuid().optional(),
         maxResults: z.number().min(1).max(100).default(50),
       }),
     )
     .output(
       z.object({
         results: z.array(PostResolvedSchema),
-        nextCursor: UUIDToShort.nullish(),
+        nextCursor: z.string().uuid().optional(),
       }),
     )
     .query(

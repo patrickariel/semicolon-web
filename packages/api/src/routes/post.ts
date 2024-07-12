@@ -13,120 +13,6 @@ import _ from "lodash";
 import { z } from "zod";
 
 export const post = router({
-  id: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/posts/id/{id}" } })
-    .input(z.object({ id: ShortToUUID }))
-    .output(PostResolvedSchema)
-    .query(async ({ input: { id } }) => {
-      const post = await db.post.findUnique({
-        where: { id },
-        include: {
-          parent: {
-            include: {
-              user: true,
-            },
-          },
-          user: true,
-          _count: {
-            select: {
-              likes: true,
-              children: true,
-            },
-          },
-        },
-      });
-
-      if (!post) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "The requested post does not exist",
-        });
-      }
-
-      return {
-        ...post,
-        name: post.user.name!,
-        to: post.parent?.user.username ?? null,
-        username: post.user.username!,
-        verified: post.user.verified,
-        avatar: post.user.image,
-        likeCount: post._count.likes,
-        replyCount: post._count.children,
-      };
-    }),
-  replies: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/posts/id/{id}/replies" } })
-    .input(
-      z.object({
-        id: ShortToUUID,
-        cursor: z.string().uuid().nullish(),
-        maxResults: z.number().min(1).max(100).default(50),
-      }),
-    )
-    .output(
-      z.object({
-        replies: z.array(PostResolvedSchema),
-        nextCursor: z.string().uuid().nullish(),
-      }),
-    )
-    .query(async ({ input: { id, maxResults, cursor } }) => {
-      const post = await db.post.findUnique({
-        where: { id },
-        include: {
-          children: {
-            ...(cursor && { cursor: { id: cursor } }),
-            take: maxResults + 1,
-            include: {
-              user: true,
-              parent: {
-                include: {
-                  user: true,
-                },
-              },
-              _count: {
-                select: {
-                  likes: true,
-                  children: true,
-                },
-              },
-            },
-            orderBy: {
-              likes: {
-                _count: "desc",
-              },
-            },
-          },
-        },
-      });
-
-      if (!post) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "The requested post does not exist",
-        });
-      }
-
-      let nextCursor: typeof cursor | undefined;
-
-      if (post.children.length > maxResults) {
-        const nextItem = post.children.pop();
-        nextCursor = nextItem!.id;
-      }
-
-      return {
-        replies: post.children.map((child) => ({
-          ...child,
-          name: child.user.name!,
-          username: child.user.username!,
-          to: null,
-          verified: child.user.verified,
-          avatar: child.user.image,
-          likeCount: child._count.likes,
-          replyCount: child._count.children,
-        })),
-        nextCursor,
-      };
-    }),
   new: userProcedure
     .meta({ openapi: { method: "POST", path: "/posts/new" } })
     .input(
@@ -190,76 +76,6 @@ export const post = router({
         replyCount: post._count.children,
       };
     }),
-  update: userProcedure
-    .meta({ openapi: { method: "PUT", path: "/posts/id/{id}" } })
-    .input(
-      z.object({
-        id: z.string(),
-        content: z.string(),
-      }),
-    )
-    .mutation(async ({ ctx: { user }, input: { id, content } }) => {
-      const post = await db.post.findUnique({
-        select: { userId: true },
-        where: {
-          id,
-        },
-      });
-
-      if (!post) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Requested post not found",
-        });
-      }
-
-      if (post.userId !== user.id) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User not permitted to modify requested post",
-        });
-      }
-
-      await db.post.update({
-        where: { id: id },
-        data: {
-          content,
-        },
-      });
-    }),
-  delete: userProcedure
-    .meta({ openapi: { method: "DELETE", path: "/posts/id/{id}" } })
-    .input(
-      z.object({
-        id: ShortToUUID,
-      }),
-    )
-    .mutation(async ({ ctx: { user }, input: { id } }) => {
-      const post = await db.post.findUnique({
-        select: { userId: true },
-        where: {
-          id,
-        },
-      });
-
-      if (!post) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Requested post not found",
-        });
-      }
-
-      if (post.userId !== user.id) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User not permitted to modify requested post",
-        });
-      }
-
-      await db.post.delete({
-        where: { id },
-      });
-    }),
   search: publicProcedure
     .meta({ openapi: { method: "GET", path: "/posts/search" } })
     .input(
@@ -276,7 +92,7 @@ export const post = router({
           sortBy: z
             .union([z.literal("recency"), z.literal("relevancy")])
             .default("recency"),
-          cursor: z.string().uuid().nullish(),
+          cursor: z.string().uuid().optional(),
           maxResults: z.number().min(1).max(100).default(50),
         })
         .transform((obj) => ({
@@ -287,7 +103,7 @@ export const post = router({
     .output(
       z.object({
         results: z.array(PostResolvedSchema),
-        nextCursor: z.string().uuid().nullish(),
+        nextCursor: z.string().uuid().optional(),
       }),
     )
     .query(
@@ -511,4 +327,240 @@ export const post = router({
         };
       },
     ),
+  id: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/posts/{id}" } })
+    .input(z.object({ id: ShortToUUID }))
+    .output(PostResolvedSchema)
+    .query(async ({ input: { id } }) => {
+      const post = await db.post.findUnique({
+        where: { id },
+        include: {
+          parent: {
+            include: {
+              user: true,
+            },
+          },
+          user: true,
+          _count: {
+            select: {
+              likes: true,
+              children: true,
+            },
+          },
+        },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The requested post does not exist",
+        });
+      }
+
+      return {
+        ...post,
+        name: post.user.name!,
+        to: post.parent?.user.username ?? null,
+        username: post.user.username!,
+        verified: post.user.verified,
+        avatar: post.user.image,
+        likeCount: post._count.likes,
+        replyCount: post._count.children,
+      };
+    }),
+  update: userProcedure
+    .meta({ openapi: { method: "POST", path: "/posts/{id}" } })
+    .input(
+      z.object({
+        id: z.string(),
+        content: z.string(),
+      }),
+    )
+    .output(PostResolvedSchema)
+    .mutation(async ({ ctx: { user }, input: { id, content } }) => {
+      const post = await db.post.findUnique({
+        select: { userId: true },
+        where: {
+          id,
+        },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Requested post not found",
+        });
+      }
+
+      if (post.userId !== user.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not permitted to modify requested post",
+        });
+      }
+
+      const updated = await db.post.update({
+        where: { id: id },
+        data: {
+          content,
+        },
+        include: {
+          user: true,
+          parent: {
+            include: {
+              user: true,
+            },
+          },
+          _count: {
+            select: {
+              likes: true,
+              children: true,
+            },
+          },
+        },
+      });
+
+      return {
+        ...updated,
+        name: updated.user.name!,
+        to: updated.parent?.user.username ?? null,
+        username: updated.user.username!,
+        verified: updated.user.verified,
+        avatar: updated.user.image,
+        likeCount: updated._count.likes,
+        replyCount: updated._count.children,
+      };
+    }),
+  delete: userProcedure
+    .meta({ openapi: { method: "DELETE", path: "/posts/{id}" } })
+    .input(
+      z.object({
+        id: ShortToUUID,
+      }),
+    )
+    .output(PostResolvedSchema)
+    .mutation(async ({ ctx: { user }, input: { id } }) => {
+      const post = await db.post.findUnique({
+        select: { userId: true },
+        where: {
+          id,
+        },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Requested post not found",
+        });
+      }
+
+      if (post.userId !== user.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not permitted to modify requested post",
+        });
+      }
+
+      const deleted = await db.post.delete({
+        where: { id },
+        include: {
+          user: true,
+          parent: {
+            include: {
+              user: true,
+            },
+          },
+          _count: {
+            select: {
+              likes: true,
+              children: true,
+            },
+          },
+        },
+      });
+
+      return {
+        ...deleted,
+        name: deleted.user.name!,
+        to: deleted.parent?.user.username ?? null,
+        username: deleted.user.username!,
+        verified: deleted.user.verified,
+        avatar: deleted.user.image,
+        likeCount: deleted._count.likes,
+        replyCount: deleted._count.children,
+      };
+    }),
+  replies: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/posts/{id}/replies" } })
+    .input(
+      z.object({
+        id: ShortToUUID,
+        cursor: z.string().uuid().optional(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        replies: z.array(PostResolvedSchema),
+        nextCursor: z.string().uuid().optional(),
+      }),
+    )
+    .query(async ({ input: { id, maxResults, cursor } }) => {
+      const post = await db.post.findUnique({
+        where: { id },
+        include: {
+          children: {
+            ...(cursor && { cursor: { id: cursor } }),
+            take: maxResults + 1,
+            include: {
+              user: true,
+              parent: {
+                include: {
+                  user: true,
+                },
+              },
+              _count: {
+                select: {
+                  likes: true,
+                  children: true,
+                },
+              },
+            },
+            orderBy: {
+              likes: {
+                _count: "desc",
+              },
+            },
+          },
+        },
+      });
+
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The requested post does not exist",
+        });
+      }
+
+      let nextCursor: typeof cursor | undefined;
+
+      if (post.children.length > maxResults) {
+        const nextItem = post.children.pop();
+        nextCursor = nextItem!.id;
+      }
+
+      return {
+        replies: post.children.map((child) => ({
+          ...child,
+          name: child.user.name!,
+          username: child.user.username!,
+          to: null,
+          verified: child.user.verified,
+          avatar: child.user.image,
+          likeCount: child._count.likes,
+          replyCount: child._count.children,
+        })),
+        nextCursor,
+      };
+    }),
 });

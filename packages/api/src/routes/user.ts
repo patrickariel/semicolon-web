@@ -1,5 +1,6 @@
 import {
   BirthdaySchema,
+  PostResolvedSchema,
   PublicUserResolvedSchema,
   UserResolvedSchema,
   UsernameSchema,
@@ -16,6 +17,77 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const user = router({
+  search: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/users/search" } })
+    .input(z.object({ query: z.string() }))
+    .output(z.array(PublicUserResolvedSchema))
+    .query(async ({ input: { query } }) => {
+      const users = await db.user.findMany({
+        where: {
+          username: {
+            search: query,
+          },
+          bio: {
+            search: query,
+          },
+          NOT: { registered: null },
+        },
+        include: {
+          _count: {
+            select: {
+              followedBy: true,
+              following: true,
+            },
+          },
+        },
+      });
+
+      return users.map((user) => ({
+        ...user,
+        name: user.name!,
+        username: user.username!,
+        registered: user.registered!,
+        following: user._count.following,
+        followers: user._count.followedBy,
+      }));
+    }),
+  me: userProcedure
+    .meta({ openapi: { method: "GET", path: "/users/me" } })
+    .input(z.void())
+    .output(UserResolvedSchema)
+    .query(({ ctx: { user } }) => user),
+  register: newUserProcedure
+    .meta({ openapi: { method: "POST", path: "/users/register" } })
+    .input(
+      z.object({
+        name: z.string(),
+        username: UsernameSchema,
+        image: z.string().url().optional(),
+        birthday: BirthdaySchema,
+      }),
+    )
+    .output(z.void())
+    .mutation(async ({ ctx: { user }, input }) => {
+      const { name, username, image, registered } = await db.user
+        .update({
+          where: { email: user.email },
+          data: { ...input, registered: new Date() },
+        })
+        .catch((e: unknown) => {
+          if (
+            e instanceof Prisma.PrismaClientKnownRequestError &&
+            e.code === "P2002"
+          ) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "The username is already taken",
+            });
+          }
+          throw e;
+        });
+
+      await update({ user: { name, username, image, registered } });
+    }),
   id: publicProcedure
     .meta({ openapi: { method: "GET", path: "/users/by/id/{id}" } })
     .input(z.object({ id: z.string().uuid() }))
@@ -50,7 +122,7 @@ export const user = router({
       };
     }),
   username: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/users/by/username/{username}" } })
+    .meta({ openapi: { method: "GET", path: "/users/{username}" } })
     .input(z.object({ username: UsernameSchema }))
     .output(PublicUserResolvedSchema)
     .query(async ({ input: { username } }) => {
@@ -82,72 +154,87 @@ export const user = router({
         followers: user._count.followedBy,
       };
     }),
-  me: userProcedure
-    .meta({ openapi: { method: "GET", path: "/users/me" } })
-    .input(z.void())
-    .output(UserResolvedSchema)
-    .query(({ ctx: { user } }) => user),
-  register: newUserProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        username: UsernameSchema,
-        image: z.string().url().optional(),
-        birthday: BirthdaySchema,
-      }),
-    )
-    .mutation(async ({ ctx: { user }, input }) => {
-      const { name, username, image, registered } = await db.user
-        .update({
-          where: { email: user.email },
-          data: { ...input, registered: new Date() },
-        })
-        .catch((e: unknown) => {
-          if (
-            e instanceof Prisma.PrismaClientKnownRequestError &&
-            e.code === "P2002"
-          ) {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "The username is already taken",
-            });
-          }
-          throw e;
-        });
-
-      await update({ user: { name, username, image, registered } });
-    }),
-  search: publicProcedure
-    .input(z.object({ query: z.string() }))
-    .output(z.array(PublicUserResolvedSchema))
-    .query(async ({ input: { query } }) => {
-      const users = await db.user.findMany({
+  posts: publicProcedure
+    .meta({
+      openapi: { method: "GET", path: "/users/{username}/posts" },
+    })
+    .input(z.object({ username: z.string().uuid() }))
+    .output(z.array(PostResolvedSchema))
+    .query(async ({ input: { username } }) => {
+      const posts = await db.post.findMany({
         where: {
-          username: {
-            search: query,
+          user: {
+            username,
           },
-          bio: {
-            search: query,
-          },
-          NOT: { registered: null },
         },
+        orderBy: { createdAt: "desc" },
         include: {
+          parent: {
+            include: {
+              user: true,
+            },
+          },
+          user: true,
           _count: {
             select: {
-              followedBy: true,
-              following: true,
+              likes: true,
+              children: true,
             },
           },
         },
       });
 
-      return users.map((user) => ({
-        ...user,
-        name: user.name!,
-        username: user.username!,
-        registered: user.registered!,
-        following: user._count.following,
-        followers: user._count.followedBy,
+      return posts.map((post) => ({
+        ...post,
+        name: post.user.name!,
+        to: post.parent?.user.username ?? null,
+        username: post.user.username!,
+        verified: post.user.verified,
+        avatar: post.user.image,
+        likeCount: post._count.likes,
+        replyCount: post._count.children,
+      }));
+    }),
+  replies: publicProcedure
+    .meta({
+      openapi: { method: "GET", path: "/users/{username}/replies" },
+    })
+    .input(z.object({ username: z.string() }))
+    .output(z.array(PostResolvedSchema))
+    .query(async ({ input: { username } }) => {
+      const posts = await db.post.findMany({
+        where: {
+          user: {
+            username,
+          },
+          parentId: { not: null },
+        },
+        orderBy: { createdAt: "desc" },
+        include: {
+          parent: {
+            include: {
+              user: true,
+            },
+          },
+          user: true,
+          _count: {
+            select: {
+              likes: true,
+              children: true,
+            },
+          },
+        },
+      });
+
+      return posts.map((post) => ({
+        ...post,
+        name: post.user.name!,
+        to: post.parent?.user.username ?? null,
+        username: post.user.username!,
+        verified: post.user.verified,
+        avatar: post.user.image,
+        likeCount: post._count.likes,
+        replyCount: post._count.children,
       }));
     }),
 });

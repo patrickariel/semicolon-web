@@ -19,20 +19,17 @@ export const BirthdaySchema = z
 
 const uuidTranslator = short(short.constants.flickrBase58);
 
-export const ShortToUUID = z
-  .string()
-  .transform((val, ctx) => {
-    try {
-      return uuidTranslator.toUUID(val);
-    } catch (_) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Invalid suuid",
-      });
-      return z.NEVER;
-    }
-  })
-  .pipe(z.string().uuid());
+export const ShortToUUID = z.string().transform((val, ctx) => {
+  try {
+    return uuidTranslator.toUUID(val);
+  } catch (_) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid suuid",
+    });
+    return z.NEVER;
+  }
+});
 
 export const UUIDToShort = z
   .string()
