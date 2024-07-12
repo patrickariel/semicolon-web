@@ -1,6 +1,6 @@
-import { NavTab, NavTabItem } from "./nav-tab";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
+import { TabsList, TabsTrigger } from "@semicolon/ui/tabs";
 import { BadgeCheck, CalendarDays, MapPin, User } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -18,6 +18,13 @@ interface ProfileCardProps {
   verified?: boolean;
   isOwner: boolean;
   isFollowing: boolean;
+}
+
+enum ActiveTab {
+  Posts = "posts",
+  Replies = "replies",
+  Media = "media",
+  Likes = "likes",
 }
 
 const ProfileCard = ({
@@ -117,20 +124,20 @@ const ProfileCard = ({
           </div>
         </div>
 
-        <NavTab className="flex justify-between gap-2 overflow-x-auto sm:gap-0">
-          <NavTabItem href="#" className="px-2.5 pb-3.5" active>
+        <TabsList className="flex justify-between gap-2 overflow-x-auto sm:gap-0">
+          <TabsTrigger value={ActiveTab.Posts} className="px-2.5 pb-3.5">
             Posts
-          </NavTabItem>
-          <NavTabItem href="#" className="px-2.5 pb-3.5">
+          </TabsTrigger>
+          <TabsTrigger value={ActiveTab.Replies} className="px-2.5 pb-3.5">
             Replies
-          </NavTabItem>
-          <NavTabItem href="#" className="px-2.5 pb-3.5">
+          </TabsTrigger>
+          <TabsTrigger value={ActiveTab.Media} className="px-2.5 pb-3.5">
             Media
-          </NavTabItem>
-          <NavTabItem href="#" className="px-2.5 pb-3.5">
+          </TabsTrigger>
+          <TabsTrigger value={ActiveTab.Likes} className="px-2.5 pb-3.5">
             Likes
-          </NavTabItem>
-        </NavTab>
+          </TabsTrigger>
+        </TabsList>
       </div>
     </div>
   );

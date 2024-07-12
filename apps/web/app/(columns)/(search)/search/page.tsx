@@ -1,12 +1,18 @@
 "use client";
 
-import { NavTab, NavTabItem } from "@/components/nav-tab";
 import { SearchBar } from "@/components/search-bar";
 import { Button } from "@semicolon/ui/button";
 import { Separator } from "@semicolon/ui/separator";
+import { TabsList, TabsTrigger } from "@semicolon/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
+
+enum ActiveTab {
+  Top = "top",
+  Latest = "latest",
+  People = "people",
+}
 
 export default function Page() {
   const router = useRouter();
@@ -24,13 +30,11 @@ export default function Page() {
           </Button>
           <SearchBar />
         </div>
-        <NavTab>
-          <NavTabItem href="#" active>
-            Top
-          </NavTabItem>
-          <NavTabItem href="#">Latest</NavTabItem>
-          <NavTabItem href="#">People</NavTabItem>
-        </NavTab>
+        <TabsList>
+          <TabsTrigger value={ActiveTab.Top}>Top</TabsTrigger>
+          <TabsTrigger value={ActiveTab.Latest}>Latest</TabsTrigger>
+          <TabsTrigger value={ActiveTab.People}>People</TabsTrigger>
+        </TabsList>
         <Separator />
       </div>
       <div className="mb-4 flex flex-col"></div>

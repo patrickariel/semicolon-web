@@ -90,6 +90,11 @@ export const post = router({
                 },
               },
             },
+            orderBy: {
+              likes: {
+                _count: "desc",
+              },
+            },
           },
         },
       });
