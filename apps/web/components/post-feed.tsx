@@ -51,7 +51,7 @@ export function PostFeed({
               href={`/${username}/post/${id}/photo/1`}
               scroll={false}
             >
-              <AspectRatio ratio={1}>
+              <AspectRatio ratio={1} className="bg-muted">
                 <Image
                   src={media[0]!}
                   alt={`${username}'s image (${i})`}
