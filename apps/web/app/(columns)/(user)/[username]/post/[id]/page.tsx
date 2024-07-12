@@ -1,5 +1,6 @@
 "use client";
 
+import { BackHeader } from "@/components/back-header";
 import { PostDetail } from "@/components/post-detail";
 import { PostFeed } from "@/components/post-feed";
 import { PostForm } from "@/components/post-form";
@@ -76,17 +77,9 @@ export default function Page({
 
   return (
     <div>
-      <div className="flex flex-row items-center gap-8 p-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full p-2"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="size-6" />
-        </Button>
+      <BackHeader>
         <h3 className="text-xl font-semibold">Post</h3>
-      </div>
+      </BackHeader>
       <PostDetail {...post} />
       <PostForm
         to={id}

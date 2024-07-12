@@ -1,6 +1,7 @@
 "use client";
 
 import { Post } from "@/components/post";
+import { BackHeader } from "@/components/back-header";
 import ProfileCard from "@/components/profile-card";
 import { trpc } from "@/lib/trpc-client";
 import { Separator } from "@semicolon/ui/separator";
@@ -37,6 +38,16 @@ export default function Page({
 
   return (
     <div className="flex flex-col">
+      <BackHeader>
+        <article className="flex flex-col">
+          <p className="text-xl font-semibold">{user.name}</p>
+          <p className="text-muted-foreground text-xs">
+            {`${new Intl.NumberFormat("en-US", {
+              notation: "compact",
+            }).format(user.posts)} posts`}
+          </p>
+        </article>
+      </BackHeader>
       <ProfileCard
         name={user.name}
         username={username}
