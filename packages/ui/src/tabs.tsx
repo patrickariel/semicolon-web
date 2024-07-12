@@ -1,4 +1,5 @@
 import { Button } from "./button";
+import { Separator } from "./separator";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cn } from "@semicolon/ui/utils";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -38,7 +39,13 @@ export function TabsList({
   const [canScrollRight, setCanScrollRight] = useState(false);
 
   return (
-    <div className="relative">
+    <div
+      className={cn(
+        "bg-background/80 sticky top-0 z-10 backdrop-blur",
+        className,
+      )}
+      {...props}
+    >
       <ResizeObserver
         onResize={(info, elem) => {
           setCanScrollLeft(elem.scrollLeft > 0);
@@ -97,6 +104,7 @@ export function TabsList({
       >
         <ArrowRight className="h-5 w-5" />
       </Button>
+      <Separator />
     </div>
   );
 }
