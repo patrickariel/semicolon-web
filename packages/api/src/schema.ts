@@ -53,6 +53,7 @@ export const UserResolvedSchema = UserSchema.merge(
     registered: z.date(),
     following: z.number(),
     followers: z.number(),
+    posts: z.number(),
   }),
 );
 
@@ -78,3 +79,4 @@ export const PostResolvedSchema = PostSchema.merge(
 );
 
 export type PostResolved = z.infer<typeof PostResolvedSchema>;
+export type PublicUserResolved = z.infer<typeof PublicUserResolvedSchema>;
