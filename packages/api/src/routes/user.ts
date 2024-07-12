@@ -2,7 +2,6 @@ import {
   BirthdaySchema,
   PostResolvedSchema,
   PublicUserResolvedSchema,
-  UUIDToShort,
   UserResolvedSchema,
   UsernameSchema,
 } from "../schema";
@@ -38,6 +37,7 @@ export const user = router({
             select: {
               followedBy: true,
               following: true,
+              posts: true,
             },
           },
         },
@@ -50,6 +50,7 @@ export const user = router({
         registered: user.registered!,
         following: user._count.following,
         followers: user._count.followedBy,
+        posts: user._count.posts,
       }));
     }),
   me: userProcedure

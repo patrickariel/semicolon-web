@@ -24,12 +24,15 @@ export const optUserProcedure = t.procedure.use(
     let user;
     if (session?.user?.id) {
       user = await db.user.findUnique({
-        where: { id: session.user.id },
+        where: {
+          id: session.user.id,
+        },
         include: {
           _count: {
             select: {
               followedBy: true,
               following: true,
+              posts: true,
             },
           },
         },
@@ -43,6 +46,7 @@ export const optUserProcedure = t.procedure.use(
               ...user,
               following: user._count.following,
               followers: user._count.followedBy,
+              posts: user._count.posts,
             }
           : null,
       },
