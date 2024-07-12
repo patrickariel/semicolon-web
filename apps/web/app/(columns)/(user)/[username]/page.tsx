@@ -87,6 +87,39 @@ function Replies({ username }: { username: string }) {
   );
 }
 
+function Media({ username }: { username: string }) {
+  const {
+    data: feed,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isLoadingError,
+    isFetchingNextPage,
+    isFetchNextPageError,
+    refetch,
+  } = trpc.user.media.useInfiniteQuery(
+    { username, maxResults: 15 },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
+  );
+  const [feedArray, setFeedArray] = useState<PostResolved[]>([]);
+
+  useEffect(() => {
+    setFeedArray((feed?.pages ?? []).flatMap((page) => page.posts));
+  }, [feed, username]);
+
+  return (
+    <PostFeed
+      posts={feedArray}
+      hasNextPage={hasNextPage}
+      loading={isLoading || isFetchingNextPage}
+      error={isLoadingError || isFetchNextPageError}
+      fetchNextPage={fetchNextPage}
+      refetch={refetch}
+      media
+    />
+  );
+}
+
 export default function Page({
   params: { username },
 }: {
@@ -132,6 +165,9 @@ export default function Page({
         </TabsContent>
         <TabsContent value={ActiveTab.Replies}>
           <Replies username={username} />
+        </TabsContent>
+        <TabsContent value={ActiveTab.Media}>
+          <Media username={username} />
         </TabsContent>
       </Tabs>
     </div>
