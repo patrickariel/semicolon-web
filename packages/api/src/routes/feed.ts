@@ -1,4 +1,4 @@
-import { PostResolvedSchema } from "../schema";
+import { PostResolvedSchema, ShortToUUID, UUIDToShort } from "../schema";
 import { router, userProcedure } from "../trpc";
 import { db } from "@semicolon/db";
 import { NotNull, sql } from "kysely";
@@ -9,156 +9,167 @@ export const feed = router({
     .meta({ openapi: { method: "GET", path: "/feed/recommended" } })
     .input(
       z.object({
-        cursor: z.string().uuid().nullish(),
+        cursor: ShortToUUID.nullish(),
         maxResults: z.number().min(1).max(100).default(50),
       }),
     )
     .output(
       z.object({
-        results: z.array(PostResolvedSchema),
-        nextCursor: z.string().nullish(),
+        posts: z.array(PostResolvedSchema),
+        nextCursor: UUIDToShort.nullish(),
       }),
     )
-    .query(async ({ ctx: { user }, input: { cursor, maxResults } }) => {
-      let dbQuery = db.$kysely
-        .selectFrom([
-          db.$kysely
-            .selectFrom("Post")
-            .leftJoin(
-              (eb) =>
-                eb
-                  .selectFrom("User")
-                  .select([
-                    "User.id",
-                    "User.name",
-                    "User.username",
-                    "User.image",
-                    "User.verified",
-                  ])
-                  .as("Author"),
-              (join) => join.onRef("Post.userId", "=", "Author.id"),
-            )
-            .leftJoin(
-              (eb) =>
-                eb
-                  .selectFrom("_Like")
-                  .select((eb) => [
-                    "_Like.A",
-                    eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
-                  ])
-                  .groupBy("_Like.A")
-                  .as("AggrLike"),
-              (join) => join.onRef("Post.id", "=", "AggrLike.A"),
-            )
-            .leftJoin(
-              (eb) =>
-                eb
-                  .selectFrom("Post")
-                  .select((eb) => [
-                    "Post.parentId",
-                    eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
-                  ])
-                  .groupBy("Post.parentId")
-                  .as("AggrReply"),
-              (join) => join.onRef("Post.id", "=", "AggrReply.parentId"),
-            )
-            .leftJoin("Post as ParentPost", (join) =>
-              join.onRef("ParentPost.id", "=", "Post.parentId"),
-            )
-            .leftJoin("User as ParentAuthor", (join) =>
-              join.onRef("ParentAuthor.id", "=", "ParentPost.userId"),
-            )
-            .select([
-              "Post.id",
-              "Post.createdAt",
-              "Post.userId",
-              "Post.content",
-              "Post.parentId",
-              "Post.media",
-              "Post.views",
-              "ParentAuthor.username as to",
-              "Author.name",
-              "Author.username",
-              "Author.verified",
-              "Author.image as avatar",
-              (eb) =>
-                eb.fn
-                  .coalesce("AggrLike.count", sql<number>`0`)
-                  .as("likeCount"),
-              (eb) =>
-                eb.fn
-                  .coalesce("AggrReply.count", sql<number>`0`)
-                  .as("replyCount"),
-              sql<number>`"AggrLike".count * "Post".views / extract(day from now()-"Post"."createdAt"::timestamptz)`.as(
-                "rank",
-              ),
-            ])
-            .where(({ eb, and }) =>
-              and([
-                eb("Author.id", "!=", eb.cast<string>(eb.val(user.id), "uuid")),
-                eb("ParentAuthor.id", "is", null),
-              ]),
-            )
-            .$narrowType<{
-              name: NotNull;
-              username: NotNull;
-              verified: NotNull;
-            }>()
-            .as("Post"),
-        ])
-        .selectAll()
-        .orderBy(["Post.rank desc", "Post.id asc"])
-        .limit(maxResults + 1);
+    .query(
+      async ({
+        ctx: {
+          user: { id },
+        },
+        input: { cursor, maxResults },
+      }) => {
+        const rank = sql<number>`"AggrLike".count * "Post".views / (EXTRACT(epoch from AGE("Post"."createdAt")) / 3600)`;
 
-      if (cursor) {
-        dbQuery = dbQuery.where(({ eb, and, or }) => {
-          const tieBreaker = eb(
+        let dbQuery = db.$kysely
+          .selectFrom("Post")
+          .leftJoin(
+            (eb) =>
+              eb
+                .selectFrom("User")
+                .select([
+                  "User.id",
+                  "User.name",
+                  "User.username",
+                  "User.image",
+                  "User.verified",
+                ])
+                .as("Author"),
+            (join) => join.onRef("Post.userId", "=", "Author.id"),
+          )
+          .leftJoin(
+            (eb) =>
+              eb
+                .selectFrom("_Like")
+                .select((eb) => [
+                  "_Like.A",
+                  eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
+                ])
+                .groupBy("_Like.A")
+                .as("AggrLike"),
+            (join) => join.onRef("Post.id", "=", "AggrLike.A"),
+          )
+          .leftJoin(
+            (eb) =>
+              eb
+                .selectFrom("Post")
+                .select((eb) => [
+                  "Post.parentId",
+                  eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
+                ])
+                .groupBy("Post.parentId")
+                .as("AggrReply"),
+            (join) => join.onRef("Post.id", "=", "AggrReply.parentId"),
+          )
+          .leftJoin("Post as ParentPost", (join) =>
+            join.onRef("ParentPost.id", "=", "Post.parentId"),
+          )
+          .leftJoin("User as ParentAuthor", (join) =>
+            join.onRef("ParentAuthor.id", "=", "ParentPost.userId"),
+          )
+          .select([
             "Post.id",
-            ">=",
-            eb
+            "Post.createdAt",
+            "Post.userId",
+            "Post.content",
+            "Post.parentId",
+            "Post.media",
+            "Post.views",
+            "ParentAuthor.username as to",
+            "Author.name",
+            "Author.username",
+            "Author.verified",
+            "Author.image as avatar",
+            (eb) =>
+              eb.fn.coalesce("AggrLike.count", sql<number>`0`).as("likeCount"),
+            (eb) =>
+              eb.fn
+                .coalesce("AggrReply.count", sql<number>`0`)
+                .as("replyCount"),
+          ])
+          .where(({ eb, and }) =>
+            and([
+              eb("Author.id", "!=", eb.cast<string>(eb.val(id), "uuid")),
+              eb("ParentAuthor.id", "is", null),
+            ]),
+          )
+          .orderBy([sql`${rank} DESC`, "Post.id asc"])
+          .$narrowType<{
+            name: NotNull;
+            username: NotNull;
+            verified: NotNull;
+          }>()
+          .limit(maxResults + 1);
+
+        if (cursor) {
+          dbQuery = dbQuery.where(({ eb, and, or }) => {
+            const tieBreaker = eb(
+              "Post.id",
+              ">=",
+              eb
+                .selectFrom("Post")
+                .select("Post.id")
+                .where("Post.id", "=", eb.cast<string>(eb.val(cursor), "uuid")),
+            );
+
+            const cursorQuery = eb
               .selectFrom("Post")
-              .select("Post.id")
-              .where("Post.id", "=", cursor),
-          );
+              .leftJoin(
+                (eb) =>
+                  eb
+                    .selectFrom("_Like")
+                    .select((eb) => [
+                      "_Like.A",
+                      eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
+                    ])
+                    .groupBy("_Like.A")
+                    .as("AggrLike"),
+                (join) => join.onRef("Post.id", "=", "AggrLike.A"),
+              )
+              .select(rank.as("rank"))
+              .where("Post.id", "=", eb.cast<string>(eb.val(cursor), "uuid"));
 
-          const cursorQuery = eb
-            .selectFrom("Post")
-            .select("Post.rank")
-            .where("Post.id", "=", cursor);
+            return or([
+              and([eb(rank, "=", cursorQuery), tieBreaker]),
+              eb(rank, "<", cursorQuery),
+            ]);
+          });
+        }
 
-          return or([
-            and([eb("Post.rank", "=", cursorQuery), tieBreaker]),
-            eb("Post.rank", "<", cursorQuery),
-          ]);
-        });
-      }
+        const posts = await dbQuery.execute();
 
-      const results = await dbQuery.execute();
+        let nextCursor: typeof cursor | undefined;
 
-      let nextCursor: typeof cursor | undefined;
+        if (posts.length > maxResults) {
+          const nextItem = posts.pop();
+          nextCursor = nextItem!.id;
+        }
 
-      if (results.length > maxResults) {
-        const nextItem = results.pop();
-        nextCursor = nextItem!.id;
-      }
-
-      return {
-        results,
-        nextCursor,
-      };
-    }),
+        return {
+          posts,
+          nextCursor,
+        };
+      },
+    ),
   following: userProcedure
     .meta({ openapi: { method: "GET", path: "/feed/following" } })
     .input(
       z.object({
-        cursor: z.string().uuid().nullish(),
+        cursor: ShortToUUID.nullish(),
         maxResults: z.number().min(1).max(100).default(50),
       }),
     )
     .output(
       z.object({
         results: z.array(PostResolvedSchema),
-        nextCursor: z.string().nullish(),
+        nextCursor: UUIDToShort.nullish(),
       }),
     )
     .query(
