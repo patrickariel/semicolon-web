@@ -177,7 +177,10 @@ export function Post(post: PostResolved) {
                 </Tooltip>
               </div>
             </div>
-            <PostDropdown {...post} />
+            <PostDropdown
+              {...post}
+              isOwner={session?.user?.name === post.name}
+            />
           </div>
           {to && (
             <p className="text-sm">
