@@ -41,7 +41,7 @@ export function TabsList({
   return (
     <div
       className={cn(
-        "bg-background/80 sticky top-0 z-10 backdrop-blur",
+        "bg-background/65 sticky top-0 z-10 backdrop-blur-md",
         className,
       )}
       {...props}
