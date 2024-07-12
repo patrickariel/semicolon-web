@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
-import { TabsList, TabsTrigger } from "@semicolon/ui/tabs";
 import { BadgeCheck, CalendarDays, MapPin, User } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -18,13 +17,6 @@ interface ProfileCardProps {
   verified?: boolean;
   isOwner: boolean;
   isFollowing: boolean;
-}
-
-enum ActiveTab {
-  Posts = "posts",
-  Replies = "replies",
-  Media = "media",
-  Likes = "likes",
 }
 
 const ProfileCard = ({
@@ -123,21 +115,6 @@ const ProfileCard = ({
             </div>
           </div>
         </div>
-
-        <TabsList className="flex justify-between gap-2 overflow-x-auto sm:gap-0">
-          <TabsTrigger value={ActiveTab.Posts} className="px-2.5 pb-3.5">
-            Posts
-          </TabsTrigger>
-          <TabsTrigger value={ActiveTab.Replies} className="px-2.5 pb-3.5">
-            Replies
-          </TabsTrigger>
-          <TabsTrigger value={ActiveTab.Media} className="px-2.5 pb-3.5">
-            Media
-          </TabsTrigger>
-          <TabsTrigger value={ActiveTab.Likes} className="px-2.5 pb-3.5">
-            Likes
-          </TabsTrigger>
-        </TabsList>
       </div>
     </div>
   );

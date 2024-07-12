@@ -5,8 +5,16 @@ import ProfileCard from "@/components/profile-card";
 import { trpc } from "@/lib/trpc-client";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@semicolon/ui/tabs";
 import _ from "lodash";
 import React from "react";
+
+enum ActiveTab {
+  Posts = "posts",
+  Replies = "replies",
+  Media = "media",
+  Likes = "likes",
+}
 
 export default function Page({
   params: { username },
@@ -43,19 +51,29 @@ export default function Page({
         isOwner={true}
         isFollowing={false}
       />
-      <Separator />
-      <div className="mb-4 flex flex-col">
-        {posts ? (
-          posts.results.map((post, i) => (
-            <React.Fragment key={i}>
-              <Post {...post} />
-              <Separator />
-            </React.Fragment>
-          ))
-        ) : (
-          <Spinner size={30} />
-        )}
-      </div>
+      <Tabs defaultValue={ActiveTab.Posts} className="mt-3">
+        <TabsList>
+          <TabsTrigger value={ActiveTab.Posts}>Posts</TabsTrigger>
+          <TabsTrigger value={ActiveTab.Replies}>Replies</TabsTrigger>
+          <TabsTrigger value={ActiveTab.Media}>Media</TabsTrigger>
+          <TabsTrigger value={ActiveTab.Likes}>Likes</TabsTrigger>
+        </TabsList>
+        <Separator />
+        <TabsContent value={ActiveTab.Posts}>
+          <div className="mb-4 flex flex-col">
+            {posts ? (
+              posts.results.map((post, i) => (
+                <React.Fragment key={i}>
+                  <Post {...post} />
+                  <Separator />
+                </React.Fragment>
+              ))
+            ) : (
+              <Spinner size={30} />
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
