@@ -45,6 +45,7 @@ export function PostForm({
   placeholder?: string;
   onPost?: (post: PostResolved) => unknown;
 }) {
+  const utils = trpc.useUtils();
   const postMutation = trpc.post.new.useMutation({
     onMutate: () => setSubmitDisabled(true),
     onError: () => setSubmitDisabled(false),
@@ -55,6 +56,8 @@ export function PostForm({
       }
       updateMedia(() => ({}));
       setMyPosts((myPosts) => [data, ...myPosts]);
+      await utils.user.posts.refetch({ username: data.username });
+      await utils.user.replies.refetch({ username: data.username });
       await onPost?.(data);
     },
   });
