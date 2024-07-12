@@ -93,10 +93,12 @@ const ProfileCard = ({
           {bio && <p className="text-sm leading-[26px]">{bio}</p>}
 
           <div className="flex gap-5">
-            <div className="flex gap-1.5">
-              <MapPin className="stroke-muted-foreground h-[18px] w-[18px]" />
-              <p className="text-muted-foreground text-sm">{location}</p>
-            </div>
+            {location && (
+              <div className="flex gap-1.5">
+                <MapPin className="stroke-muted-foreground h-[18px] w-[18px]" />
+                <p className="text-muted-foreground text-sm">{location}</p>
+              </div>
+            )}
             <div className="flex gap-1.5">
               <CalendarDays className="stroke-muted-foreground h-[18px] w-[18px]" />
               <p className="text-muted-foreground text-sm">{joinDate}</p>
