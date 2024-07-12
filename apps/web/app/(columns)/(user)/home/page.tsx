@@ -106,15 +106,12 @@ export default function Page() {
   const { data: session } = useSession();
 
   return (
-    <div className="flex flex-col">
+    <div className="relative flex flex-col">
       <Tabs defaultValue={ActiveTab.Recommended}>
-        <div className="bg-card sticky top-0 z-20">
-          <TabsList>
-            <TabsTrigger value={ActiveTab.Recommended}>For You</TabsTrigger>
-            <TabsTrigger value={ActiveTab.Following}>Following</TabsTrigger>
-          </TabsList>
-          <Separator />
-        </div>
+        <TabsList>
+          <TabsTrigger value={ActiveTab.Recommended}>For You</TabsTrigger>
+          <TabsTrigger value={ActiveTab.Following}>Following</TabsTrigger>
+        </TabsList>
         <PostForm avatar={session?.user?.image} />
         <Separator />
         <TabsContent value={ActiveTab.Recommended}>
