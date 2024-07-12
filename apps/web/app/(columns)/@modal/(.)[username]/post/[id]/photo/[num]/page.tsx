@@ -68,6 +68,7 @@ export default function Page({
         ...reply,
         to: null as string | null,
       }));
+    console.log(myReplies);
 
     setRepliesCustom(
       myReplies.concat(
@@ -189,6 +190,7 @@ export default function Page({
             <div className="bg-background hidden h-full w-[350px] flex-none flex-col py-4 lg:flex">
               <PostDetail showMedia={false} {...post} />
               <PostForm
+                to={id}
                 avatar={session?.user?.image}
                 placeholder="Post your reply"
               />
