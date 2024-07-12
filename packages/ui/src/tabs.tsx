@@ -15,13 +15,15 @@ export function TabsTrigger({
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        `hover:bg-accent hover:text-accent-foreground group relative flex h-14 flex-auto snap-start flex-col items-center justify-center px-8 text-base font-bold transition-colors`,
+        `hover:bg-accent hover:text-accent-foreground group flex h-14 flex-auto snap-start justify-center px-8 text-base font-bold transition-colors`,
         className,
       )}
       {...props}
     >
-      <p>{children}</p>
-      <div className="absolute inset-x-0 bottom-0 mx-auto hidden h-1 w-2/3 rounded-full bg-sky-400 group-data-[state=active]:block" />
+      <div className="relative flex h-full w-fit flex-col items-center justify-center">
+        <p>{children}</p>
+        <div className="absolute bottom-0 hidden h-1 w-full min-w-14 rounded-full bg-sky-400 group-data-[state=active]:block" />
+      </div>
     </TabsPrimitive.Trigger>
   );
 }
