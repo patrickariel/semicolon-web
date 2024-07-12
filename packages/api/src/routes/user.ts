@@ -2,6 +2,7 @@ import {
   BirthdaySchema,
   PostResolvedSchema,
   PublicUserResolvedSchema,
+  UUIDToShort,
   UserResolvedSchema,
   UsernameSchema,
 } from "../schema";
@@ -200,6 +201,71 @@ export const user = router({
           },
         },
         ...(cursor && { cursor: { id: cursor } }),
+      });
+
+      let nextCursor: typeof cursor | undefined;
+
+      if (posts.length > maxResults) {
+        const nextItem = posts.pop();
+        nextCursor = nextItem!.id; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      }
+
+      return {
+        posts: posts.map((post) => ({
+          ...post,
+          name: post.user.name!,
+          to: post.parent?.user.username ?? null,
+          username: post.user.username!,
+          verified: post.user.verified,
+          avatar: post.user.image,
+          likeCount: post._count.likes,
+          replyCount: post._count.children,
+        })),
+        nextCursor,
+      };
+    }),
+  media: publicProcedure
+    .meta({ openapi: { method: "GET", path: "/users/{username}/media" } })
+    .input(
+      z.object({
+        username: z.string(),
+        cursor: z.string().uuid().optional(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        posts: z.array(PostResolvedSchema),
+        nextCursor: z.string().uuid().nullish(),
+      }),
+    )
+    .query(async ({ input: { username, cursor, maxResults } }) => {
+      const posts = await db.post.findMany({
+        where: {
+          user: {
+            username,
+          },
+          media: {
+            isEmpty: false,
+          },
+        },
+        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+        take: maxResults + 1,
+        ...(cursor && { cursor: { id: cursor } }),
+        include: {
+          parent: {
+            include: {
+              user: true,
+            },
+          },
+          user: true,
+          _count: {
+            select: {
+              likes: true,
+              children: true,
+            },
+          },
+        },
       });
 
       let nextCursor: typeof cursor | undefined;
