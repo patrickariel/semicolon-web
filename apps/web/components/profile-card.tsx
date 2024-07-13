@@ -5,8 +5,9 @@ import type { PublicUserResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@semicolon/ui/dialog";
-import { BadgeCheck, CalendarDays, MapPin, User } from "lucide-react";
+import { BadgeCheck, CalendarDays, Link2, MapPin, User } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useState } from "react";
 
 interface ProfileCardProps extends PublicUserResolved {
@@ -26,6 +27,7 @@ const ProfileCard = (props: ProfileCardProps) => {
     image,
     createdAt,
     verified = true,
+    website,
     isOwner,
     isFollowing,
   } = props;
@@ -102,6 +104,17 @@ const ProfileCard = (props: ProfileCardProps) => {
               <div className="flex gap-1.5">
                 <MapPin className="stroke-muted-foreground h-[18px] w-[18px]" />
                 <p className="text-muted-foreground text-sm">{location}</p>
+              </div>
+            )}
+            {website && (
+              <div className="flex gap-1.5">
+                <Link2 className="stroke-muted-foreground h-[18px] w-[18px]" />
+                <Link
+                  className="text-sm text-sky-400 hover:underline"
+                  href={website}
+                >
+                  {website}
+                </Link>
               </div>
             )}
             <div className="flex gap-1.5">
