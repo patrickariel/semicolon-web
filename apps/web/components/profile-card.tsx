@@ -48,7 +48,7 @@ const ProfileCard = ({
             <Avatar className="bg-background -mt-20 h-[120px] w-[120px] rounded-full border-4 border-black object-cover">
               {image && <AvatarImage src={image} alt="Profile Photo" />}
               <AvatarFallback>
-                <User />
+                <User size={65} />
               </AvatarFallback>
             </Avatar>
 
