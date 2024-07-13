@@ -36,7 +36,7 @@ const ProfileCard = (props: ProfileCardProps) => {
 
   return (
     <div className="flex h-fit flex-col gap-5">
-      <div className="relative h-[200px] w-full">
+      <div className="bg-muted relative h-[200px] w-full">
         {header && (
           <Image
             className="object-cover"
