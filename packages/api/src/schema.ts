@@ -54,7 +54,7 @@ export const UserResolvedSchema = UserSchema.merge(
     following: z.number(),
     followers: z.number(),
     posts: z.number(),
-    birthday: z.date().optional(),
+    birthday: z.date().nullable(),
   }),
 );
 
