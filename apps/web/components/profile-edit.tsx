@@ -56,7 +56,7 @@ export function ProfileEdit({
   location,
   website,
   birthday,
-  image,
+  image: initialAvatar,
   header: initialHeaderArg,
 }: PublicUserResolved) {
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -118,8 +118,8 @@ export function ProfileEdit({
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     userUpdate.mutate({
       ...data,
-      avatar: avatar?.url ?? image ?? undefined,
-      header: header?.url,
+      avatar: avatar?.url ?? initialAvatar ?? undefined,
+      header: header?.url ?? initialHeader ?? undefined,
     });
   };
 
@@ -293,8 +293,11 @@ export function ProfileEdit({
               </div>
             </div>
             <Avatar className="bg-background -mt-20 ml-4 h-[120px] w-[120px] rounded-full border-4 border-black object-cover">
-              {(avatar?.blob ?? image) && (
-                <AvatarImage src={avatar?.blob ?? image!} alt="Profile Photo" />
+              {(avatar?.blob ?? initialAvatar) && (
+                <AvatarImage
+                  src={avatar?.blob ?? initialAvatar!}
+                  alt="Profile Photo"
+                />
               )}
               <AvatarFallback>
                 <User size={65} />
