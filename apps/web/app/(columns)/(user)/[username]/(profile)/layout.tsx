@@ -18,7 +18,7 @@ export default async function Page({
   const session = await auth();
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex flex-col">
       {/* INSANE bug: 
       - https://github.com/vercel/next.js/discussions/64435#discussioncomment-9101547 
       - https://github.com/vercel/next.js/issues/64441 */}
@@ -35,7 +35,6 @@ export default async function Page({
       </BackHeader>
       <ProfileCard
         {...user}
-        coverImage="https://picsum.photos/seed/picsum/1280/720"
         isOwner={session?.user?.username === user.username}
         isFollowing={user.followed}
       />

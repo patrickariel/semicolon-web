@@ -37,15 +37,13 @@ export default function Page({
   }, [myPosts, feed, session, username]);
 
   return (
-    <div>
-      <PostFeed
-        posts={feedArray}
-        hasNextPage={hasNextPage}
-        loading={isLoading || isFetchingNextPage}
-        error={isLoadingError || isFetchNextPageError}
-        fetchNextPage={fetchNextPage}
-        refetch={refetch}
-      />
-    </div>
+    <PostFeed
+      posts={feedArray}
+      hasNextPage={hasNextPage}
+      loading={isLoading || isFetchingNextPage}
+      error={isLoadingError || isFetchNextPageError}
+      fetchNextPage={fetchNextPage}
+      refetch={refetch}
+    />
   );
 }
