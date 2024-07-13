@@ -15,6 +15,7 @@ import {
 import { update } from "@semicolon/auth";
 import { Prisma, db } from "@semicolon/db";
 import { TRPCError } from "@trpc/server";
+import _ from "lodash";
 import { z } from "zod";
 
 export const user = router({
@@ -152,7 +153,7 @@ export const user = router({
       }
 
       return {
-        ...user,
+        ...(username !== me?.username ? _.omit(user, "birthday") : user),
         name: user.name!,
         username: user.username!,
         registered: user.registered!,
