@@ -56,7 +56,7 @@ export function PostFeed({
                   src={media[0]!}
                   alt={`${username}'s image (${i})`}
                   fill
-                  sizes="(max-width: 768px) 45vw, (max-width: 1536px) 15vw, 7vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 45vw, 15vw"
                   className="object-cover"
                 />
               </AspectRatio>
