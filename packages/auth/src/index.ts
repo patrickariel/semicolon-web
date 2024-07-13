@@ -63,6 +63,7 @@ export const {
           token = {
             ...token,
             ...update.data,
+            picture: update.data.image,
           };
         }
       } else if (trigger === "signIn") {
@@ -75,6 +76,7 @@ export const {
             name: user?.name,
             username: user?.username,
             image: user?.image,
+            picture: user?.image,
             registered: user?.registered,
           },
         };
