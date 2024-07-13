@@ -225,6 +225,81 @@ export const user = router({
         nextCursor,
       };
     }),
+  likes: publicProcedure
+    .meta({
+      openapi: { method: "GET", path: "/users/{username}/likes" },
+    })
+    .input(
+      z.object({
+        username: z.string(),
+        cursor: z.string().optional(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        posts: z.array(PostResolvedSchema),
+        nextCursor: z.string().optional(),
+      }),
+    )
+    .query(async ({ input: { username, cursor, maxResults } }) => {
+      const likes = await db.like.findMany({
+        where: {
+          user: {
+            username,
+          },
+        },
+        orderBy: [{ createdAt: "desc" }, { postId: "asc" }, { userId: "asc" }],
+        take: maxResults + 1,
+        include: {
+          post: {
+            include: {
+              parent: {
+                include: {
+                  user: true,
+                },
+              },
+              user: true,
+              _count: {
+                select: {
+                  likes: true,
+                  children: true,
+                },
+              },
+            },
+          },
+        },
+        ...(cursor && {
+          cursor: {
+            postId_userId: {
+              postId: cursor.split("_")[0]!,
+              userId: cursor.split("_")[1]!,
+            },
+          },
+        }),
+      });
+
+      let nextCursor: typeof cursor | undefined;
+
+      if (likes.length > maxResults) {
+        const nextItem = likes.pop();
+        nextCursor = `${nextItem!.postId}_${nextItem!.userId}`;
+      }
+
+      return {
+        posts: likes.map(({ post }) => ({
+          ...post,
+          name: post.user.name!,
+          to: post.parent?.user.username ?? null,
+          username: post.user.username!,
+          verified: post.user.verified,
+          avatar: post.user.image,
+          likeCount: post._count.likes,
+          replyCount: post._count.children,
+        })),
+        nextCursor,
+      };
+    }),
   media: publicProcedure
     .meta({ openapi: { method: "GET", path: "/users/{username}/media" } })
     .input(

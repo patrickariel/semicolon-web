@@ -47,14 +47,14 @@ export const feed = router({
           .leftJoin(
             (eb) =>
               eb
-                .selectFrom("_Like")
+                .selectFrom("Like")
                 .select((eb) => [
-                  "_Like.A",
+                  "Like.postId",
                   eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
                 ])
-                .groupBy("_Like.A")
+                .groupBy("Like.postId")
                 .as("AggrLike"),
-            (join) => join.onRef("Post.id", "=", "AggrLike.A"),
+            (join) => join.onRef("Post.id", "=", "AggrLike.postId"),
           )
           .leftJoin(
             (eb) =>
@@ -124,14 +124,14 @@ export const feed = router({
               .leftJoin(
                 (eb) =>
                   eb
-                    .selectFrom("_Like")
+                    .selectFrom("Like")
                     .select((eb) => [
-                      "_Like.A",
+                      "Like.postId",
                       eb.cast<number>(eb.fn.countAll(), "integer").as("count"),
                     ])
-                    .groupBy("_Like.A")
+                    .groupBy("Like.postId")
                     .as("AggrLike"),
-                (join) => join.onRef("Post.id", "=", "AggrLike.A"),
+                (join) => join.onRef("Post.id", "=", "AggrLike.postId"),
               )
               .select(rank.as("rank"))
               .where("Post.id", "=", eb.cast<string>(eb.val(cursor), "uuid"));

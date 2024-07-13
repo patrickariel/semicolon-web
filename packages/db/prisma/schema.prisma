@@ -33,7 +33,7 @@ model User {
   sessions      Session[]
   bio           String?
   posts         Post[]
-  likes         Post[]    @relation("Like")
+  likes         Like[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -87,7 +87,17 @@ model Post {
   parentId  String?  @db.Uuid
   parent    Post?    @relation("PostHierarchy", fields: [parentId], references: [id])
   children  Post[]   @relation("PostHierarchy")
-  likes     User[]   @relation("Like")
+  likes     Like[]
   views     Int      @default(0)
   media     String[]
+}
+
+model Like {
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  @@id([postId, userId])
 }

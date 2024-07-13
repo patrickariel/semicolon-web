@@ -88,19 +88,14 @@ async function main() {
     ),
   });
 
-  for (const chunk of _.chunk(posts, 32767 / (2 * 150))) {
-    await db.$kysely
-      .insertInto("_Like")
-      .values((eb) =>
-        chunk.flatMap((post) =>
-          _.sampleSize(users, _.random(5, users.length)).map((user) => ({
-            A: eb.cast(eb.val(post.id), "uuid"),
-            B: eb.cast(eb.val(user.id), "uuid"),
-          })),
-        ),
-      )
-      .execute();
-  }
+  await db.like.createMany({
+    data: posts.flatMap((post) =>
+      _.sampleSize(users, _.random(5, users.length)).map((user) => ({
+        postId: post.id,
+        userId: user.id,
+      })),
+    ),
+  });
 
   const replies = await db.post.createManyAndReturn({
     data: _.flattenDeep(
@@ -131,19 +126,14 @@ async function main() {
     ),
   });
 
-  for (const chunk of _.chunk(replies, 32767 / (2 * 150))) {
-    await db.$kysely
-      .insertInto("_Like")
-      .values((eb) =>
-        chunk.flatMap((post) =>
-          _.sampleSize(users, _.random(5, users.length)).map((user) => ({
-            A: eb.cast(eb.val(post.id), "uuid"),
-            B: eb.cast(eb.val(user.id), "uuid"),
-          })),
-        ),
-      )
-      .execute();
-  }
+  await db.like.createMany({
+    data: replies.flatMap((post) =>
+      _.sampleSize(users, _.random(5, users.length)).map((user) => ({
+        postId: post.id,
+        userId: user.id,
+      })),
+    ),
+  });
 
   const moreReplies = await db.post.createManyAndReturn({
     data: _.flattenDeep(
@@ -174,19 +164,14 @@ async function main() {
     ),
   });
 
-  for (const chunk of _.chunk(moreReplies, 32767 / (2 * 150))) {
-    await db.$kysely
-      .insertInto("_Like")
-      .values((eb) =>
-        chunk.flatMap((post) =>
-          _.sampleSize(users, _.random(5, users.length)).map((user) => ({
-            A: eb.cast(eb.val(post.id), "uuid"),
-            B: eb.cast(eb.val(user.id), "uuid"),
-          })),
-        ),
-      )
-      .execute();
-  }
+  await db.like.createMany({
+    data: moreReplies.flatMap((post) =>
+      _.sampleSize(users, _.random(5, users.length)).map((user) => ({
+        postId: post.id,
+        userId: user.id,
+      })),
+    ),
+  });
 }
 
 main()
