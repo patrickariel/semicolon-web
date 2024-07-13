@@ -1,22 +1,14 @@
+import type { PublicUserResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
 import { BadgeCheck, CalendarDays, MapPin, User } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
-interface ProfileCardProps {
-  name: string;
-  username: string;
-  bio: string | null;
-  location: string | null;
-  following: number;
-  followers: number;
-  coverImage: string;
-  profileImage: string | null;
-  createdAt: Date;
-  verified?: boolean;
+interface ProfileCardProps extends PublicUserResolved {
   isOwner: boolean;
   isFollowing: boolean;
+  coverImage: string;
 }
 
 const ProfileCard = ({
@@ -27,12 +19,14 @@ const ProfileCard = ({
   following,
   followers,
   coverImage,
-  profileImage,
+  image,
+  posts,
   createdAt,
   verified = true,
   isOwner,
   isFollowing,
 }: ProfileCardProps) => {
+  console.log(posts);
   const joinDate = `Joined ${createdAt.toLocaleString("default", { month: "long" })} ${createdAt.getFullYear()}`;
 
   return (
@@ -52,9 +46,7 @@ const ProfileCard = ({
         <div className="flex flex-col gap-3.5 px-5">
           <div className="flex flex-row justify-between">
             <Avatar className="bg-background -mt-20 h-[120px] w-[120px] rounded-full border-4 border-black object-cover">
-              {profileImage && (
-                <AvatarImage src={profileImage} alt="Profile Photo" />
-              )}
+              {image && <AvatarImage src={image} alt="Profile Photo" />}
               <AvatarFallback>
                 <User />
               </AvatarFallback>

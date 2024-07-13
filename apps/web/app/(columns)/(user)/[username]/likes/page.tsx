@@ -1,12 +1,9 @@
 "use client";
 
 import { PostFeed } from "@/components/post-feed";
-import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import type { PostResolved } from "@semicolon/api/schema";
-import { useAtomValue } from "jotai";
 import _ from "lodash";
-import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
 export default function Page({
@@ -23,18 +20,15 @@ export default function Page({
     isFetchingNextPage,
     isFetchNextPageError,
     refetch,
-  } = trpc.user.posts.useInfiniteQuery(
+  } = trpc.user.likes.useInfiniteQuery(
     { username, maxResults: 15 },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
-  const { data: session } = useSession();
-
-  const myPosts = useAtomValue(myPostsAtom);
   const [feedArray, setFeedArray] = useState<PostResolved[]>([]);
 
   useEffect(() => {
     setFeedArray((feed?.pages ?? []).flatMap((page) => page.posts));
-  }, [myPosts, feed, session, username]);
+  }, [feed, username]);
 
   return (
     <PostFeed

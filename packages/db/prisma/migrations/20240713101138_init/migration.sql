@@ -68,13 +68,16 @@ CREATE TABLE "Post" (
 );
 
 -- CreateTable
-CREATE TABLE "_UserFollow" (
-    "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+CREATE TABLE "Like" (
+    "postId" UUID NOT NULL,
+    "userId" UUID NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Like_pkey" PRIMARY KEY ("postId","userId")
 );
 
 -- CreateTable
-CREATE TABLE "_Like" (
+CREATE TABLE "_UserFollow" (
     "A" UUID NOT NULL,
     "B" UUID NOT NULL
 );
@@ -94,12 +97,6 @@ CREATE UNIQUE INDEX "_UserFollow_AB_unique" ON "_UserFollow"("A", "B");
 -- CreateIndex
 CREATE INDEX "_UserFollow_B_index" ON "_UserFollow"("B");
 
--- CreateIndex
-CREATE UNIQUE INDEX "_Like_AB_unique" ON "_Like"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_Like_B_index" ON "_Like"("B");
-
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -113,13 +110,13 @@ ALTER TABLE "Post" ADD CONSTRAINT "Post_userId_fkey" FOREIGN KEY ("userId") REFE
 ALTER TABLE "Post" ADD CONSTRAINT "Post_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Post"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Like" ADD CONSTRAINT "Like_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Like" ADD CONSTRAINT "Like_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "_UserFollow" ADD CONSTRAINT "_UserFollow_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_UserFollow" ADD CONSTRAINT "_UserFollow_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_Like" ADD CONSTRAINT "_Like_A_fkey" FOREIGN KEY ("A") REFERENCES "Post"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_Like" ADD CONSTRAINT "_Like_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

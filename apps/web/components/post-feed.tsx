@@ -4,11 +4,14 @@ import { Post } from "@/components/post";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Alert, AlertDescription, AlertTitle } from "@semicolon/ui/alert";
+import { AspectRatio } from "@semicolon/ui/aspect-ratio";
 import { Button } from "@semicolon/ui/button";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
 import _ from "lodash";
 import { RotateCw } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import React, { Fragment } from "react";
 import { InView } from "react-intersection-observer";
 
@@ -19,6 +22,7 @@ export function PostFeed({
   fetchNextPage,
   refetch,
   hasNextPage,
+  media = false,
 }: {
   posts: PostResolved[];
   loading: boolean;
@@ -26,10 +30,11 @@ export function PostFeed({
   hasNextPage: boolean;
   fetchNextPage: () => Promise<unknown>;
   refetch: () => Promise<unknown>;
+  media?: boolean;
 }) {
   return (
     <>
-      {
+      {!media ? (
         <div className="flex flex-col">
           {posts.map((post, i) => (
             <Fragment key={i}>
@@ -38,7 +43,27 @@ export function PostFeed({
             </Fragment>
           ))}
         </div>
-      }
+      ) : (
+        <div className="grid grid-cols-1 gap-1 p-1 sm:grid-cols-2 md:grid-cols-3">
+          {posts.map(({ id, media, username }, i) => (
+            <Link
+              key={i}
+              href={`/${username}/post/${id}/photo/1`}
+              scroll={false}
+            >
+              <AspectRatio ratio={1} className="bg-muted">
+                <Image
+                  src={media[0]!}
+                  alt={`${username}'s image (${i})`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 45vw, 15vw"
+                  className="object-cover"
+                />
+              </AspectRatio>
+            </Link>
+          ))}
+        </div>
+      )}
       {loading ? (
         <div className="flex h-20 items-center justify-center">
           <Spinner size={30} />

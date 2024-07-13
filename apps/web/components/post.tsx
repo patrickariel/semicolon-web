@@ -134,7 +134,7 @@ export function Post(post: PostResolved) {
       <div className="flex w-full min-w-0 flex-col gap-2">
         <div className="flex flex-col gap-0">
           <div className="flex items-center justify-between gap-1">
-            <div className="flex w-full min-w-0 flex-col items-start justify-start gap-2 sm:flex-row sm:items-center">
+            <div className="flex w-full min-w-0 flex-col items-start justify-start gap-0 sm:flex-row sm:items-center sm:gap-2">
               <div className="flex min-w-0 max-w-full gap-1">
                 <div className="flex min-w-0 flex-row items-center gap-1 text-sm">
                   <Link
@@ -221,8 +221,19 @@ export function Post(post: PostResolved) {
             </DialogContent>
           </Dialog>
           <PostButton icon={Repeat2} highlight="green" label={15} />
-          <PostButton icon={Heart} highlight="pink" label={likeCount} />
-          <PostButton icon={BarChart2} label={views} />
+          <PostButton
+            icon={Heart}
+            highlight="pink"
+            label={new Intl.NumberFormat("en-US", {
+              notation: "compact",
+            }).format(likeCount)}
+          />
+          <PostButton
+            icon={BarChart2}
+            label={new Intl.NumberFormat("en-US", {
+              notation: "compact",
+            }).format(views)}
+          />
           <div className="flex flex-row">
             <PostButton icon={Bookmark} />
             <PostButton icon={Upload} />

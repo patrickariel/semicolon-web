@@ -26,6 +26,8 @@ export function PostDropdown({
       setMyPosts((myPosts) => myPosts.filter((post) => post.id !== id));
       await utils.post.search.refetch();
       await utils.post.replies.refetch();
+      await utils.user.posts.refetch({ username });
+      await utils.user.replies.refetch({ username });
     },
   });
 

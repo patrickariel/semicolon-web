@@ -1,19 +1,17 @@
 "use client";
 
+import { BackHeader } from "@/components/back-header";
 import { PostDetail } from "@/components/post-detail";
 import { PostFeed } from "@/components/post-feed";
 import { PostForm } from "@/components/post-form";
 import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import { PostResolved } from "@semicolon/api/schema";
-import { Button } from "@semicolon/ui/button";
 import { Separator } from "@semicolon/ui/separator";
 import Spinner from "@semicolon/ui/spinner";
 import { useAtomValue } from "jotai";
 import _ from "lodash";
-import { ArrowLeft } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export default function Page({
@@ -21,7 +19,6 @@ export default function Page({
 }: {
   params: { username: string; id: string };
 }) {
-  const router = useRouter();
   const { data: post } = trpc.post.id.useQuery({ id });
   const { data: session } = useSession();
   const {
@@ -76,17 +73,9 @@ export default function Page({
 
   return (
     <div>
-      <div className="flex flex-row items-center gap-8 p-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full p-2"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="size-6" />
-        </Button>
+      <BackHeader>
         <h3 className="text-xl font-semibold">Post</h3>
-      </div>
+      </BackHeader>
       <PostDetail {...post} />
       <PostForm
         to={id}

@@ -19,20 +19,17 @@ export const BirthdaySchema = z
 
 const uuidTranslator = short(short.constants.flickrBase58);
 
-export const ShortToUUID = z
-  .string()
-  .transform((val, ctx) => {
-    try {
-      return uuidTranslator.toUUID(val);
-    } catch (_) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Invalid suuid",
-      });
-      return z.NEVER;
-    }
-  })
-  .pipe(z.string().uuid());
+export const ShortToUUID = z.string().transform((val, ctx) => {
+  try {
+    return uuidTranslator.toUUID(val);
+  } catch (_) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid suuid",
+    });
+    return z.NEVER;
+  }
+});
 
 export const UUIDToShort = z
   .string()
@@ -56,6 +53,7 @@ export const UserResolvedSchema = UserSchema.merge(
     registered: z.date(),
     following: z.number(),
     followers: z.number(),
+    posts: z.number(),
   }),
 );
 
@@ -81,3 +79,4 @@ export const PostResolvedSchema = PostSchema.merge(
 );
 
 export type PostResolved = z.infer<typeof PostResolvedSchema>;
+export type PublicUserResolved = z.infer<typeof PublicUserResolvedSchema>;

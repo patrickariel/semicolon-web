@@ -1,31 +1,58 @@
-import { Button } from "./button";
-import { Separator } from "./separator";
-import * as TabsPrimitive from "@radix-ui/react-tabs";
+"use client";
+
+import { Button } from "@semicolon/ui/button";
+import { Separator } from "@semicolon/ui/separator";
 import { cn } from "@semicolon/ui/utils";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import ResizeObserver from "rc-resize-observer";
-import { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
-export const Tabs = TabsPrimitive.Root;
-
-export function TabsTrigger({
+export function TabsLink({
   children,
   className,
+  href,
   ...props
-}: TabsPrimitive.TabsTriggerProps) {
+}: Parameters<typeof Link>[0]) {
+  const validateHref = useCallback(() => {
+    if (typeof href === "string") {
+      if (!href.startsWith("/")) {
+        throw Error("Tabs must link to an absolute URL");
+      }
+      return href;
+    }
+
+    if (!href.pathname) {
+      throw Error("UrlObject did not return a valid pathname");
+    }
+
+    return href.pathname;
+  }, [href]);
+
+  const pathname = usePathname();
+  const [resolvedHref, setResolvedHref] = useState(() => validateHref());
+
+  useEffect(() => {
+    setResolvedHref(validateHref());
+  }, [validateHref]);
+
   return (
-    <TabsPrimitive.Trigger
+    <Link
       className={cn(
         "hover:bg-accent hover:text-accent-foreground group flex h-14 flex-auto snap-start justify-center px-8 text-base font-bold transition-colors",
         className,
       )}
+      href={href}
       {...props}
     >
       <div className="relative flex h-full w-fit flex-col items-center justify-center">
         <p>{children}</p>
-        <div className="absolute bottom-0 hidden h-1 w-full min-w-14 rounded-full bg-sky-400 group-data-[state=active]:block" />
+        <div
+          className={`absolute bottom-0 h-1 w-full min-w-14 rounded-full bg-sky-400 ${resolvedHref === pathname ? "block" : "hidden"}`}
+        />
       </div>
-    </TabsPrimitive.Trigger>
+    </Link>
   );
 }
 
@@ -54,7 +81,7 @@ export function TabsList({
           );
         }}
       >
-        <TabsPrimitive.List
+        <div
           className={cn(
             "no-scrollbar flex snap-x justify-stretch overflow-x-auto",
             className,
@@ -70,7 +97,7 @@ export function TabsList({
           {...props}
         >
           {children}
-        </TabsPrimitive.List>
+        </div>
       </ResizeObserver>
       <Button
         variant="outline"
@@ -108,5 +135,3 @@ export function TabsList({
     </div>
   );
 }
-
-export const TabsContent = TabsPrimitive.Content;
