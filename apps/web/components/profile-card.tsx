@@ -1,45 +1,48 @@
+"use client";
+
+import { ProfileEdit } from "./profile-edit";
 import type { PublicUserResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@semicolon/ui/dialog";
 import { BadgeCheck, CalendarDays, MapPin, User } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 
 interface ProfileCardProps extends PublicUserResolved {
   isOwner: boolean;
   isFollowing: boolean;
-  coverImage: string;
 }
 
-const ProfileCard = ({
-  name,
-  username,
-  bio,
-  location,
-  following,
-  followers,
-  coverImage,
-  image,
-  posts,
-  createdAt,
-  verified = true,
-  isOwner,
-  isFollowing,
-}: ProfileCardProps) => {
-  console.log(posts);
+const ProfileCard = (props: ProfileCardProps) => {
+  const {
+    name,
+    username,
+    bio,
+    location,
+    following,
+    followers,
+    header,
+    image,
+    createdAt,
+    verified = true,
+    isOwner,
+    isFollowing,
+  } = props;
   const joinDate = `Joined ${createdAt.toLocaleString("default", { month: "long" })} ${createdAt.getFullYear()}`;
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="flex h-fit flex-col gap-5">
-      <div className="relative">
-        <div className="relative h-[200px] w-full">
+      <div className="relative h-[200px] w-full">
+        {header && (
           <Image
             className="object-cover"
             alt={`${username}'s header image`}
             fill
-            src={coverImage}
+            src={header}
           />
-        </div>
+        )}
       </div>
 
       <div className="flex flex-col justify-start gap-3">
@@ -53,9 +56,19 @@ const ProfileCard = ({
             </Avatar>
 
             {isOwner ? (
-              <Button className="min-w-[100px] rounded-full">
-                <span className="font-bold">Edit profile</span>
-              </Button>
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button className="min-w-[100px] rounded-full">
+                    <span className="font-bold">Edit profile</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent
+                  close={false}
+                  className="max-h-[650px] overflow-y-auto p-0"
+                >
+                  <ProfileEdit {...props} />
+                </DialogContent>
+              </Dialog>
             ) : (
               <Button
                 type="submit"
