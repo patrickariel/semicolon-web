@@ -31,9 +31,21 @@ import { z } from "zod";
 
 const FormSchema = z.object({
   name: z.string().min(2).max(50),
-  bio: z.string().optional(),
-  location: z.string().optional(),
-  website: z.string().url().optional(),
+  bio: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.length === 0 ? undefined : value,
+    z.string().optional(),
+  ),
+  location: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.length === 0 ? undefined : value,
+    z.string().optional(),
+  ),
+  website: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.length === 0 ? undefined : value,
+    z.string().url().optional(),
+  ),
   birthday: z.date(),
 });
 
