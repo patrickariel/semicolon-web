@@ -10,6 +10,7 @@ import {
   publicProcedure,
   userProcedure,
   newUserProcedure,
+  optUserProcedure,
 } from "@semicolon/api/trpc";
 import { update } from "@semicolon/auth";
 import { Prisma, db } from "@semicolon/db";
@@ -125,11 +126,11 @@ export const user = router({
         posts: user._count.posts,
       };
     }),
-  username: publicProcedure
+  username: optUserProcedure
     .meta({ openapi: { method: "GET", path: "/users/{username}" } })
     .input(z.object({ username: UsernameSchema }))
-    .output(PublicUserResolvedSchema)
-    .query(async ({ input: { username } }) => {
+    .output(PublicUserResolvedSchema.merge(z.object({ followed: z.boolean() })))
+    .query(async ({ input: { username }, ctx: { user: me } }) => {
       const user = await db.user.findUnique({
         where: { username, registered: { not: null } },
         include: {
@@ -158,6 +159,18 @@ export const user = router({
         following: user._count.following,
         followers: user._count.followedBy,
         posts: user._count.posts,
+        followed: me?.username
+          ? !!(await db.user.findUnique({
+              where: {
+                username: me.username,
+                following: {
+                  some: {
+                    username: user.username!,
+                  },
+                },
+              },
+            }))
+          : false,
       };
     }),
   posts: publicProcedure
