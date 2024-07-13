@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@semicolon/ui/button";
 import { cn } from "@semicolon/ui/utils";
 import { ArrowLeft } from "lucide-react";
