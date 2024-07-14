@@ -41,7 +41,7 @@ const ProfileCard = (props: ProfileCardProps) => {
         {header && (
           <Image
             className="object-cover"
-            alt={`${username}'s header image`}
+            alt={`${name}'s header image`}
             fill
             src={header}
           />
@@ -52,7 +52,7 @@ const ProfileCard = (props: ProfileCardProps) => {
         <div className="flex flex-col gap-3.5 px-5">
           <div className="flex flex-row justify-between">
             <Avatar className="bg-background -mt-20 h-[120px] w-[120px] rounded-full border-4 border-black object-cover">
-              {image && <AvatarImage src={image} alt="Profile Photo" />}
+              {image && <AvatarImage src={image} alt={`${name}'s avatar`} />}
               <AvatarFallback>
                 <User size={65} />
               </AvatarFallback>
