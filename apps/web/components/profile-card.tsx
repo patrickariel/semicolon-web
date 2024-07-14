@@ -5,6 +5,7 @@ import type { PublicUserResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@semicolon/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@semicolon/ui/tooltip";
 import { BadgeCheck, CalendarDays, Link2, MapPin, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -99,27 +100,49 @@ const ProfileCard = (props: ProfileCardProps) => {
 
           {bio && <p className="text-sm leading-[26px]">{bio}</p>}
 
-          <div className="flex gap-5">
-            {location && (
-              <div className="flex gap-1.5">
-                <MapPin className="stroke-muted-foreground h-[18px] w-[18px]" />
-                <p className="text-muted-foreground text-sm">{location}</p>
-              </div>
-            )}
-            {website && (
-              <div className="flex gap-1.5">
-                <Link2 className="stroke-muted-foreground h-[18px] w-[18px]" />
-                <Link
-                  className="text-sm text-sky-400 hover:underline"
-                  href={website}
-                >
-                  {website}
-                </Link>
+          <div className="flex flex-col gap-1 md:flex-row md:gap-5">
+            {(location ?? website) && (
+              <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:gap-5">
+                {location && (
+                  <div className="flex min-w-0 gap-1.5">
+                    <MapPin className="stroke-muted-foreground h-[18px] w-[18px] flex-none" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <p className="text-muted-foreground truncate text-sm">
+                          {location}
+                        </p>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{location}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                )}
+                {website && (
+                  <div className="flex min-w-0 gap-1.5">
+                    <Link2 className="stroke-muted-foreground h-[18px] w-[18px] flex-none" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          className="truncate text-sm text-sky-400 hover:underline"
+                          href={website}
+                        >
+                          {website}
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{website}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                )}
               </div>
             )}
             <div className="flex gap-1.5">
-              <CalendarDays className="stroke-muted-foreground h-[18px] w-[18px]" />
-              <p className="text-muted-foreground text-sm">{joinDate}</p>
+              <CalendarDays className="stroke-muted-foreground h-[18px] w-[18px] flex-none" />
+              <p className="text-muted-foreground text-nowrap text-sm">
+                {joinDate}
+              </p>
             </div>
           </div>
 
