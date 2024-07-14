@@ -292,7 +292,7 @@ export function ProfileEdit({
                 )}
               </div>
             </div>
-            <Avatar className="bg-background -mt-20 ml-4 h-[120px] w-[120px] rounded-full border-4 border-black object-cover">
+            <Avatar className="bg-background -mt-16 ml-4 h-[120px] w-[120px] rounded-full border-4 border-black object-cover">
               {(avatar?.blob ?? initialAvatar) && (
                 <AvatarImage
                   src={avatar?.blob ?? initialAvatar!}
