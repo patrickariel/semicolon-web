@@ -62,7 +62,7 @@ export const user = router({
     .output(UserResolvedSchema)
     .query(({ ctx: { user } }) => user),
   update: userProcedure
-    .meta({ openapi: { method: "GET", path: "/users/me/update" } })
+    .meta({ openapi: { method: "POST", path: "/users/me/update" } })
     .input(
       z.object({
         name: z.string().min(2).max(50),
