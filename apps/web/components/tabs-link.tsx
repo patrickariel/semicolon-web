@@ -71,10 +71,10 @@ export function TabsList({
       {...props}
     >
       <ResizeObserver
-        onResize={(info, elem) => {
+        onResize={(_info, elem) => {
           setCanScrollLeft(elem.scrollLeft > 0);
           setCanScrollRight(
-            elem.scrollWidth - info.offsetWidth !== elem.scrollLeft,
+            elem.scrollWidth - elem.offsetWidth !== elem.scrollLeft,
           );
         }}
       >
