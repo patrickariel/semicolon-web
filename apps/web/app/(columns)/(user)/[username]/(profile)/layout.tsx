@@ -38,7 +38,7 @@ export default async function Page({
         isOwner={session?.user?.username === user.username}
         isFollowing={user.followed}
       />
-      <TabsList className="static mt-1">
+      <TabsList className="bg-background relative mt-1">
         <TabsLink href={`/${username}`}>Posts</TabsLink>
         <TabsLink href={`/${username}/replies`}>Replies</TabsLink>
         <TabsLink href={`/${username}/media`}>Media</TabsLink>
