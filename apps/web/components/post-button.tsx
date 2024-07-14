@@ -70,11 +70,11 @@ export function PostButton({
     : Slot;
 
   return (
-    <div className="group relative flex flex-row items-center">
+    <div className={cn("group relative flex flex-row items-center", className)}>
       <Button
         variant={"ghost"}
         className={cn(
-          highlightVariants({ highlight, className }),
+          highlightVariants({ highlight }),
           "flex aspect-square h-auto items-center justify-start gap-0 rounded-full p-2 after:absolute after:inset-0 after:block after:content-['']",
         )}
         asChild={href ? true : false}

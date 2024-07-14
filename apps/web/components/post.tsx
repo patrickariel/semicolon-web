@@ -234,8 +234,8 @@ export function Post(post: PostResolved) {
               notation: "compact",
             }).format(views)}
           />
-          <div className="flex flex-row">
-            <PostButton icon={Bookmark} />
+          <div className="hidden flex-row min-[300px]:flex">
+            <PostButton icon={Bookmark} className="hidden min-[350px]:block" />
             <PostButton icon={Upload} />
           </div>
         </div>
