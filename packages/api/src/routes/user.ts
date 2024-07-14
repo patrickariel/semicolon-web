@@ -10,10 +10,13 @@ import {
   publicProcedure,
   userProcedure,
   newUserProcedure,
+  optUserProcedure,
 } from "@semicolon/api/trpc";
 import { update } from "@semicolon/auth";
 import { Prisma, db } from "@semicolon/db";
 import { TRPCError } from "@trpc/server";
+import { BlobNotFoundError, head } from "@vercel/blob";
+import _ from "lodash";
 import { z } from "zod";
 
 export const user = router({
@@ -58,6 +61,60 @@ export const user = router({
     .input(z.void())
     .output(UserResolvedSchema)
     .query(({ ctx: { user } }) => user),
+  update: userProcedure
+    .meta({ openapi: { method: "POST", path: "/users/me/update" } })
+    .input(
+      z.object({
+        name: z.string().min(2).max(50),
+        bio: z.string().optional(),
+        location: z.string().optional(),
+        website: z.string().url().optional(),
+        birthday: z.date(),
+        avatar: z.string().url().optional(),
+        header: z.string().url().optional(),
+      }),
+    )
+    .output(z.void())
+    .mutation(
+      async ({
+        ctx: {
+          user: { id },
+        },
+        input: { name, bio, location, website, birthday, avatar, header },
+      }) => {
+        if (header) {
+          try {
+            await head(header);
+          } catch (error) {
+            if (error instanceof BlobNotFoundError) {
+              throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "External media URLs are forbidden",
+              });
+            } else {
+              throw error;
+            }
+          }
+        }
+
+        await db.user.update({
+          where: {
+            id,
+          },
+          data: {
+            name,
+            bio: bio ?? null,
+            location: location ?? null,
+            website: website ?? null,
+            birthday,
+            image: avatar ?? null,
+            header: header ?? null,
+          },
+        });
+
+        await update({ user: { name, image: avatar } });
+      },
+    ),
   register: newUserProcedure
     .meta({ openapi: { method: "POST", path: "/users/register" } })
     .input(
@@ -125,11 +182,11 @@ export const user = router({
         posts: user._count.posts,
       };
     }),
-  username: publicProcedure
+  username: optUserProcedure
     .meta({ openapi: { method: "GET", path: "/users/{username}" } })
     .input(z.object({ username: UsernameSchema }))
-    .output(PublicUserResolvedSchema)
-    .query(async ({ input: { username } }) => {
+    .output(PublicUserResolvedSchema.merge(z.object({ followed: z.boolean() })))
+    .query(async ({ input: { username }, ctx: { user: me } }) => {
       const user = await db.user.findUnique({
         where: { username, registered: { not: null } },
         include: {
@@ -151,13 +208,25 @@ export const user = router({
       }
 
       return {
-        ...user,
+        ...(username !== me?.username ? { ...user, birthday: null } : user),
         name: user.name!,
         username: user.username!,
         registered: user.registered!,
         following: user._count.following,
         followers: user._count.followedBy,
         posts: user._count.posts,
+        followed: me?.username
+          ? !!(await db.user.findUnique({
+              where: {
+                username: me.username,
+                following: {
+                  some: {
+                    username: user.username!,
+                  },
+                },
+              },
+            }))
+          : false,
       };
     }),
   posts: publicProcedure

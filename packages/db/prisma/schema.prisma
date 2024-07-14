@@ -21,8 +21,10 @@ model User {
   username      String?   @unique
   name          String?
   email         String    @unique
+  header        String?
   registered    DateTime?
   location      String?
+  website       String?
   verified      Boolean   @default(false)
   emailVerified DateTime?
   birthday      DateTime?

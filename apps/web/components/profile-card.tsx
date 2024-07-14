@@ -1,61 +1,77 @@
+"use client";
+
+import { ProfileEdit } from "./profile-edit";
 import type { PublicUserResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
-import { BadgeCheck, CalendarDays, MapPin, User } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@semicolon/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@semicolon/ui/tooltip";
+import { BadgeCheck, CalendarDays, Link2, MapPin, User } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import Link from "next/link";
+import React, { useState } from "react";
 
 interface ProfileCardProps extends PublicUserResolved {
   isOwner: boolean;
   isFollowing: boolean;
-  coverImage: string;
 }
 
-const ProfileCard = ({
-  name,
-  username,
-  bio,
-  location,
-  following,
-  followers,
-  coverImage,
-  image,
-  posts,
-  createdAt,
-  verified = true,
-  isOwner,
-  isFollowing,
-}: ProfileCardProps) => {
-  console.log(posts);
+const ProfileCard = (props: ProfileCardProps) => {
+  const {
+    name,
+    username,
+    bio,
+    location,
+    following,
+    followers,
+    header,
+    image,
+    createdAt,
+    verified = true,
+    website,
+    isOwner,
+    isFollowing,
+  } = props;
   const joinDate = `Joined ${createdAt.toLocaleString("default", { month: "long" })} ${createdAt.getFullYear()}`;
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="flex h-fit flex-col gap-5">
-      <div className="relative">
-        <div className="relative h-[200px] w-full">
+      <div className="bg-muted relative h-[200px] w-full">
+        {header && (
           <Image
             className="object-cover"
-            alt={`${username}'s header image`}
+            alt={`${name}'s header image`}
             fill
-            src={coverImage}
+            src={header}
           />
-        </div>
+        )}
       </div>
 
       <div className="flex flex-col justify-start gap-3">
         <div className="flex flex-col gap-3.5 px-5">
           <div className="flex flex-row justify-between">
             <Avatar className="bg-background -mt-20 h-[120px] w-[120px] rounded-full border-4 border-black object-cover">
-              {image && <AvatarImage src={image} alt="Profile Photo" />}
+              {image && <AvatarImage src={image} alt={`${name}'s avatar`} />}
               <AvatarFallback>
-                <User />
+                <User size={65} />
               </AvatarFallback>
             </Avatar>
 
             {isOwner ? (
-              <Button className="min-w-[100px] rounded-full">
-                <span className="font-bold">Edit profile</span>
-              </Button>
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button className="min-w-[100px] rounded-full">
+                    <span className="font-bold">Edit profile</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent
+                  close={false}
+                  className="max-h-[650px] overflow-y-auto p-0"
+                >
+                  <ProfileEdit {...props} />
+                </DialogContent>
+              </Dialog>
             ) : (
               <Button
                 type="submit"
@@ -84,16 +100,49 @@ const ProfileCard = ({
 
           {bio && <p className="text-sm leading-[26px]">{bio}</p>}
 
-          <div className="flex gap-5">
-            {location && (
-              <div className="flex gap-1.5">
-                <MapPin className="stroke-muted-foreground h-[18px] w-[18px]" />
-                <p className="text-muted-foreground text-sm">{location}</p>
+          <div className="flex flex-col gap-1 md:flex-row md:gap-5">
+            {(location ?? website) && (
+              <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:gap-5">
+                {location && (
+                  <div className="flex min-w-0 gap-1.5">
+                    <MapPin className="stroke-muted-foreground h-[18px] w-[18px] flex-none" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <p className="text-muted-foreground truncate text-sm">
+                          {location}
+                        </p>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{location}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                )}
+                {website && (
+                  <div className="flex min-w-0 gap-1.5">
+                    <Link2 className="stroke-muted-foreground h-[18px] w-[18px] flex-none" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          className="truncate text-sm text-sky-400 hover:underline"
+                          href={website}
+                        >
+                          {website}
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{website}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                )}
               </div>
             )}
             <div className="flex gap-1.5">
-              <CalendarDays className="stroke-muted-foreground h-[18px] w-[18px]" />
-              <p className="text-muted-foreground text-sm">{joinDate}</p>
+              <CalendarDays className="stroke-muted-foreground h-[18px] w-[18px] flex-none" />
+              <p className="text-muted-foreground text-nowrap text-sm">
+                {joinDate}
+              </p>
             </div>
           </div>
 

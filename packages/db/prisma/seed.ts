@@ -32,8 +32,13 @@ async function main() {
       email: faker.internet.email(),
       location: faker.location.country(),
       verified: _.sample([true, false]),
+      website: faker.internet.url(),
       bio: faker.person.bio(),
       image: faker.image.avatar(),
+      header: faker.image.urlPicsumPhotos({
+        width: 600,
+        height: 400,
+      }),
       birthday: faker.date.between({
         from: "1990-01-01",
         to: "2007-01-01",

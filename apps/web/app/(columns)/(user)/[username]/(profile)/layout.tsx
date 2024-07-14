@@ -1,32 +1,28 @@
-"use client";
-
 import { BackHeader } from "@/components/back-header";
 import ProfileCard from "@/components/profile-card";
+import ScrollTop from "@/components/scroll-top";
 import { TabsList, TabsLink } from "@/components/tabs-link";
-import { trpc } from "@/lib/trpc-client";
-import Spinner from "@semicolon/ui/spinner";
+import { trpc } from "@/lib/trpc";
+import { auth } from "@semicolon/auth";
 import _ from "lodash";
 import React from "react";
 
-export default function Page({
+export default async function Page({
   params: { username },
   children,
 }: {
   params: { username: string };
   children: React.ReactNode;
 }) {
-  const { data: user } = trpc.user.username.useQuery({ username });
-
-  if (!user) {
-    return (
-      <div className="flex min-h-20 items-center justify-center">
-        <Spinner size={30} />
-      </div>
-    );
-  }
+  const user = await trpc.user.username.query({ username });
+  const session = await auth();
 
   return (
     <div className="flex flex-col">
+      {/* INSANE bug: 
+      - https://github.com/vercel/next.js/discussions/64435#discussioncomment-9101547 
+      - https://github.com/vercel/next.js/issues/64441 */}
+      <ScrollTop />
       <BackHeader>
         <article className="flex flex-col">
           <p className="text-xl font-semibold">{user.name}</p>
@@ -39,9 +35,8 @@ export default function Page({
       </BackHeader>
       <ProfileCard
         {...user}
-        coverImage="https://picsum.photos/seed/picsum/1280/720"
-        isOwner={true}
-        isFollowing={false}
+        isOwner={session?.user?.username === user.username}
+        isFollowing={user.followed}
       />
       <TabsList className="static mt-1">
         <TabsLink href={`/${username}`}>Posts</TabsLink>

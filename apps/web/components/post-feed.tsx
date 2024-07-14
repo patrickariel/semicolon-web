@@ -36,8 +36,8 @@ export function PostFeed({
     <>
       {!media ? (
         <div className="flex flex-col">
-          {posts.map((post, i) => (
-            <Fragment key={i}>
+          {posts.map((post) => (
+            <Fragment key={post.id}>
               <Post {...post} />
               <Separator />
             </Fragment>
@@ -47,7 +47,7 @@ export function PostFeed({
         <div className="grid grid-cols-1 gap-1 p-1 sm:grid-cols-2 md:grid-cols-3">
           {posts.map(({ id, media, username }, i) => (
             <Link
-              key={i}
+              key={id}
               href={`/${username}/post/${id}/photo/1`}
               scroll={false}
             >
