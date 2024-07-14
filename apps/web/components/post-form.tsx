@@ -269,6 +269,7 @@ export function PostForm({
                 variant="ghost"
                 size="icon"
                 className="rounded-full hover:bg-sky-400/10"
+                onClick={(e) => e.preventDefault()}
               >
                 <Smile className="stroke-sky-400" />
               </Button>
