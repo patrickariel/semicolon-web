@@ -186,8 +186,8 @@ export default function Page({
             </div>
           </div>
           <Separator orientation="vertical" />
-          <ScrollArea className="h-full">
-            <div className="bg-background hidden h-full w-[350px] flex-none flex-col py-4 lg:flex">
+          <ScrollArea className="bg-background h-full">
+            <div className="hidden h-full w-[350px] flex-none flex-col py-4 lg:flex">
               <PostDetail showMedia={false} {...post} />
               <PostForm
                 to={id}
