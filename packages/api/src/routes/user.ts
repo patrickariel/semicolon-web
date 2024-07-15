@@ -10,7 +10,6 @@ import {
   publicProcedure,
   userProcedure,
   newUserProcedure,
-  optUserProcedure,
 } from "@semicolon/api/trpc";
 import { update } from "@semicolon/auth";
 import { Prisma, db } from "@semicolon/db";
@@ -20,11 +19,11 @@ import _ from "lodash";
 import { z } from "zod";
 
 export const user = router({
-  search: publicProcedure
+  search: userProcedure
     .meta({ openapi: { method: "GET", path: "/users/search" } })
     .input(z.object({ query: z.string() }))
     .output(z.array(PublicUserResolvedSchema))
-    .query(async ({ input: { query } }) => {
+    .query(async ({ ctx: { session }, input: { query } }) => {
       const users = await db.user.findMany({
         where: {
           username: {
@@ -43,6 +42,11 @@ export const user = router({
               posts: true,
             },
           },
+          followedBy: {
+            where: {
+              username: session?.user?.username,
+            },
+          },
         },
       });
 
@@ -53,6 +57,7 @@ export const user = router({
         registered: user.registered!,
         following: user._count.following,
         followers: user._count.followedBy,
+        followed: user.followedBy.length > 0,
         posts: user._count.posts,
       }));
     }),
@@ -60,7 +65,7 @@ export const user = router({
     .meta({ openapi: { method: "GET", path: "/users/me" } })
     .input(z.void())
     .output(UserResolvedSchema)
-    .query(({ ctx: { user } }) => user),
+    .query(({ ctx: { user } }) => ({ ...user, followed: false })),
   update: userProcedure
     .meta({ openapi: { method: "POST", path: "/users/me/update" } })
     .input(
@@ -151,10 +156,15 @@ export const user = router({
     .meta({ openapi: { method: "GET", path: "/users/by/id/{id}" } })
     .input(z.object({ id: z.string().uuid() }))
     .output(PublicUserResolvedSchema)
-    .query(async ({ input: { id } }) => {
+    .query(async ({ ctx: { session }, input: { id } }) => {
       const user = await db.user.findUnique({
         where: { id, registered: { not: null } },
         include: {
+          followedBy: {
+            where: {
+              username: session?.user?.username,
+            },
+          },
           _count: {
             select: {
               followedBy: true,
@@ -179,17 +189,23 @@ export const user = router({
         registered: user.registered!,
         following: user._count.following,
         followers: user._count.followedBy,
+        followed: user.followedBy.length > 0,
         posts: user._count.posts,
       };
     }),
-  username: optUserProcedure
+  username: publicProcedure
     .meta({ openapi: { method: "GET", path: "/users/{username}" } })
     .input(z.object({ username: UsernameSchema }))
     .output(PublicUserResolvedSchema.merge(z.object({ followed: z.boolean() })))
-    .query(async ({ input: { username }, ctx: { user: me } }) => {
+    .query(async ({ input: { username }, ctx: { session } }) => {
       const user = await db.user.findUnique({
         where: { username, registered: { not: null } },
         include: {
+          followedBy: {
+            where: {
+              username: session?.user?.username,
+            },
+          },
           _count: {
             select: {
               followedBy: true,
@@ -208,27 +224,64 @@ export const user = router({
       }
 
       return {
-        ...(username !== me?.username ? { ...user, birthday: null } : user),
+        ...(username !== session?.user?.username
+          ? { ...user, birthday: null }
+          : user),
         name: user.name!,
         username: user.username!,
         registered: user.registered!,
         following: user._count.following,
         followers: user._count.followedBy,
         posts: user._count.posts,
-        followed: me?.username
-          ? !!(await db.user.findUnique({
-              where: {
-                username: me.username,
-                following: {
-                  some: {
-                    username: user.username!,
-                  },
-                },
-              },
-            }))
-          : false,
+        followed: user.followedBy.length > 0,
       };
     }),
+  follow: userProcedure
+    .meta({ openapi: { method: "PUT", path: "/users/{username}/follow" } })
+    .input(z.object({ username: UsernameSchema }))
+    .output(z.void())
+    .mutation(
+      async ({
+        ctx: {
+          user: { id },
+        },
+        input: { username },
+      }) => {
+        await db.user.update({
+          where: { id },
+          data: {
+            following: {
+              connect: {
+                username,
+              },
+            },
+          },
+        });
+      },
+    ),
+  unfollow: userProcedure
+    .meta({ openapi: { method: "DELETE", path: "/users/{username}/follow" } })
+    .input(z.object({ username: UsernameSchema }))
+    .output(z.void())
+    .mutation(
+      async ({
+        ctx: {
+          user: { id },
+        },
+        input: { username },
+      }) => {
+        await db.user.update({
+          where: { id },
+          data: {
+            following: {
+              disconnect: {
+                username,
+              },
+            },
+          },
+        });
+      },
+    ),
   posts: publicProcedure
     .meta({
       openapi: { method: "GET", path: "/users/{username}/posts" },
@@ -246,54 +299,65 @@ export const user = router({
         nextCursor: z.string().uuid().optional(),
       }),
     )
-    .query(async ({ input: { username, cursor, maxResults } }) => {
-      const posts = await db.post.findMany({
-        where: {
-          user: {
-            username,
+    .query(
+      async ({ ctx: { session }, input: { username, cursor, maxResults } }) => {
+        const posts = await db.post.findMany({
+          where: {
+            user: {
+              username,
+            },
+            parentId: { equals: null },
           },
-          parentId: { equals: null },
-        },
-        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
-        take: maxResults + 1,
-        include: {
-          parent: {
-            include: {
-              user: true,
+          orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+          take: maxResults + 1,
+          include: {
+            parent: {
+              include: {
+                user: true,
+              },
+            },
+            user: {
+              include: {
+                followedBy: {
+                  where: {
+                    username: session?.user?.username,
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                likes: true,
+                children: true,
+              },
             },
           },
-          user: true,
-          _count: {
-            select: {
-              likes: true,
-              children: true,
-            },
-          },
-        },
-        ...(cursor && { cursor: { id: cursor } }),
-      });
+          ...(cursor && { cursor: { id: cursor } }),
+        });
 
-      let nextCursor: typeof cursor | undefined;
+        let nextCursor: typeof cursor | undefined;
 
-      if (posts.length > maxResults) {
-        const nextItem = posts.pop();
-        nextCursor = nextItem!.id; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-      }
+        if (posts.length > maxResults) {
+          const nextItem = posts.pop();
+          nextCursor = nextItem!.id; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        }
 
-      return {
-        posts: posts.map((post) => ({
-          ...post,
-          name: post.user.name!,
-          to: post.parent?.user.username ?? null,
-          username: post.user.username!,
-          verified: post.user.verified,
-          avatar: post.user.image,
-          likeCount: post._count.likes,
-          replyCount: post._count.children,
-        })),
-        nextCursor,
-      };
-    }),
+        return {
+          posts: posts.map((post) => ({
+            ...post,
+            name: post.user.name!,
+            to: post.parent?.user.username ?? null,
+            username: post.user.username!,
+            verified: post.user.verified,
+            avatar: post.user.image,
+            followed: post.user.followedBy.length > 0,
+            likeCount: post._count.likes,
+            replyCount: post._count.children,
+          })),
+          nextCursor,
+        };
+      },
+    ),
   likes: publicProcedure
     .meta({
       openapi: { method: "GET", path: "/users/{username}/likes" },
@@ -311,64 +375,79 @@ export const user = router({
         nextCursor: z.string().optional(),
       }),
     )
-    .query(async ({ input: { username, cursor, maxResults } }) => {
-      const likes = await db.like.findMany({
-        where: {
-          user: {
-            username,
+    .query(
+      async ({ ctx: { session }, input: { username, cursor, maxResults } }) => {
+        const likes = await db.like.findMany({
+          where: {
+            user: {
+              username,
+            },
           },
-        },
-        orderBy: [{ createdAt: "desc" }, { postId: "asc" }, { userId: "asc" }],
-        take: maxResults + 1,
-        include: {
-          post: {
-            include: {
-              parent: {
-                include: {
-                  user: true,
+          orderBy: [
+            { createdAt: "desc" },
+            { postId: "asc" },
+            { userId: "asc" },
+          ],
+          take: maxResults + 1,
+          include: {
+            post: {
+              include: {
+                parent: {
+                  include: {
+                    user: true,
+                  },
                 },
-              },
-              user: true,
-              _count: {
-                select: {
-                  likes: true,
-                  children: true,
+                user: {
+                  include: {
+                    followedBy: {
+                      where: {
+                        username: session?.user?.username,
+                      },
+                    },
+                  },
+                },
+                _count: {
+                  select: {
+                    likes: true,
+                    children: true,
+                  },
                 },
               },
             },
           },
-        },
-        ...(cursor && {
-          cursor: {
-            postId_userId: {
-              postId: cursor.split("_")[0]!,
-              userId: cursor.split("_")[1]!,
+          ...(cursor && {
+            cursor: {
+              postId_userId: {
+                postId: cursor.split("_")[0]!,
+                userId: cursor.split("_")[1]!,
+              },
             },
-          },
-        }),
-      });
+          }),
+        });
 
-      let nextCursor: typeof cursor | undefined;
+        let nextCursor: typeof cursor | undefined;
 
-      if (likes.length > maxResults) {
-        const nextItem = likes.pop();
-        nextCursor = `${nextItem!.postId}_${nextItem!.userId}`;
-      }
+        if (likes.length > maxResults) {
+          const nextItem = likes.pop();
+          nextCursor = `${nextItem!.postId}_${nextItem!.userId}`;
+        }
 
-      return {
-        posts: likes.map(({ post }) => ({
-          ...post,
-          name: post.user.name!,
-          to: post.parent?.user.username ?? null,
-          username: post.user.username!,
-          verified: post.user.verified,
-          avatar: post.user.image,
-          likeCount: post._count.likes,
-          replyCount: post._count.children,
-        })),
-        nextCursor,
-      };
-    }),
+        return {
+          posts: likes.map(({ post }) => ({
+            ...post,
+            name: post.user.name!,
+            to: post.parent?.user.username ?? null,
+            username: post.user.username!,
+            verified: post.user.verified,
+            avatar: post.user.image,
+            likeCount: post._count.likes,
+            replyCount: post._count.children,
+            followed: post.user.followedBy.length > 0,
+          })),
+          nextCursor,
+        };
+      },
+    ),
   media: publicProcedure
     .meta({ openapi: { method: "GET", path: "/users/{username}/media" } })
     .input(
@@ -384,56 +463,67 @@ export const user = router({
         nextCursor: z.string().uuid().nullish(),
       }),
     )
-    .query(async ({ input: { username, cursor, maxResults } }) => {
-      const posts = await db.post.findMany({
-        where: {
-          user: {
-            username,
-          },
-          media: {
-            isEmpty: false,
-          },
-        },
-        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
-        take: maxResults + 1,
-        ...(cursor && { cursor: { id: cursor } }),
-        include: {
-          parent: {
-            include: {
-              user: true,
+    .query(
+      async ({ ctx: { session }, input: { username, cursor, maxResults } }) => {
+        const posts = await db.post.findMany({
+          where: {
+            user: {
+              username,
+            },
+            media: {
+              isEmpty: false,
             },
           },
-          user: true,
-          _count: {
-            select: {
-              likes: true,
-              children: true,
+          orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+          take: maxResults + 1,
+          ...(cursor && { cursor: { id: cursor } }),
+          include: {
+            parent: {
+              include: {
+                user: true,
+              },
+            },
+            user: {
+              include: {
+                followedBy: {
+                  where: {
+                    username: session?.user?.username,
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                likes: true,
+                children: true,
+              },
             },
           },
-        },
-      });
+        });
 
-      let nextCursor: typeof cursor | undefined;
+        let nextCursor: typeof cursor | undefined;
 
-      if (posts.length > maxResults) {
-        const nextItem = posts.pop();
-        nextCursor = nextItem!.id; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-      }
+        if (posts.length > maxResults) {
+          const nextItem = posts.pop();
+          nextCursor = nextItem!.id; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        }
 
-      return {
-        posts: posts.map((post) => ({
-          ...post,
-          name: post.user.name!,
-          to: post.parent?.user.username ?? null,
-          username: post.user.username!,
-          verified: post.user.verified,
-          avatar: post.user.image,
-          likeCount: post._count.likes,
-          replyCount: post._count.children,
-        })),
-        nextCursor,
-      };
-    }),
+        return {
+          posts: posts.map((post) => ({
+            ...post,
+            name: post.user.name!,
+            to: post.parent?.user.username ?? null,
+            username: post.user.username!,
+            verified: post.user.verified,
+            avatar: post.user.image,
+            likeCount: post._count.likes,
+            replyCount: post._count.children,
+            followed: post.user.followedBy.length > 0,
+          })),
+          nextCursor,
+        };
+      },
+    ),
   replies: publicProcedure
     .meta({
       openapi: { method: "GET", path: "/users/{username}/replies" },
@@ -451,52 +541,63 @@ export const user = router({
         nextCursor: z.string().uuid().optional(),
       }),
     )
-    .query(async ({ input: { username, cursor, maxResults } }) => {
-      const posts = await db.post.findMany({
-        where: {
-          user: {
-            username,
+    .query(
+      async ({ ctx: { session }, input: { username, cursor, maxResults } }) => {
+        const posts = await db.post.findMany({
+          where: {
+            user: {
+              username,
+            },
+            parentId: { not: null },
           },
-          parentId: { not: null },
-        },
-        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
-        take: maxResults + 1,
-        include: {
-          parent: {
-            include: {
-              user: true,
+          orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+          take: maxResults + 1,
+          include: {
+            parent: {
+              include: {
+                user: true,
+              },
+            },
+            user: {
+              include: {
+                followedBy: {
+                  where: {
+                    username: session?.user?.username,
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                likes: true,
+                children: true,
+              },
             },
           },
-          user: true,
-          _count: {
-            select: {
-              likes: true,
-              children: true,
-            },
-          },
-        },
-        ...(cursor && { cursor: { id: cursor } }),
-      });
+          ...(cursor && { cursor: { id: cursor } }),
+        });
 
-      let nextCursor: typeof cursor | undefined;
+        let nextCursor: typeof cursor | undefined;
 
-      if (posts.length > maxResults) {
-        const nextItem = posts.pop();
-        nextCursor = nextItem!.id; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-      }
+        if (posts.length > maxResults) {
+          const nextItem = posts.pop();
+          nextCursor = nextItem!.id; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        }
 
-      return {
-        posts: posts.map((post) => ({
-          ...post,
-          name: post.user.name!,
-          to: post.parent?.user.username ?? null,
-          username: post.user.username!,
-          verified: post.user.verified,
-          avatar: post.user.image,
-          likeCount: post._count.likes,
-          replyCount: post._count.children,
-        })),
-        nextCursor,
-      };
-    }),
+        return {
+          posts: posts.map((post) => ({
+            ...post,
+            name: post.user.name!,
+            to: post.parent?.user.username ?? null,
+            username: post.user.username!,
+            verified: post.user.verified,
+            avatar: post.user.image,
+            likeCount: post._count.likes,
+            replyCount: post._count.children,
+            followed: post.user.followedBy.length > 0,
+          })),
+          nextCursor,
+        };
+      },
+    ),
 });

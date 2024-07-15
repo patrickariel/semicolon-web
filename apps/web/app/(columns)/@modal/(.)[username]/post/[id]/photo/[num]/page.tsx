@@ -68,7 +68,6 @@ export default function Page({
         ...reply,
         to: null as string | null,
       }));
-    console.log(myReplies);
 
     setRepliesCustom(
       myReplies.concat(

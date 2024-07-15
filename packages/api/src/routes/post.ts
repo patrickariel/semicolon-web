@@ -50,7 +50,15 @@ export const post = router({
           content,
         },
         include: {
-          user: true,
+          user: {
+            include: {
+              followedBy: {
+                where: {
+                  username: user.username,
+                },
+              },
+            },
+          },
           parent: {
             include: {
               user: true,
@@ -74,6 +82,7 @@ export const post = router({
         avatar: user.image,
         likeCount: post._count.likes,
         replyCount: post._count.children,
+        followed: post.user.followedBy.length > 0,
       };
     }),
   search: publicProcedure
@@ -108,6 +117,7 @@ export const post = router({
     )
     .query(
       async ({
+        ctx: { session },
         input: {
           query,
           since,
@@ -170,6 +180,33 @@ export const post = router({
           )
           .leftJoin("User as ParentAuthor", (join) =>
             join.onRef("ParentAuthor.id", "=", "ParentPost.userId"),
+          )
+          .$if(session?.user?.id !== undefined, (qb) =>
+            qb
+              .leftJoin(
+                (eb) =>
+                  eb
+                    .selectFrom("_UserFollow")
+                    .select([
+                      "A",
+                      "B",
+                      (eb) =>
+                        eb
+                          .cast<number>(eb.fn.countAll(), "integer")
+                          .as("count"),
+                    ])
+                    .groupBy(["_UserFollow.A", "_UserFollow.B"])
+                    .where(({ eb }) =>
+                      eb(
+                        "_UserFollow.B",
+                        "=",
+                        eb.cast<string>(eb.val(session!.user!.id), "uuid"),
+                      ),
+                    )
+                    .as("UserFollow"),
+                (join) => join.onRef("UserFollow.A", "=", "Author.id"),
+              )
+              .select(["UserFollow.count as followedBy"]),
           )
           .select([
             "Post.id",
@@ -322,7 +359,10 @@ export const post = router({
         }
 
         return {
-          results,
+          results: results.map((result) => ({
+            ...result,
+            followed: (result.followedBy ?? 0) > 0,
+          })),
           nextCursor,
         };
       },
@@ -331,7 +371,7 @@ export const post = router({
     .meta({ openapi: { method: "GET", path: "/posts/{id}" } })
     .input(z.object({ id: ShortToUUID }))
     .output(PostResolvedSchema)
-    .query(async ({ input: { id } }) => {
+    .query(async ({ ctx: { session }, input: { id } }) => {
       const post = await db.post.findUnique({
         where: { id },
         include: {
@@ -340,7 +380,15 @@ export const post = router({
               user: true,
             },
           },
-          user: true,
+          user: {
+            include: {
+              followedBy: {
+                where: {
+                  username: session?.user?.username,
+                },
+              },
+            },
+          },
           _count: {
             select: {
               likes: true,
@@ -364,6 +412,7 @@ export const post = router({
         username: post.user.username!,
         verified: post.user.verified,
         avatar: post.user.image,
+        followed: post.user.followedBy.length > 0,
         likeCount: post._count.likes,
         replyCount: post._count.children,
       };
@@ -429,6 +478,7 @@ export const post = router({
         avatar: updated.user.image,
         likeCount: updated._count.likes,
         replyCount: updated._count.children,
+        followed: false,
       };
     }),
   delete: userProcedure
@@ -464,7 +514,15 @@ export const post = router({
       const deleted = await db.post.delete({
         where: { id },
         include: {
-          user: true,
+          user: {
+            include: {
+              followedBy: {
+                where: {
+                  username: user.username,
+                },
+              },
+            },
+          },
           parent: {
             include: {
               user: true,
@@ -488,6 +546,7 @@ export const post = router({
         avatar: deleted.user.image,
         likeCount: deleted._count.likes,
         replyCount: deleted._count.children,
+        followed: deleted.user.followedBy.length > 0,
       };
     }),
   replies: publicProcedure
@@ -505,7 +564,7 @@ export const post = router({
         nextCursor: z.string().uuid().optional(),
       }),
     )
-    .query(async ({ input: { id, maxResults, cursor } }) => {
+    .query(async ({ ctx: { session }, input: { id, maxResults, cursor } }) => {
       const post = await db.post.findUnique({
         where: { id },
         include: {
@@ -513,7 +572,15 @@ export const post = router({
             ...(cursor && { cursor: { id: cursor } }),
             take: maxResults + 1,
             include: {
-              user: true,
+              user: {
+                include: {
+                  followedBy: {
+                    where: {
+                      username: session?.user?.username,
+                    },
+                  },
+                },
+              },
               parent: {
                 include: {
                   user: true,
@@ -559,6 +626,7 @@ export const post = router({
           avatar: child.user.image,
           likeCount: child._count.likes,
           replyCount: child._count.children,
+          followed: child.user.followedBy.length > 0,
         })),
         nextCursor,
       };
