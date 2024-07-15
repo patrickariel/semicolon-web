@@ -59,6 +59,7 @@ const ProfileCard = (props: ProfileCardProps) => {
     },
     onSettled: () => setDisableFollow(false),
   });
+
   const unfollowUser = trpc.user.unfollow.useMutation({
     onMutate: () => setDisableFollow(true),
     onSuccess: async () => {
@@ -118,18 +119,16 @@ const ProfileCard = (props: ProfileCardProps) => {
                     : followUser.mutate({ username })
                 }
               >
-                <p
-                  className={`text-black ${follows[username] ? "text-foreground group-hover:hidden" : ""}`}
-                >
-                  {follows[username] ? "Following" : "Follow"}
-                </p>
-                <p
-                  className={`hidden text-black ${
-                    follows[username] ? "text-red-700 group-hover:block" : ""
-                  } `}
-                >
-                  Unfollow
-                </p>
+                {follows[username] ? (
+                  <>
+                    <p className="group-hover:hidden">Following</p>
+                    <p className="hidden text-red-700 group-hover:block">
+                      Unfollow
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-black">Follow</p>
+                )}
               </Button>
             )}
           </div>

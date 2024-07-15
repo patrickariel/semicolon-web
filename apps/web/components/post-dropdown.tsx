@@ -1,3 +1,4 @@
+import { followsAtom } from "@/lib/atom";
 import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import { PostResolved } from "@semicolon/api/schema";
@@ -8,14 +9,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@semicolon/ui/dropdown-menu";
+import { useAtom } from "jotai";
 import { useSetAtom } from "jotai";
-import { Ellipsis, Flag, Trash2, UserPlus } from "lucide-react";
+import { Ellipsis, Flag, Trash2, UserPlus, UserX } from "lucide-react";
+import React, { useEffect } from "react";
 
 export function PostDropdown({
   username,
   id,
   isOwner = false,
   content: _content,
+  followed,
   ...props
 }: Omit<React.HtmlHTMLAttributes<HTMLDivElement>, "content"> &
   PostResolved & { isOwner?: boolean }) {
@@ -28,6 +32,34 @@ export function PostDropdown({
       await utils.post.replies.refetch();
       await utils.user.posts.refetch({ username });
       await utils.user.replies.refetch({ username });
+    },
+  });
+
+  const [follows, updateFollows] = useAtom(followsAtom);
+
+  useEffect(() => {
+    if (follows[username] === undefined) {
+      updateFollows((follows) => {
+        follows[username] = followed;
+      });
+    }
+  }, [follows, followed, username, updateFollows]);
+
+  const followUser = trpc.user.follow.useMutation({
+    onSuccess: async () => {
+      updateFollows((follows) => {
+        follows[username] = true;
+      });
+      await utils.feed.following.refetch();
+    },
+  });
+
+  const unfollowUser = trpc.user.unfollow.useMutation({
+    onSuccess: async () => {
+      updateFollows((follows) => {
+        follows[username] = false;
+      });
+      await utils.feed.following.refetch();
     },
   });
 
@@ -59,15 +91,25 @@ export function PostDropdown({
           <>
             <DropdownMenuItem
               className="cursor-pointer justify-start gap-4 rounded-none px-4 py-4"
-              onSelect={() => deletePost.mutate({ id })}
+              onSelect={() =>
+                follows[username]
+                  ? unfollowUser.mutate({ username })
+                  : followUser.mutate({ username })
+              }
             >
-              <UserPlus size={20} />
-              <div>Follow {`@${username}`}</div>
+              {follows[username] ? (
+                <>
+                  <UserX size={20} />
+                  <div>Unfollow {`@${username}`}</div>
+                </>
+              ) : (
+                <>
+                  <UserPlus size={20} />
+                  {<div>Follow {`@${username}`}</div>}{" "}
+                </>
+              )}
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer justify-start gap-4 rounded-none px-4 py-4"
-              onSelect={() => deletePost.mutate({ id })}
-            >
+            <DropdownMenuItem className="cursor-pointer justify-start gap-4 rounded-none px-4 py-4">
               <Flag size={20} />
               <div>Report post</div>
             </DropdownMenuItem>
