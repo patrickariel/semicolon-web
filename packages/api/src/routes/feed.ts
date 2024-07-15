@@ -189,6 +189,7 @@ export const feed = router({
               },
             },
           },
+          take: maxResults + 1,
           include: {
             user: true,
             _count: {
