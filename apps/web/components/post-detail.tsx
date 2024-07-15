@@ -67,7 +67,7 @@ export function PostDetail({
       </div>
       <div className="flex flex-col gap-2">
         <Separator />
-        <PostActions {...post} />
+        <PostActions {...post} variant="detail" />
         <Separator />
       </div>
     </div>
