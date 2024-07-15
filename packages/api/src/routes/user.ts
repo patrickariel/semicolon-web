@@ -229,6 +229,52 @@ export const user = router({
           : false,
       };
     }),
+  follow: userProcedure
+    .meta({ openapi: { method: "PUT", path: "/users/{username}/follow" } })
+    .input(z.object({ username: UsernameSchema }))
+    .output(z.void())
+    .mutation(
+      async ({
+        ctx: {
+          user: { id },
+        },
+        input: { username },
+      }) => {
+        await db.user.update({
+          where: { id },
+          data: {
+            following: {
+              connect: {
+                username,
+              },
+            },
+          },
+        });
+      },
+    ),
+  unfollow: userProcedure
+    .meta({ openapi: { method: "DELETE", path: "/users/{username}/follow" } })
+    .input(z.object({ username: UsernameSchema }))
+    .output(z.void())
+    .mutation(
+      async ({
+        ctx: {
+          user: { id },
+        },
+        input: { username },
+      }) => {
+        await db.user.update({
+          where: { id },
+          data: {
+            following: {
+              disconnect: {
+                username,
+              },
+            },
+          },
+        });
+      },
+    ),
   posts: publicProcedure
     .meta({
       openapi: { method: "GET", path: "/users/{username}/posts" },
