@@ -47,7 +47,6 @@ const ProfileCard = (props: ProfileCardProps) => {
     onSuccess: () => setFollow(false),
     onSettled: () => setDisableFollow(false),
   });
-  console.log(follow);
 
   return (
     <div className="flex h-fit flex-col gap-5">
