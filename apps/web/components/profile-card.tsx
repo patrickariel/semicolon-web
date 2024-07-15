@@ -88,7 +88,7 @@ const ProfileCard = (props: ProfileCardProps) => {
               </Dialog>
             ) : (
               <Button
-                className={`group min-w-[110px] cursor-pointer text-nowrap rounded-full font-bold text-black ${follow ? "text-foreground hover:bg-destructive/5 hover:border-red-900" : "text-background"}`}
+                className={`group min-w-[110px] cursor-pointer text-nowrap rounded-full font-bold text-black ${follow ? "text-foreground hover:bg-destructive/15 hover:border-red-900" : "text-background"}`}
                 disabled={disableFollow}
                 variant={follow ? "outline" : "default"}
                 onClick={() =>
