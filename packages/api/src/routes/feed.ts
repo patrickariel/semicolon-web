@@ -22,6 +22,7 @@ export const feed = router({
     .query(
       async ({
         ctx: {
+          session,
           user: { id },
         },
         input: { cursor, maxResults },
@@ -73,6 +74,33 @@ export const feed = router({
           )
           .leftJoin("User as ParentAuthor", (join) =>
             join.onRef("ParentAuthor.id", "=", "ParentPost.userId"),
+          )
+          .$if(session?.user?.id !== undefined, (qb) =>
+            qb
+              .leftJoin(
+                (eb) =>
+                  eb
+                    .selectFrom("_UserFollow")
+                    .select([
+                      "A",
+                      "B",
+                      (eb) =>
+                        eb
+                          .cast<number>(eb.fn.countAll(), "integer")
+                          .as("count"),
+                    ])
+                    .groupBy(["_UserFollow.A", "_UserFollow.B"])
+                    .where(({ eb }) =>
+                      eb(
+                        "_UserFollow.B",
+                        "=",
+                        eb.cast<string>(eb.val(session!.user!.id), "uuid"),
+                      ),
+                    )
+                    .as("UserFollow"),
+                (join) => join.onRef("UserFollow.A", "=", "Author.id"),
+              )
+              .select(["UserFollow.count as followedBy"]),
           )
           .select([
             "Post.id",
@@ -153,7 +181,10 @@ export const feed = router({
         }
 
         return {
-          posts,
+          posts: posts.map((result) => ({
+            ...result,
+            followed: (result.followedBy ?? 0) > 0,
+          })),
           nextCursor,
         };
       },
@@ -175,7 +206,7 @@ export const feed = router({
     .query(
       async ({
         ctx: {
-          user: { id },
+          user: { id, username },
         },
         input: { cursor, maxResults },
       }) => {
@@ -191,7 +222,15 @@ export const feed = router({
           },
           take: maxResults + 1,
           include: {
-            user: true,
+            user: {
+              include: {
+                followedBy: {
+                  where: {
+                    username: username,
+                  },
+                },
+              },
+            },
             _count: {
               select: {
                 likes: true,
@@ -221,6 +260,7 @@ export const feed = router({
             ...post,
             name: post.user.name!,
             to: post.parent?.user.username ?? null,
+            followed: post.user.followedBy.length > 0,
             username: post.user.username!,
             verified: post.user.verified,
             avatar: post.user.image,
