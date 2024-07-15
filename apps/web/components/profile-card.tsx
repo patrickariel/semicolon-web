@@ -1,6 +1,7 @@
 "use client";
 
 import { ProfileEdit } from "./profile-edit";
+import { trpc } from "@/lib/trpc-client";
 import type { PublicUserResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
@@ -32,8 +33,21 @@ const ProfileCard = (props: ProfileCardProps) => {
     isOwner,
     isFollowing,
   } = props;
-  const joinDate = `Joined ${createdAt.toLocaleString("default", { month: "long" })} ${createdAt.getFullYear()}`;
+  const joinDate = `Joined ${createdAt.toLocaleString("en-US", { year: "numeric", month: "long" })}`;
+  const [follow, setFollow] = useState(isFollowing);
+  const [disableFollow, setDisableFollow] = useState(false);
   const [open, setOpen] = useState(false);
+  const followUser = trpc.user.follow.useMutation({
+    onMutate: () => setDisableFollow(true),
+    onSuccess: () => setFollow(true),
+    onSettled: () => setDisableFollow(false),
+  });
+  const unfollowUser = trpc.user.unfollow.useMutation({
+    onMutate: () => setDisableFollow(true),
+    onSuccess: () => setFollow(false),
+    onSettled: () => setDisableFollow(false),
+  });
+  console.log(follow);
 
   return (
     <div className="flex h-fit flex-col gap-5">
@@ -74,10 +88,27 @@ const ProfileCard = (props: ProfileCardProps) => {
               </Dialog>
             ) : (
               <Button
-                type="submit"
-                className="min-w-[100px] cursor-pointer text-nowrap rounded-full font-bold text-black"
+                className={`group min-w-[110px] cursor-pointer text-nowrap rounded-full font-bold text-black ${follow ? "text-foreground hover:bg-destructive/5 hover:border-red-900" : "text-background"}`}
+                disabled={disableFollow}
+                variant={follow ? "outline" : "default"}
+                onClick={() =>
+                  follow
+                    ? unfollowUser.mutate({ username })
+                    : followUser.mutate({ username })
+                }
               >
-                {isFollowing ? "Unfollow" : "Follow"}
+                <p
+                  className={`text-black ${follow ? "text-foreground group-hover:hidden" : ""}`}
+                >
+                  {follow ? "Following" : "Follow"}
+                </p>
+                <p
+                  className={`hidden text-black ${
+                    follow ? "text-red-700 group-hover:block" : ""
+                  } `}
+                >
+                  Unfollow
+                </p>
               </Button>
             )}
           </div>
