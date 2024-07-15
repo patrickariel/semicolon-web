@@ -100,7 +100,26 @@ export const feed = router({
                     .as("UserFollow"),
                 (join) => join.onRef("UserFollow.A", "=", "Author.id"),
               )
-              .select(["UserFollow.count as followedBy"]),
+              .leftJoin(
+                (eb) =>
+                  eb
+                    .selectFrom("Like")
+                    .selectAll()
+                    .groupBy(["Like.postId", "Like.userId"])
+                    .where(({ eb }) =>
+                      eb(
+                        "Like.userId",
+                        "=",
+                        eb.cast<string>(eb.val(session!.user!.id), "uuid"),
+                      ),
+                    )
+                    .as("LikeStatus"),
+                (join) => join.onRef("LikeStatus.postId", "=", "Post.id"),
+              )
+              .select([
+                "UserFollow.count as followedBy",
+                "LikeStatus.userId as likeStatus",
+              ]),
           )
           .select([
             "Post.id",
@@ -184,6 +203,7 @@ export const feed = router({
           posts: posts.map((result) => ({
             ...result,
             followed: (result.followedBy ?? 0) > 0,
+            liked: !!result.likeStatus,
           })),
           nextCursor,
         };
@@ -231,6 +251,13 @@ export const feed = router({
                 },
               },
             },
+            likes: {
+              where: {
+                user: {
+                  username,
+                },
+              },
+            },
             _count: {
               select: {
                 likes: true,
@@ -266,6 +293,7 @@ export const feed = router({
             avatar: post.user.image,
             likeCount: post._count.likes,
             replyCount: post._count.children,
+            liked: post.likes.length > 0,
           })),
           nextCursor,
         };

@@ -21,7 +21,7 @@ const uuidTranslator = short(short.constants.flickrBase58);
 
 export const ShortToUUID = z.string().transform((val, ctx) => {
   try {
-    return uuidTranslator.toUUID(val);
+    return uuidTranslator.toUUID(val) as string;
   } catch (_) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -73,6 +73,7 @@ export const PostResolvedSchema = PostSchema.merge(
     username: z.string(),
     verified: z.boolean(),
     followed: z.boolean(),
+    liked: z.boolean(),
     avatar: z.string().nullable(),
     likeCount: z.number(),
     replyCount: z.number(),

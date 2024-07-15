@@ -59,6 +59,13 @@ export const post = router({
               },
             },
           },
+          likes: {
+            where: {
+              user: {
+                username: user.username,
+              },
+            },
+          },
           parent: {
             include: {
               user: true,
@@ -83,6 +90,7 @@ export const post = router({
         likeCount: post._count.likes,
         replyCount: post._count.children,
         followed: post.user.followedBy.length > 0,
+        liked: post.likes.length > 0,
       };
     }),
   search: publicProcedure
@@ -206,7 +214,26 @@ export const post = router({
                     .as("UserFollow"),
                 (join) => join.onRef("UserFollow.A", "=", "Author.id"),
               )
-              .select(["UserFollow.count as followedBy"]),
+              .leftJoin(
+                (eb) =>
+                  eb
+                    .selectFrom("Like")
+                    .selectAll()
+                    .groupBy(["Like.postId", "Like.userId"])
+                    .where(({ eb }) =>
+                      eb(
+                        "Like.userId",
+                        "=",
+                        eb.cast<string>(eb.val(session!.user!.id), "uuid"),
+                      ),
+                    )
+                    .as("LikeStatus"),
+                (join) => join.onRef("LikeStatus.postId", "=", "Post.id"),
+              )
+              .select([
+                "UserFollow.count as followedBy",
+                "LikeStatus.userId as likeStatus",
+              ]),
           )
           .select([
             "Post.id",
@@ -362,6 +389,7 @@ export const post = router({
           results: results.map((result) => ({
             ...result,
             followed: (result.followedBy ?? 0) > 0,
+            liked: !!result.likeStatus,
           })),
           nextCursor,
         };
@@ -387,6 +415,11 @@ export const post = router({
                   username: session?.user?.username,
                 },
               },
+            },
+          },
+          likes: {
+            where: {
+              userId: session?.user?.id,
             },
           },
           _count: {
@@ -415,6 +448,7 @@ export const post = router({
         followed: post.user.followedBy.length > 0,
         likeCount: post._count.likes,
         replyCount: post._count.children,
+        liked: post.likes.length > 0,
       };
     }),
   update: userProcedure
@@ -460,6 +494,13 @@ export const post = router({
               user: true,
             },
           },
+          likes: {
+            where: {
+              user: {
+                username: user.username,
+              },
+            },
+          },
           _count: {
             select: {
               likes: true,
@@ -479,6 +520,7 @@ export const post = router({
         likeCount: updated._count.likes,
         replyCount: updated._count.children,
         followed: false,
+        liked: updated.likes.length > 0,
       };
     }),
   delete: userProcedure
@@ -528,6 +570,13 @@ export const post = router({
               user: true,
             },
           },
+          likes: {
+            where: {
+              user: {
+                username: user.username,
+              },
+            },
+          },
           _count: {
             select: {
               likes: true,
@@ -547,6 +596,7 @@ export const post = router({
         likeCount: deleted._count.likes,
         replyCount: deleted._count.children,
         followed: deleted.user.followedBy.length > 0,
+        liked: deleted.likes.length > 0,
       };
     }),
   replies: publicProcedure
@@ -572,6 +622,13 @@ export const post = router({
             ...(cursor && { cursor: { id: cursor } }),
             take: maxResults + 1,
             include: {
+              likes: {
+                where: {
+                  user: {
+                    username: session?.user?.username,
+                  },
+                },
+              },
               user: {
                 include: {
                   followedBy: {
@@ -627,8 +684,49 @@ export const post = router({
           likeCount: child._count.likes,
           replyCount: child._count.children,
           followed: child.user.followedBy.length > 0,
+          liked: child.likes.length > 0,
         })),
         nextCursor,
       };
+    }),
+  like: userProcedure
+    .meta({ openapi: { method: "PUT", path: "/posts/{id}/like" } })
+    .input(z.object({ id: ShortToUUID }))
+    .output(z.void())
+    .mutation(async ({ ctx: { user }, input: { id } }) => {
+      await db.post.update({
+        where: {
+          id,
+        },
+        data: {
+          likes: {
+            connectOrCreate: {
+              where: {
+                postId_userId: {
+                  postId: id,
+                  userId: user.id,
+                },
+              },
+              create: {
+                userId: user.id,
+              },
+            },
+          },
+        },
+      });
+    }),
+  unlike: userProcedure
+    .meta({ openapi: { method: "DELETE", path: "/posts/{id}/like" } })
+    .input(z.object({ id: ShortToUUID }))
+    .output(z.void())
+    .mutation(async ({ ctx: { user }, input: { id } }) => {
+      await db.like.delete({
+        where: {
+          postId_userId: {
+            postId: id,
+            userId: user.id,
+          },
+        },
+      });
     }),
 });
