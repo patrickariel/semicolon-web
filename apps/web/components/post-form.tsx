@@ -56,8 +56,8 @@ export function PostForm({
       }
       updateMedia(() => ({}));
       setMyPosts((myPosts) => [data, ...myPosts]);
-      await utils.user.posts.refetch({ username: data.username });
-      await utils.user.replies.refetch({ username: data.username });
+      await utils.user.posts.invalidate({ username: data.username });
+      await utils.user.replies.invalidate({ username: data.username });
       await onPost?.(data);
     },
   });

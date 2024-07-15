@@ -106,6 +106,7 @@ export function PostActions({
           liked: true,
         },
       ),
+    onSuccess: () => utils.user.likes.invalidate(),
     onError: () =>
       utils.post.id.setData(
         { id },
@@ -126,6 +127,7 @@ export function PostActions({
           liked: false,
         },
       ),
+    onSuccess: () => utils.user.likes.invalidate(),
     onError: () =>
       utils.post.id.setData(
         { id },

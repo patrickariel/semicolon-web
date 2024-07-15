@@ -109,7 +109,7 @@ export function ProfileEdit({
     onMutate: () => setSubmitDisabled(true),
     onError: () => setSubmitDisabled(false),
     onSuccess: async () => {
-      await utils.user.username.refetch({ username });
+      await utils.user.username.invalidate({ username });
       await update();
       window.location.reload();
     },
