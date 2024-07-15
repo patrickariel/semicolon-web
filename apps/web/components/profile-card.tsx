@@ -30,7 +30,7 @@ const ProfileCard = (props: ProfileCardProps) => {
     header,
     image,
     createdAt,
-    verified = true,
+    verified,
     website,
     isOwner,
     followed,
