@@ -1,36 +1,27 @@
-import { PostButton } from "./post-button";
+import { PostActions } from "./post-actions";
 import { PostDropdown } from "./post-dropdown";
 import { ThumbGrid } from "./thumb-grid";
+import { trpc } from "@/lib/trpc-client";
 import { formatLongDate } from "@/lib/utils";
 import type { PostResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Separator } from "@semicolon/ui/separator";
-import {
-  Bookmark,
-  Heart,
-  MessageCircle,
-  Repeat2,
-  Upload,
-  User,
-} from "lucide-react";
+import { User } from "lucide-react";
 import Link from "next/link";
 
 export function PostDetail({
   showMedia = true,
-  ...post
+  ...initialData
 }: PostResolved & { showMedia?: boolean }) {
-  const {
-    name,
-    avatar,
-    username,
-    createdAt,
-    content,
-    views,
-    media,
-    replyCount,
-    likeCount,
-    id,
-  } = post;
+  const { data: post, refetch } = trpc.post.id.useQuery(
+    { id: initialData.id },
+    {
+      initialData,
+    },
+  );
+
+  const { name, avatar, username, createdAt, content, views, media, id } = post;
+
   return (
     <div className="flex flex-col gap-3 px-4">
       <div className="flex flex-row justify-between">
@@ -76,23 +67,7 @@ export function PostDetail({
       </div>
       <div className="flex flex-col gap-2">
         <Separator />
-        <div className="flex w-full min-w-0 items-center justify-between gap-2 lg:px-3">
-          <PostButton icon={MessageCircle} iconSize="big" label={replyCount} />
-          <PostButton
-            icon={Repeat2}
-            iconSize="big"
-            highlight="green"
-            label={15}
-          />
-          <PostButton
-            icon={Heart}
-            iconSize="big"
-            highlight="pink"
-            label={likeCount}
-          />
-          <PostButton icon={Bookmark} iconSize="big" label={15} />
-          <PostButton icon={Upload} />
-        </div>
+        <PostActions {...post} onLike={() => refetch()} variant="detail" />
         <Separator />
       </div>
     </div>
