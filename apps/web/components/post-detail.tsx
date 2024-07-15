@@ -13,7 +13,7 @@ export function PostDetail({
   showMedia = true,
   ...initialData
 }: PostResolved & { showMedia?: boolean }) {
-  const { data: post, refetch } = trpc.post.id.useQuery(
+  const { data: post } = trpc.post.id.useQuery(
     { id: initialData.id },
     {
       initialData,
