@@ -16,7 +16,7 @@ export function Post(initialData: PostResolved) {
   const { data: session } = useSession();
   const router = useRouter();
   const utils = trpc.useUtils();
-  const { data: post, refetch } = trpc.post.id.useQuery(
+  const { data: post } = trpc.post.id.useQuery(
     { id: initialData.id },
     {
       initialData,
@@ -131,7 +131,7 @@ export function Post(initialData: PostResolved) {
 
         {media.length > 0 && <ThumbGrid {...post} />}
 
-        <PostActions {...post} onLike={() => refetch()} />
+        <PostActions {...post} />
       </div>
     </div>
   );

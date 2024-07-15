@@ -80,25 +80,61 @@ function ReplyIndicator({
 }
 
 export function PostActions({
-  onLike,
   variant = "normal",
-  ...post
-}: PostResolved & { onLike?: () => unknown; variant?: "normal" | "detail" }) {
-  const { replyCount, id, views, likeCount, liked } = post;
+  ...initialData
+}: PostResolved & { variant?: "normal" | "detail" }) {
   const { data: session } = useSession();
+  const utils = trpc.useUtils();
   const [open, setOpen] = useState(false);
-  const [fakeLike, setFakeLike] = useState<"increment" | "decrement" | null>(
-    null,
+
+  const { data: post } = trpc.post.id.useQuery(
+    { id: initialData.id },
+    {
+      initialData,
+    },
   );
+
+  const { replyCount, id, views, likeCount, liked } = post;
+
   const likePost = trpc.post.like.useMutation({
-    onMutate: () => setFakeLike("increment"),
-    onSuccess: () => onLike?.(),
-    onSettled: () => setFakeLike(null),
+    onMutate: () =>
+      utils.post.id.setData(
+        { id },
+        {
+          ...post,
+          likeCount: post.likeCount + 1,
+          liked: true,
+        },
+      ),
+    onError: () =>
+      utils.post.id.setData(
+        { id },
+        {
+          ...post,
+          likeCount: post.likeCount - 1,
+          liked: false,
+        },
+      ),
   });
   const unlikePost = trpc.post.unlike.useMutation({
-    onMutate: () => setFakeLike("decrement"),
-    onSuccess: () => onLike?.(),
-    onSettled: () => setFakeLike(null),
+    onMutate: () =>
+      utils.post.id.setData(
+        { id },
+        {
+          ...post,
+          likeCount: post.likeCount - 1,
+          liked: false,
+        },
+      ),
+    onError: () =>
+      utils.post.id.setData(
+        { id },
+        {
+          ...post,
+          likeCount: post.likeCount + 1,
+          liked: true,
+        },
+      ),
   });
 
   return (
@@ -116,7 +152,7 @@ export function PostActions({
           onKeyUp={(e) => e.stopPropagation()}
         >
           <div className="flex flex-col">
-            <ReplyIndicator {...post} />
+            <ReplyIndicator {...initialData} />
             <PostForm
               to={id}
               placeholder="Post your reply"
@@ -136,17 +172,11 @@ export function PostActions({
       <PostButton
         icon={Heart}
         highlight="pink"
-        active={fakeLike !== null ? fakeLike === "increment" : liked}
+        active={liked}
         iconSize={variant === "normal" ? "small" : "big"}
         label={new Intl.NumberFormat("en-US", {
           notation: "compact",
-        }).format(
-          fakeLike !== null
-            ? fakeLike === "increment"
-              ? likeCount + 1
-              : likeCount - 1
-            : likeCount,
-        )}
+        }).format(likeCount)}
         onClick={() =>
           liked ? unlikePost.mutate({ id }) : likePost.mutate({ id })
         }
