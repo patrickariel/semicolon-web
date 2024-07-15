@@ -39,6 +39,7 @@ const ProfileCard = (props: ProfileCardProps) => {
   const [disableFollow, setDisableFollow] = useState(false);
   const [open, setOpen] = useState(false);
   const [follows, updateFollows] = useAtom(followsAtom);
+  const utils = trpc.useUtils();
 
   useEffect(() => {
     if (follows[username] === undefined) {
@@ -50,19 +51,21 @@ const ProfileCard = (props: ProfileCardProps) => {
 
   const followUser = trpc.user.follow.useMutation({
     onMutate: () => setDisableFollow(true),
-    onSuccess: () => {
+    onSuccess: async () => {
       updateFollows((follows) => {
         follows[username] = true;
       });
+      await utils.feed.following.refetch();
     },
     onSettled: () => setDisableFollow(false),
   });
   const unfollowUser = trpc.user.unfollow.useMutation({
     onMutate: () => setDisableFollow(true),
-    onSuccess: () => {
+    onSuccess: async () => {
       updateFollows((follows) => {
         follows[username] = false;
       });
+      await utils.feed.following.refetch();
     },
     onSettled: () => setDisableFollow(false),
   });
