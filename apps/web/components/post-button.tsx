@@ -19,6 +19,7 @@ type PostButtonProps = ButtonProps &
   ) & {
     icon: LucideIcon;
     label?: string | number;
+    active?: boolean;
   } & VariantProps<typeof highlightVariants> &
   VariantProps<typeof iconSizeVariants>;
 
@@ -31,6 +32,20 @@ const highlightVariants = cva([], {
         "hover:bg-green-600/20 [&>*]:group-hover:stroke-green-600 [&~*]:group-hover:text-green-600",
       yellow:
         "hover:bg-yellow-400/20 [&>*]:group-hover:stroke-yellow-400 [&~*]:group-hover:text-yellow-400",
+    },
+  },
+  defaultVariants: {
+    highlight: "blue",
+  },
+});
+
+const activeVariants = cva([], {
+  variants: {
+    highlight: {
+      blue: "[&>*]:stroke-blue-400 [&~*]:text-blue-400",
+      pink: "[&>*]:stroke-pink-500 [&~*]:text-pink-500",
+      green: "[&>*]:stroke-green-600 [&~*]:text-green-600",
+      yellow: "[&>*]:stroke-yellow-400 [&~*]:text-yellow-400",
     },
   },
   defaultVariants: {
@@ -59,6 +74,7 @@ export function PostButton({
   className,
   highlight,
   iconSize,
+  active = false,
   ...props
 }: PostButtonProps) {
   const Comp = href
@@ -75,6 +91,7 @@ export function PostButton({
         variant={"ghost"}
         className={cn(
           highlightVariants({ highlight }),
+          active ? activeVariants({ highlight }) : "",
           "flex aspect-square h-auto items-center justify-start gap-0 rounded-full p-2 after:absolute after:inset-0 after:block after:content-['']",
         )}
         asChild={href ? true : false}
