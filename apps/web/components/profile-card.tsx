@@ -1,20 +1,22 @@
 "use client";
 
 import { ProfileEdit } from "./profile-edit";
+import { followsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import type { PublicUserResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@semicolon/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@semicolon/ui/tooltip";
+import { useAtom } from "jotai";
 import { BadgeCheck, CalendarDays, Link2, MapPin, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface ProfileCardProps extends PublicUserResolved {
   isOwner: boolean;
-  isFollowing: boolean;
+  followed: boolean;
 }
 
 const ProfileCard = (props: ProfileCardProps) => {
@@ -31,20 +33,37 @@ const ProfileCard = (props: ProfileCardProps) => {
     verified = true,
     website,
     isOwner,
-    isFollowing,
+    followed,
   } = props;
   const joinDate = `Joined ${createdAt.toLocaleString("en-US", { year: "numeric", month: "long" })}`;
-  const [follow, setFollow] = useState(isFollowing);
   const [disableFollow, setDisableFollow] = useState(false);
   const [open, setOpen] = useState(false);
+  const [follows, updateFollows] = useAtom(followsAtom);
+
+  useEffect(() => {
+    if (follows[username] === undefined) {
+      updateFollows((follows) => {
+        follows[username] = followed;
+      });
+    }
+  }, [follows, followed, username, updateFollows]);
+
   const followUser = trpc.user.follow.useMutation({
     onMutate: () => setDisableFollow(true),
-    onSuccess: () => setFollow(true),
+    onSuccess: () => {
+      updateFollows((follows) => {
+        follows[username] = true;
+      });
+    },
     onSettled: () => setDisableFollow(false),
   });
   const unfollowUser = trpc.user.unfollow.useMutation({
     onMutate: () => setDisableFollow(true),
-    onSuccess: () => setFollow(false),
+    onSuccess: () => {
+      updateFollows((follows) => {
+        follows[username] = false;
+      });
+    },
     onSettled: () => setDisableFollow(false),
   });
 
@@ -87,23 +106,23 @@ const ProfileCard = (props: ProfileCardProps) => {
               </Dialog>
             ) : (
               <Button
-                className={`group min-w-[110px] cursor-pointer text-nowrap rounded-full font-bold text-black ${follow ? "text-foreground hover:bg-destructive/15 hover:border-red-900" : "text-background"}`}
+                className={`group min-w-[110px] cursor-pointer text-nowrap rounded-full font-bold text-black ${follows[username] ? "text-foreground hover:bg-destructive/15 hover:border-red-900" : "text-background"}`}
                 disabled={disableFollow}
-                variant={follow ? "outline" : "default"}
+                variant={follows[username] ? "outline" : "default"}
                 onClick={() =>
-                  follow
+                  follows[username]
                     ? unfollowUser.mutate({ username })
                     : followUser.mutate({ username })
                 }
               >
                 <p
-                  className={`text-black ${follow ? "text-foreground group-hover:hidden" : ""}`}
+                  className={`text-black ${follows[username] ? "text-foreground group-hover:hidden" : ""}`}
                 >
-                  {follow ? "Following" : "Follow"}
+                  {follows[username] ? "Following" : "Follow"}
                 </p>
                 <p
                   className={`hidden text-black ${
-                    follow ? "text-red-700 group-hover:block" : ""
+                    follows[username] ? "text-red-700 group-hover:block" : ""
                   } `}
                 >
                   Unfollow
