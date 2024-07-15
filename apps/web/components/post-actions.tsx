@@ -130,7 +130,7 @@ export function PostActions({
       <PostButton
         icon={Repeat2}
         highlight="green"
-        label={15}
+        label={0}
         iconSize={variant === "normal" ? "small" : "big"}
       />
       <PostButton
