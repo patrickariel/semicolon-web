@@ -316,6 +316,13 @@ export const user = router({
                 user: true,
               },
             },
+            likes: {
+              where: {
+                user: {
+                  username: session?.user?.username,
+                },
+              },
+            },
             user: {
               include: {
                 followedBy: {
@@ -352,6 +359,7 @@ export const user = router({
             avatar: post.user.image,
             followed: post.user.followedBy.length > 0,
             likeCount: post._count.likes,
+            liked: post.likes.length > 0,
             replyCount: post._count.children,
           })),
           nextCursor,
@@ -392,6 +400,13 @@ export const user = router({
           include: {
             post: {
               include: {
+                likes: {
+                  where: {
+                    user: {
+                      username: session?.user?.username,
+                    },
+                  },
+                },
                 parent: {
                   include: {
                     user: true,
@@ -443,6 +458,7 @@ export const user = router({
             likeCount: post._count.likes,
             replyCount: post._count.children,
             followed: post.user.followedBy.length > 0,
+            liked: post.likes.length > 0,
           })),
           nextCursor,
         };
@@ -483,6 +499,13 @@ export const user = router({
                 user: true,
               },
             },
+            likes: {
+              where: {
+                user: {
+                  username: session?.user?.username,
+                },
+              },
+            },
             user: {
               include: {
                 followedBy: {
@@ -519,6 +542,7 @@ export const user = router({
             likeCount: post._count.likes,
             replyCount: post._count.children,
             followed: post.user.followedBy.length > 0,
+            liked: post.likes.length > 0,
           })),
           nextCursor,
         };
@@ -553,6 +577,13 @@ export const user = router({
           orderBy: [{ createdAt: "desc" }, { id: "asc" }],
           take: maxResults + 1,
           include: {
+            likes: {
+              where: {
+                user: {
+                  username: session?.user?.username,
+                },
+              },
+            },
             parent: {
               include: {
                 user: true,
@@ -595,6 +626,7 @@ export const user = router({
             likeCount: post._count.likes,
             replyCount: post._count.children,
             followed: post.user.followedBy.length > 0,
+            liked: post.likes.length > 0,
           })),
           nextCursor,
         };

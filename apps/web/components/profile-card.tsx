@@ -55,7 +55,7 @@ const ProfileCard = (props: ProfileCardProps) => {
       updateFollows((follows) => {
         follows[username] = true;
       });
-      await utils.feed.following.refetch();
+      await utils.feed.following.invalidate();
     },
     onSettled: () => setDisableFollow(false),
   });
@@ -66,7 +66,7 @@ const ProfileCard = (props: ProfileCardProps) => {
       updateFollows((follows) => {
         follows[username] = false;
       });
-      await utils.feed.following.refetch();
+      await utils.feed.following.invalidate();
     },
     onSettled: () => setDisableFollow(false),
   });

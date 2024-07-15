@@ -28,10 +28,10 @@ export function PostDropdown({
   const deletePost = trpc.post.delete.useMutation({
     onSuccess: async (_data, { id }) => {
       setMyPosts((myPosts) => myPosts.filter((post) => post.id !== id));
-      await utils.post.search.refetch();
-      await utils.post.replies.refetch();
-      await utils.user.posts.refetch({ username });
-      await utils.user.replies.refetch({ username });
+      await utils.post.search.invalidate();
+      await utils.post.replies.invalidate();
+      await utils.user.posts.invalidate({ username });
+      await utils.user.replies.invalidate({ username });
     },
   });
 
