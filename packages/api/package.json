@@ -6,7 +6,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "dotenvx run -- scripts/test.sh run"
+    "test": "scripts/test.sh run"
   },
   "exports": {
     ".": "./src/index.ts",
