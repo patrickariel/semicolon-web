@@ -70,13 +70,13 @@ export const user = router({
     .meta({ openapi: { method: "POST", path: "/users/me/update" } })
     .input(
       z.object({
-        name: z.string().min(2).max(50),
-        bio: z.string().optional(),
-        location: z.string().optional(),
-        website: z.string().url().optional(),
-        birthday: z.date(),
-        avatar: z.string().url().optional(),
-        header: z.string().url().optional(),
+        name: z.string().min(2).max(50).optional(),
+        bio: z.string().nullish(),
+        location: z.string().nullish(),
+        website: z.string().url().nullish(),
+        birthday: z.date().optional(),
+        avatar: z.string().url().nullish(),
+        header: z.string().url().nullish(),
       }),
     )
     .output(z.void())
@@ -87,20 +87,24 @@ export const user = router({
         },
         input: { name, bio, location, website, birthday, avatar, header },
       }) => {
-        if (header) {
-          try {
-            await head(header);
-          } catch (error) {
-            if (error instanceof BlobNotFoundError) {
-              throw new TRPCError({
-                code: "FORBIDDEN",
-                message: "External media URLs are forbidden",
-              });
-            } else {
-              throw error;
-            }
-          }
-        }
+        await Promise.all(
+          [header, avatar]
+            .filter((v): v is string => v !== undefined && v !== null)
+            .map(async (v) => {
+              try {
+                await head(v);
+              } catch (error) {
+                if (error instanceof BlobNotFoundError) {
+                  throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "External media URLs are forbidden",
+                  });
+                } else {
+                  throw error;
+                }
+              }
+            }),
+        );
 
         await db.user.update({
           where: {
@@ -108,12 +112,12 @@ export const user = router({
           },
           data: {
             name,
-            bio: bio ?? null,
-            location: location ?? null,
-            website: website ?? null,
+            bio,
+            location,
+            website,
             birthday,
-            image: avatar ?? null,
-            header: header ?? null,
+            image: avatar,
+            header,
           },
         });
 
