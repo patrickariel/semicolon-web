@@ -3,14 +3,13 @@ services:
     image: postgres:16
     restart: always
     environment:
-      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
     volumes:
       - db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready"]
       start_period: 3m
       start_interval: 0.5s
       interval: 5m
