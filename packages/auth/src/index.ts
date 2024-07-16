@@ -93,3 +93,5 @@ export const {
     },
   },
 });
+
+export type { Session } from "next-auth";
