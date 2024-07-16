@@ -121,7 +121,12 @@ export const user = router({
           },
         });
 
-        await update({ user: { name, image: avatar } });
+        await update({
+          user: {
+            ...(name && { name }),
+            ...(avatar !== undefined && { image: avatar }),
+          },
+        });
       },
     ),
   register: newUserProcedure
