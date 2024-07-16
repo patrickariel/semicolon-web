@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "scripts/test.sh run"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -26,10 +27,12 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.6.4",
     "@semicolon/eslint-config": "*",
     "@semicolon/typescript-config": "*",
     "@types/lodash": "^4.17.6",
     "@types/validator": "^13.12.0",
-    "typescript-eslint": "^7.13.1"
+    "typescript-eslint": "^7.13.1",
+    "vitest": "^2.0.3"
   }
 }

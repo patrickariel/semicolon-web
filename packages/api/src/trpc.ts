@@ -13,7 +13,7 @@ export const createContext = async ({
   return { session };
 };
 
-const t = initTRPC.meta<OpenApiMeta>().context<Context>().create({
+export const t = initTRPC.meta<OpenApiMeta>().context<Context>().create({
   transformer: superjson,
 });
 

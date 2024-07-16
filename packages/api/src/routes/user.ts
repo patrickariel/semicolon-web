@@ -131,27 +131,34 @@ export const user = router({
       }),
     )
     .output(z.void())
-    .mutation(async ({ ctx: { user }, input }) => {
-      const { name, username, image, registered } = await db.user
-        .update({
-          where: { email: user.email },
-          data: { ...input, registered: new Date() },
-        })
-        .catch((e: unknown) => {
-          if (
-            e instanceof Prisma.PrismaClientKnownRequestError &&
-            e.code === "P2002"
-          ) {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "The username is already taken",
-            });
-          }
-          throw e;
-        });
+    .mutation(
+      async ({
+        ctx: {
+          user: { id },
+        },
+        input,
+      }) => {
+        const { name, username, image, registered } = await db.user
+          .update({
+            where: { id },
+            data: { ...input, registered: new Date() },
+          })
+          .catch((e: unknown) => {
+            if (
+              e instanceof Prisma.PrismaClientKnownRequestError &&
+              e.code === "P2002"
+            ) {
+              throw new TRPCError({
+                code: "CONFLICT",
+                message: "The username is already taken",
+              });
+            }
+            throw e;
+          });
 
-      await update({ user: { name, username, image, registered } });
-    }),
+        await update({ user: { name, username, image, registered } });
+      },
+    ),
   id: publicProcedure
     .meta({ openapi: { method: "GET", path: "/users/by/id/{id}" } })
     .input(z.object({ id: z.string().uuid() }))
