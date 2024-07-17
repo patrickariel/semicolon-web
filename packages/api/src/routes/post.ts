@@ -467,6 +467,19 @@ export const post = router({
     )
     .output(PostResolvedSchema)
     .mutation(async ({ ctx: { user }, input: { id, content, media } }) => {
+      try {
+        await Promise.all(media.map(async (blobUrl) => await head(blobUrl)));
+      } catch (error) {
+        if (error instanceof BlobNotFoundError) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "External media URLs are forbidden",
+          });
+        } else {
+          throw error;
+        }
+      }
+
       const post = await db.post.findUnique({
         select: { userId: true },
         where: {
