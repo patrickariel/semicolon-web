@@ -4,7 +4,7 @@ import { uploadMedia } from "@/lib/actions";
 import { myPostsAtom } from "@/lib/atom";
 import { trpc } from "@/lib/trpc-client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PostResolved } from "@semicolon/api/schema";
+import type { PostResolved } from "@semicolon/api/schema";
 import { AspectRatio } from "@semicolon/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
@@ -38,15 +38,33 @@ export function PostForm({
   placeholder = "What is happening?!",
   to,
   onPost,
+  editData,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   to?: string;
   avatar?: string | null;
   placeholder?: string;
+  editData?: { id: string; content?: string; media?: string[] };
   onPost?: (post: PostResolved) => unknown;
 }) {
   const utils = trpc.useUtils();
-  const postMutation = trpc.post.new.useMutation({
+
+  const postEdit = trpc.post.update.useMutation({
+    onMutate: () => setSubmitDisabled(true),
+    onError: () => setSubmitDisabled(false),
+    onSuccess: async (data) => {
+      setMyPosts((myPosts) => {
+        const i = myPosts.findIndex(({ id }) => id === data.id);
+        if (i !== -1) {
+          myPosts[i] = data;
+        }
+      });
+      utils.post.id.setData({ id: data.id }, data);
+      await onPost?.(data);
+    },
+  });
+
+  const postNew = trpc.post.new.useMutation({
     onMutate: () => setSubmitDisabled(true),
     onError: () => setSubmitDisabled(false),
     onSuccess: async (data) => {
@@ -61,19 +79,35 @@ export function PostForm({
       await onPost?.(data);
     },
   });
+
   const form = useForm<z.infer<typeof PostSchema>>({
     resolver: zodResolver(PostSchema),
     defaultValues: {
-      content: "",
+      content: editData?.content ?? "",
     },
   });
+
   const mediaInputRef = useRef<HTMLInputElement | null>(null);
   const [media, updateMedia] = useImmer<
     Record<
       string,
       { file: File; status: "uploading" | "success" | "failed"; url?: string }
     >
-  >({});
+  >(
+    editData?.media
+      ? editData.media.reduce(
+          (o, m) => ({
+            ...o,
+            [m]: {
+              file: new File([""], ""), // A fake File object should be fine for now, because a retry will never be triggered
+              status: "success",
+              url: m,
+            },
+          }),
+          {},
+        )
+      : {},
+  );
   const [content, setContent] = useState<string | undefined>();
   const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
   const [mediaDisabled, setMediaDisabled] = useState<boolean>(true);
@@ -85,6 +119,12 @@ export function PostForm({
     });
     return () => subscription.unsubscribe();
   }, [form, form.watch]);
+
+  useEffect(() => {
+    if (editData?.content) {
+      setContent(editData.content);
+    }
+  }, [editData]);
 
   useEffect(() => {
     if (Object.keys(media).length > 0) {
@@ -100,15 +140,25 @@ export function PostForm({
     setMediaDisabled(Object.keys(media).length > 3);
   }, [media]);
 
-  const handleSubmit = (data: z.infer<typeof PostSchema>) => {
-    postMutation.mutate({
-      to,
-      content: data.content,
-      media: Object.entries(media)
-        .map(([_, { url }]) => url)
-        .filter((v): v is string => v !== undefined),
-    });
-  };
+  const handleSubmit = !editData
+    ? ({ content }: z.infer<typeof PostSchema>) => {
+        postNew.mutate({
+          to,
+          content,
+          media: Object.entries(media)
+            .map(([_, { url }]) => url)
+            .filter((v): v is string => v !== undefined),
+        });
+      }
+    : ({ content }: z.infer<typeof PostSchema>) => {
+        postEdit.mutate({
+          id: editData.id,
+          content,
+          media: Object.entries(media)
+            .map(([_, { url }]) => url)
+            .filter((v): v is string => v !== undefined),
+        });
+      };
 
   return (
     <div
@@ -292,7 +342,9 @@ export function PostForm({
               className="text-foreground w-fit max-w-36 cursor-pointer rounded-full bg-sky-500 px-6 font-bold hover:bg-sky-600"
               disabled={submitDisabled}
             >
-              <p className="text-base font-bold">Post</p>
+              <p className="text-base font-bold">
+                {editData ? "Update" : "Post"}
+              </p>
             </Button>
           </div>
         </form>
