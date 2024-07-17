@@ -162,7 +162,7 @@ export function PostForm({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
-          className="flex w-full flex-col gap-3"
+          className="flex w-full flex-col justify-between gap-3"
         >
           <FormField
             name="content"
