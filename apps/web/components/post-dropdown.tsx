@@ -1,4 +1,3 @@
-import { post } from "../../../packages/api/src/routes/post";
 import { PostForm } from "./post-form";
 import { followsAtom } from "@/lib/atom";
 import { myPostsAtom } from "@/lib/atom";
@@ -16,7 +15,6 @@ import { useAtom } from "jotai";
 import { useSetAtom } from "jotai";
 import { Ellipsis, Flag, Pencil, Trash2, UserPlus, UserX } from "lucide-react";
 import { useSession } from "next-auth/react";
-import image from "next/image";
 import React, { useEffect, useState } from "react";
 
 export function PostDropdown({
