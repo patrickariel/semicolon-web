@@ -1,6 +1,10 @@
+"use client";
+
 import { NavItem } from "./nav-item";
+import { PostForm } from "./post-form";
 import { ProfileIndicator } from "./profile-indicator";
 import { Button } from "@semicolon/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@semicolon/ui/dialog";
 import { cn } from "@semicolon/ui/utils";
 import {
   Bell,
@@ -13,7 +17,7 @@ import {
   Search,
   SquarePen,
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 export function SideBar({
   className,
@@ -26,6 +30,8 @@ export function SideBar({
   name: string;
   image?: string | null;
 }) {
+  const [open, setOpen] = useState(false);
+
   return (
     <div
       className={cn(
@@ -50,10 +56,21 @@ export function SideBar({
           <NavItem href="#" icon={CircleEllipsis} label="More" />
         </div>
         <div className="mt-4 lg:pr-4">
-          <Button className="aspect-square h-auto w-full rounded-full lg:aspect-auto lg:min-h-14">
-            <span className="hidden text-lg font-bold lg:block">Post</span>
-            <SquarePen className="lg:hidden" />
-          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="aspect-square h-auto w-full rounded-full lg:aspect-auto lg:min-h-14">
+                <span className="hidden text-lg font-bold lg:block">Post</span>
+                <SquarePen className="lg:hidden" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <PostForm
+                avatar={image}
+                className="min-h-[230px]"
+                onPost={() => setOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
       <ProfileIndicator {...{ username, name, image }} />
