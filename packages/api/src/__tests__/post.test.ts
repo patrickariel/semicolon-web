@@ -25,7 +25,7 @@ describe("post interactions", () => {
     const { id } = await router.post.new({ content: "Hello world", media: [] });
 
     const newContent = "Lorem ipsum";
-    await router.post.update({ id, content: newContent });
+    await router.post.update({ id, content: newContent, media: [] });
 
     const { content } = await router.post.id({ id });
     expect(content).toBe(newContent);
