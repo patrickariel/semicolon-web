@@ -22,9 +22,11 @@ export function PostFeed({
   fetchNextPage,
   refetch,
   hasNextPage,
+  indicateReply = true,
   media = false,
 }: {
   posts: PostResolved[];
+  indicateReply?: boolean;
   loading: boolean;
   error: boolean;
   hasNextPage: boolean;
@@ -38,7 +40,7 @@ export function PostFeed({
         <div className="flex flex-col">
           {posts.map((post) => (
             <Fragment key={post.id}>
-              <Post {...post} />
+              <Post {...post} indicateReply={indicateReply} />
               <Separator />
             </Fragment>
           ))}
