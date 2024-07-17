@@ -1,85 +1,12 @@
 import { createCaller } from "..";
-import { type Session, update } from "@semicolon/auth";
-import { User, db } from "@semicolon/db";
-import { HeadBlobResult, head } from "@vercel/blob";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-
-interface UserContext {
-  user: User;
-  session: Session;
-  router: ReturnType<typeof createCaller>;
-}
-
-vi.mock("@semicolon/auth");
-vi.mock("@vercel/blob");
-
-function mockUpdateImplementation(session: Session) {
-  return (data: Parameters<typeof update>[0]): Promise<Session | null> => {
-    if (session.user) {
-      session.user = {
-        ...session.user,
-        ...data.user,
-      };
-      return Promise.resolve(session);
-    } else {
-      return Promise.resolve(null);
-    }
-  };
-}
-
-function mockHeadImplementation() {
-  return (
-    url: string,
-    _options?: Parameters<typeof head>[1],
-  ): Promise<HeadBlobResult> =>
-    Promise.resolve({
-      url,
-      downloadUrl: `${url}?download=1`,
-      size: 100,
-      uploadedAt: new Date(),
-      pathname: "profilesv1/image.jpg",
-      contentType: "image/jpeg",
-      contentDisposition: 'attachment; filename="image.jpg"',
-      cacheControl: "public, max-age=31536000, s-maxage=300",
-    });
-}
-
-async function createUserContext(
-  data: Parameters<typeof db.user.create>[0]["data"],
-): Promise<UserContext> {
-  const user = await db.user.create({ data });
-
-  const expires = new Date();
-  expires.setFullYear(expires.getFullYear() + 1);
-
-  const session = {
-    user,
-    expires: expires.toISOString(),
-  };
-
-  const router = createCaller({ session });
-
-  vi.mocked(update).mockImplementation(mockUpdateImplementation(session));
-
-  return { user, session, router };
-}
-
-beforeEach<UserContext>(async (context) => {
-  const { user, router, session } = await createUserContext({
-    name: "John Smith",
-    username: "john.smith",
-    birthday: new Date(),
-    registered: new Date(),
-  });
-
-  context.user = user;
-  context.router = router;
-  context.session = session;
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
+import {
+  UserContext,
+  createUserContext,
+  mockHeadImplementation,
+} from "./utils";
+import { db } from "@semicolon/db";
+import { head } from "@vercel/blob";
+import { describe, expect, test, vi } from "vitest";
 
 describe("user account interactions", () => {
   test<UserContext>("find user by username", async ({
@@ -91,10 +18,7 @@ describe("user account interactions", () => {
     expect(user.username).toBe(username);
   });
 
-  test<UserContext>("find user by username", async ({
-    user: { id },
-    router,
-  }) => {
+  test<UserContext>("find user by id", async ({ user: { id }, router }) => {
     const user = await router.user.id({ id });
     expect(user.id).toBe(id);
   });
@@ -258,70 +182,5 @@ describe("user account interactions", () => {
       expect(users).toHaveLength(1);
       expect(users[0]?.id).toBe(jane.id);
     }
-  });
-});
-
-describe("user post interactions", () => {
-  test<UserContext>("create/delete posts", async ({
-    user: { username },
-    router,
-  }) => {
-    const content = "Hello world";
-    const { id } = await router.post.new({ content, media: [] });
-
-    const post = await router.post.id({ id });
-    expect(post.content).toBe(content);
-
-    const { posts } = await router.user.posts({ username: username! });
-    expect(posts).toHaveLength(1);
-    expect(posts[0]?.id).toBe(id);
-
-    await router.post.delete({ id });
-    await expect(async () => router.post.id({ id })).rejects.toThrowError();
-  });
-
-  test<UserContext>("reply to post", async ({ user: { username }, router }) => {
-    const { id: to } = await router.post.new({
-      content: "Parent post",
-      media: [],
-    });
-    const { id } = await router.post.new({
-      to,
-      content: "Child post",
-      media: [],
-    });
-
-    const { posts } = await router.user.replies({ username: username! });
-    expect(posts).toHaveLength(1);
-    expect(posts[0]?.id).toBe(id);
-  });
-
-  test<UserContext>("like a post", async ({ user: { username }, router }) => {
-    const { id } = await router.post.new({
-      content: "Lorem ipsum",
-      media: [],
-    });
-
-    await router.post.like({ id });
-
-    const { posts } = await router.user.likes({ username: username! });
-    expect(posts).toHaveLength(1);
-    expect(posts[0]?.id).toBe(id);
-  });
-
-  test<UserContext>("post with media", async ({
-    user: { username },
-    router,
-  }) => {
-    vi.mocked(head).mockImplementation(mockHeadImplementation());
-
-    const { id } = await router.post.new({
-      content: "Lorem ipsum",
-      media: ["https://example.com/image.jpg"],
-    });
-
-    const { posts } = await router.user.media({ username: username! });
-    expect(posts).toHaveLength(1);
-    expect(posts[0]?.id).toBe(id);
   });
 });
