@@ -91,6 +91,7 @@ export function PostDropdown({
       <DropdownMenuContent
         className="flex flex-col gap-0 rounded-3xl px-0 py-2 [&>*]:min-w-44 [&>*]:text-sm [&>*]:font-black"
         onClick={(e) => e.stopPropagation()}
+        onKeyUp={(e) => e.stopPropagation()}
         {...props}
       >
         {isOwner ? (
