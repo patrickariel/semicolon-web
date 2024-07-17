@@ -123,6 +123,12 @@ export function PostForm({
   }, [form, form.watch]);
 
   useEffect(() => {
+    if (editData?.content) {
+      setContent(editData.content);
+    }
+  }, [editData]);
+
+  useEffect(() => {
     if (Object.keys(media).length > 0) {
       setSubmitDisabled(
         Object.entries(media).some(([_, { status }]) => status !== "success"),
