@@ -454,13 +454,19 @@ export const post = router({
   update: userProcedure
     .meta({ openapi: { method: "POST", path: "/posts/{id}" } })
     .input(
-      z.object({
-        id: ShortToUUID,
-        content: z.string(),
-      }),
+      z
+        .object({
+          id: ShortToUUID,
+          content: z.string().optional(),
+          media: z.array(z.string().url()).max(4),
+        })
+        .refine(
+          ({ content, media }) => media.length > 0 || content !== undefined,
+          { message: "Post must either contain content or media" },
+        ),
     )
     .output(PostResolvedSchema)
-    .mutation(async ({ ctx: { user }, input: { id, content } }) => {
+    .mutation(async ({ ctx: { user }, input: { id, content, media } }) => {
       const post = await db.post.findUnique({
         select: { userId: true },
         where: {
@@ -485,7 +491,8 @@ export const post = router({
       const updated = await db.post.update({
         where: { id: id },
         data: {
-          content,
+          content: content ?? null,
+          media,
         },
         include: {
           user: true,
