@@ -173,7 +173,7 @@ export function PostForm({
                   <Textarea
                     {...field}
                     placeholder={placeholder}
-                    className="h-[80px] w-full resize-none border-none p-2 text-lg text-white placeholder:text-lg focus-visible:outline-none focus-visible:ring-0"
+                    className="min-h-[80px] w-full resize-none border-none p-2 text-lg text-white placeholder:text-lg focus-visible:outline-none focus-visible:ring-0"
                     maxLength={200}
                   />
                 </FormControl>
