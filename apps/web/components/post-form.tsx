@@ -162,7 +162,7 @@ export function PostForm({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
-          className="flex w-full flex-col gap-3"
+          className="flex w-full flex-col justify-between gap-3"
         >
           <FormField
             name="content"
@@ -173,7 +173,7 @@ export function PostForm({
                   <Textarea
                     {...field}
                     placeholder={placeholder}
-                    className="h-[80px] w-full resize-none border-none p-2 text-lg text-white placeholder:text-lg focus-visible:outline-none focus-visible:ring-0"
+                    className="min-h-[80px] w-full resize-none border-none p-2 text-lg text-white placeholder:text-lg focus-visible:outline-none focus-visible:ring-0"
                     maxLength={200}
                   />
                 </FormControl>

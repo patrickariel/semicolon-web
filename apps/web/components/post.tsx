@@ -130,7 +130,9 @@ export function Post({
               </Link>
             </p>
           )}
-          <p className="text-wrap text-[15px] leading-7">{content}</p>
+          <p className="whitespace-pre text-wrap text-[15px] leading-7">
+            {content}
+          </p>
         </div>
 
         {media.length > 0 && <ThumbGrid {...post} />}
