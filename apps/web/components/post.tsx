@@ -12,7 +12,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-export function Post(initialData: PostResolved) {
+export function Post({
+  indicateReply = true,
+  ...initialData
+}: PostResolved & { indicateReply?: boolean }) {
   const { data: session } = useSession();
   const router = useRouter();
   const utils = trpc.useUtils();
@@ -20,6 +23,7 @@ export function Post(initialData: PostResolved) {
     { id: initialData.id },
     {
       initialData,
+      staleTime: 5000,
     },
   );
 
@@ -114,7 +118,7 @@ export function Post(initialData: PostResolved) {
               isOwner={session?.user?.name === post.name}
             />
           </div>
-          {to && (
+          {to && indicateReply && (
             <p className="text-sm">
               <span className="text-muted-foreground">Replying to</span>{" "}
               <Link

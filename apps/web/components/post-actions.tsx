@@ -91,6 +91,7 @@ export function PostActions({
     { id: initialData.id },
     {
       initialData,
+      staleTime: 5000,
     },
   );
 

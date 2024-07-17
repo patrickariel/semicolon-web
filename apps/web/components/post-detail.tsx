@@ -17,6 +17,7 @@ export function PostDetail({
     { id: initialData.id },
     {
       initialData,
+      staleTime: 5000,
     },
   );
 
