@@ -455,7 +455,7 @@ export const post = router({
     .meta({ openapi: { method: "POST", path: "/posts/{id}" } })
     .input(
       z.object({
-        id: z.string(),
+        id: ShortToUUID,
         content: z.string(),
       }),
     )
