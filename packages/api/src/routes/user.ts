@@ -21,46 +21,81 @@ import { z } from "zod";
 export const user = router({
   search: userProcedure
     .meta({ openapi: { method: "GET", path: "/users/search" } })
-    .input(z.object({ query: z.string() }))
-    .output(z.array(PublicUserResolvedSchema))
-    .query(async ({ ctx: { session }, input: { query } }) => {
-      const users = await db.user.findMany({
-        where: {
-          username: {
-            search: query,
+    .input(
+      z.object({
+        query: z.string(),
+        cursor: z.string().uuid().optional(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        users: z.array(PublicUserResolvedSchema),
+        nextCursor: z.string().uuid().optional(),
+      }),
+    )
+    .query(
+      async ({ ctx: { session }, input: { query, cursor, maxResults } }) => {
+        const users = await db.user.findMany({
+          where: {
+            name: {
+              search: query,
+            },
+            username: {
+              search: query,
+            },
+            bio: {
+              search: query,
+            },
+            registered: { not: null },
           },
-          bio: {
-            search: query,
-          },
-          NOT: { registered: null },
-        },
-        include: {
-          _count: {
-            select: {
-              followedBy: true,
-              following: true,
-              posts: true,
+          take: maxResults + 1,
+          ...(cursor && { cursor: { id: cursor } }),
+          orderBy: {
+            _relevance: {
+              fields: ["name", "username", "bio"],
+              search: query,
+              sort: "desc",
             },
           },
-          followedBy: {
-            where: {
-              username: session?.user?.username,
+          include: {
+            _count: {
+              select: {
+                followedBy: true,
+                following: true,
+                posts: true,
+              },
+            },
+            followedBy: {
+              where: {
+                username: session?.user?.username,
+              },
             },
           },
-        },
-      });
+        });
 
-      return users.map((user) => ({
-        ...user,
-        name: user.name!,
-        username: user.username!,
-        registered: user.registered!,
-        following: user._count.following,
-        followers: user._count.followedBy,
-        followed: user.followedBy.length > 0,
-        posts: user._count.posts,
-      }));
-    }),
+        let nextCursor: typeof cursor | undefined;
+
+        if (users.length > maxResults) {
+          const nextItem = users.pop();
+          nextCursor = nextItem!.id;
+        }
+
+        return {
+          users: users.map((user) => ({
+            ...user,
+            name: user.name!,
+            username: user.username!,
+            registered: user.registered!,
+            following: user._count.following,
+            followers: user._count.followedBy,
+            followed: user.followedBy.length > 0,
+            posts: user._count.posts,
+          })),
+          nextCursor,
+        };
+      },
+    ),
   me: userProcedure
     .meta({ openapi: { method: "GET", path: "/users/me" } })
     .input(z.void())
@@ -89,7 +124,7 @@ export const user = router({
       }) => {
         await Promise.all(
           [header, avatar]
-            .filter((v): v is string => v !== undefined && v !== null)
+            .filter((v): v is string => typeof v === "string")
             .map(async (v) => {
               try {
                 await head(v);
