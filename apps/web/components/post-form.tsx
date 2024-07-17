@@ -59,9 +59,7 @@ export function PostForm({
           myPosts[i] = data;
         }
       });
-      await utils.user.posts.invalidate({ username: data.username });
-      await utils.user.replies.invalidate({ username: data.username });
-      await utils.post.id.invalidate({ id: data.id });
+      utils.post.id.setData({ id: data.id }, data);
       await onPost?.(data);
     },
   });
