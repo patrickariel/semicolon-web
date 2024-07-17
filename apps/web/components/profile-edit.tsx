@@ -115,11 +115,21 @@ export function ProfileEdit({
     },
   });
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = ({
+    name,
+    birthday,
+    bio,
+    location,
+    website,
+  }: z.infer<typeof FormSchema>) => {
     userUpdate.mutate({
-      ...data,
-      avatar: avatar?.url ?? initialAvatar ?? undefined,
-      header: header?.url ?? initialHeader ?? undefined,
+      name: name,
+      birthday: birthday,
+      bio: bio ?? null,
+      location: location ?? null,
+      website: website ?? null,
+      avatar: avatar?.url,
+      header: header?.url ?? (initialHeader ? undefined : null),
     });
   };
 
