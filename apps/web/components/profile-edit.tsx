@@ -33,18 +33,18 @@ const FormSchema = z.object({
   name: z.string().min(2).max(50),
   bio: z.preprocess(
     (value) =>
-      typeof value === "string" && value.length === 0 ? null : value ?? null,
-    z.string().nullable(),
+      typeof value === "string" && value.length === 0 ? undefined : value,
+    z.string().optional(),
   ),
   location: z.preprocess(
     (value) =>
-      typeof value === "string" && value.length === 0 ? null : value ?? null,
-    z.string().nullable(),
+      typeof value === "string" && value.length === 0 ? undefined : value,
+    z.string().optional(),
   ),
   website: z.preprocess(
     (value) =>
-      typeof value === "string" && value.length === 0 ? null : value ?? null,
-    z.string().url().nullable(),
+      typeof value === "string" && value.length === 0 ? undefined : value,
+    z.string().url().optional(),
   ),
   birthday: z.date(),
 });
@@ -115,9 +115,19 @@ export function ProfileEdit({
     },
   });
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = ({
+    name,
+    birthday,
+    bio,
+    location,
+    website,
+  }: z.infer<typeof FormSchema>) => {
     userUpdate.mutate({
-      ...data,
+      name: name,
+      birthday: birthday,
+      bio: bio ?? null,
+      location: location ?? null,
+      website: website ?? null,
       avatar: avatar?.url,
       header: header?.url ?? (initialHeader ? undefined : null),
     });
