@@ -1,3 +1,4 @@
+import { post } from "../../../packages/api/src/routes/post";
 import { PostForm } from "./post-form";
 import { followsAtom } from "@/lib/atom";
 import { myPostsAtom } from "@/lib/atom";
@@ -34,10 +35,12 @@ export function PostDropdown({
   const setMyPosts = useSetAtom(myPostsAtom);
   const utils = trpc.useUtils();
   const deletePost = trpc.post.delete.useMutation({
-    onSuccess: async (_data, { id }) => {
+    onSuccess: async ({ parentId }, { id }) => {
       setMyPosts((myPosts) => myPosts.filter((post) => post.id !== id));
       await utils.post.search.invalidate();
-      await utils.post.replies.invalidate();
+      if (parentId) {
+        await utils.post.replies.invalidate();
+      }
       await utils.user.posts.invalidate({ username });
       await utils.user.replies.invalidate({ username });
     },
