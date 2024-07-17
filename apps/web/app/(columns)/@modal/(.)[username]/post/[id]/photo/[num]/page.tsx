@@ -62,12 +62,7 @@ export default function Page({
 
   useEffect(() => {
     // We need to filter twice because our query result is not necessarily up-to-date
-    const myReplies = myPosts
-      .filter((post) => post.parentId === id)
-      .map((reply) => ({
-        ...reply,
-        to: null as string | null,
-      }));
+    const myReplies = myPosts.filter((post) => post.parentId === id);
 
     setRepliesCustom(
       myReplies.concat(
@@ -201,6 +196,7 @@ export default function Page({
                 fetchNextPage={fetchNextPage}
                 refetch={refetch}
                 hasNextPage={hasNextPage}
+                indicateReply={false}
               />
             </div>
           </ScrollArea>

@@ -678,7 +678,7 @@ export const post = router({
           ...child,
           name: child.user.name!,
           username: child.user.username!,
-          to: null,
+          to: child.parent?.user.name ?? null,
           verified: child.user.verified,
           avatar: child.user.image,
           likeCount: child._count.likes,

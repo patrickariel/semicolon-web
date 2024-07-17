@@ -91,6 +91,7 @@ export default function Page({
           fetchNextPage={fetchNextPage}
           refetch={refetch}
           hasNextPage={hasNextPage}
+          indicateReply={false}
         />
       </div>
     </div>
