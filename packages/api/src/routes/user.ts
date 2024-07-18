@@ -19,8 +19,14 @@ import _ from "lodash";
 import { z } from "zod";
 
 export const user = router({
-  search: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/users/search" } })
+  search: userProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/users/search",
+        tags: ["users"],
+      },
+    })
     .input(
       z.object({
         query: z.string(),
@@ -104,12 +110,14 @@ export const user = router({
       },
     ),
   me: userProcedure
-    .meta({ openapi: { method: "GET", path: "/users/me" } })
+    .meta({ openapi: { method: "GET", path: "/users/me", tags: ["users"] } })
     .input(z.void())
     .output(UserResolvedSchema)
     .query(({ ctx: { user } }) => ({ ...user, followed: false })),
   update: userProcedure
-    .meta({ openapi: { method: "POST", path: "/users/me/update" } })
+    .meta({
+      openapi: { method: "POST", path: "/users/me/update", tags: ["users"] },
+    })
     .input(
       z.object({
         name: z.string().min(2).max(50).optional(),
@@ -172,7 +180,9 @@ export const user = router({
       },
     ),
   register: newUserProcedure
-    .meta({ openapi: { method: "POST", path: "/users/register" } })
+    .meta({
+      openapi: { method: "POST", path: "/users/register", tags: ["users"] },
+    })
     .input(
       z.object({
         name: z.string(),
@@ -211,7 +221,9 @@ export const user = router({
       },
     ),
   id: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/users/by/id/{id}" } })
+    .meta({
+      openapi: { method: "GET", path: "/users/by/id/{id}", tags: ["users"] },
+    })
     .input(z.object({ id: z.string().uuid() }))
     .output(PublicUserResolvedSchema)
     .query(async ({ ctx: { session }, input: { id } }) => {
@@ -252,7 +264,9 @@ export const user = router({
       };
     }),
   username: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/users/{username}" } })
+    .meta({
+      openapi: { method: "GET", path: "/users/{username}", tags: ["users"] },
+    })
     .input(z.object({ username: UsernameSchema }))
     .output(PublicUserResolvedSchema.merge(z.object({ followed: z.boolean() })))
     .query(async ({ input: { username }, ctx: { session } }) => {
@@ -295,7 +309,13 @@ export const user = router({
       };
     }),
   follow: userProcedure
-    .meta({ openapi: { method: "PUT", path: "/users/{username}/follow" } })
+    .meta({
+      openapi: {
+        method: "PUT",
+        path: "/users/{username}/follow",
+        tags: ["users"],
+      },
+    })
     .input(z.object({ username: UsernameSchema }))
     .output(z.void())
     .mutation(
@@ -318,7 +338,13 @@ export const user = router({
       },
     ),
   unfollow: userProcedure
-    .meta({ openapi: { method: "DELETE", path: "/users/{username}/follow" } })
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/users/{username}/follow",
+        tags: ["users"],
+      },
+    })
     .input(z.object({ username: UsernameSchema }))
     .output(z.void())
     .mutation(
@@ -342,7 +368,11 @@ export const user = router({
     ),
   posts: publicProcedure
     .meta({
-      openapi: { method: "GET", path: "/users/{username}/posts" },
+      openapi: {
+        method: "GET",
+        path: "/users/{username}/posts",
+        tags: ["users"],
+      },
     })
     .input(
       z.object({
@@ -426,7 +456,11 @@ export const user = router({
     ),
   likes: publicProcedure
     .meta({
-      openapi: { method: "GET", path: "/users/{username}/likes" },
+      openapi: {
+        method: "GET",
+        path: "/users/{username}/likes",
+        tags: ["users"],
+      },
     })
     .input(
       z.object({
@@ -523,7 +557,13 @@ export const user = router({
       },
     ),
   media: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/users/{username}/media" } })
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/users/{username}/media",
+        tags: ["users"],
+      },
+    })
     .input(
       z.object({
         username: z.string(),
@@ -608,7 +648,11 @@ export const user = router({
     ),
   replies: publicProcedure
     .meta({
-      openapi: { method: "GET", path: "/users/{username}/replies" },
+      openapi: {
+        method: "GET",
+        path: "/users/{username}/replies",
+        tags: ["users"],
+      },
     })
     .input(
       z.object({

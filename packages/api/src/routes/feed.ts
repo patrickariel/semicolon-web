@@ -6,7 +6,9 @@ import { z } from "zod";
 
 export const feed = router({
   recommended: userProcedure
-    .meta({ openapi: { method: "GET", path: "/feed/recommended" } })
+    .meta({
+      openapi: { method: "GET", path: "/feed/recommended", tags: ["feed"] },
+    })
     .input(
       z.object({
         cursor: z.string().uuid().optional(),
@@ -210,7 +212,9 @@ export const feed = router({
       },
     ),
   following: userProcedure
-    .meta({ openapi: { method: "GET", path: "/feed/following" } })
+    .meta({
+      openapi: { method: "GET", path: "/feed/following", tags: ["feed"] },
+    })
     .input(
       z.object({
         cursor: z.string().uuid().optional(),
