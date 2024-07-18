@@ -1,4 +1,3 @@
-// file name and directory: root/packages/api/routes/user.ts
 import {
   BirthdaySchema,
   PostResolvedSchema,

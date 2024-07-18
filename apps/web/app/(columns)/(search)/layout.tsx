@@ -1,4 +1,3 @@
-// file name and directory: root/apps/web/app/(columns)/(search)/layout.tsx
 import { Sticky } from "@/components/sticky";
 import { Suggestions } from "@/components/suggestions";
 import { Trends } from "@/components/trends";
