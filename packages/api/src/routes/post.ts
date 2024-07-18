@@ -371,13 +371,6 @@ export const post = router({
 
         const results = await dbQuery.execute();
 
-        if (results.length === 0) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "No results matched",
-          });
-        }
-
         let nextCursor: typeof cursor | undefined;
 
         if (results.length > maxResults) {
