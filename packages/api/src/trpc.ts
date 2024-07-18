@@ -10,7 +10,7 @@ export const createContext = async ({
 }: FetchCreateContextFnOptions) => {
   const session = await auth();
 
-  return { session, prisma: db };
+  return { session };
 };
 
 export const t = initTRPC.meta<OpenApiMeta>().context<Context>().create({

@@ -3,10 +3,9 @@
 import { Button } from "@semicolon/ui/button";
 import { Separator } from "@semicolon/ui/separator";
 import { cn } from "@semicolon/ui/utils";
-import _ from "lodash";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import ResizeObserver from "rc-resize-observer";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -14,56 +13,25 @@ export function TabsLink({
   children,
   className,
   href,
-  query,
   ...props
-}: Parameters<typeof Link>[0] & { query?: Record<string, string | null> }) {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const [active, setActive] = useState(false);
-
+}: Parameters<typeof Link>[0]) {
   const validateHref = useCallback(() => {
-    let params;
-    if (query) {
-      params = new URLSearchParams(searchParams.toString());
-      for (const [key, value] of Object.entries(query)) {
-        if (value === null) {
-          params.delete(key);
-        } else {
-          params.set(key, value);
-        }
-      }
-    }
-
     if (typeof href === "string") {
       if (!href.startsWith("/")) {
         throw Error("Tabs must link to an absolute URL");
       }
-      return params ? _.trimEnd(`${href}?${params}`, "?") : href;
+      return href;
     }
 
     if (!href.pathname) {
       throw Error("UrlObject did not return a valid pathname");
     }
 
-    return params
-      ? _.trimEnd(`${href.pathname}?${params}`, "?")
-      : href.pathname;
-  }, [href, query, searchParams]);
+    return href.pathname;
+  }, [href]);
 
+  const pathname = usePathname();
   const [resolvedHref, setResolvedHref] = useState(() => validateHref());
-
-  useEffect(() => {
-    if (query) {
-      for (const [key, value] of Object.entries(query)) {
-        if (searchParams.get(key) !== value) {
-          setActive(false);
-          return;
-        }
-      }
-    }
-
-    setActive(href === pathname);
-  }, [href, query, searchParams, pathname]);
 
   useEffect(() => {
     setResolvedHref(validateHref());
@@ -75,13 +43,13 @@ export function TabsLink({
         "hover:bg-accent hover:text-accent-foreground group flex h-14 flex-auto snap-start justify-center px-8 text-base font-bold transition-colors",
         className,
       )}
-      href={resolvedHref}
+      href={href}
       {...props}
     >
       <div className="relative flex h-full w-fit flex-col items-center justify-center">
         <p>{children}</p>
         <div
-          className={`absolute bottom-0 h-1 w-full min-w-14 rounded-full bg-sky-400 ${active ? "block" : "hidden"}`}
+          className={`absolute bottom-0 h-1 w-full min-w-14 rounded-full bg-sky-400 ${resolvedHref === pathname ? "block" : "hidden"}`}
         />
       </div>
     </Link>
