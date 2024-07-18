@@ -87,50 +87,42 @@ export default function Page() {
   }, [searchParams]);
 
   return (
-    <div className="flex flex-col items-center">
-      {params?.tab === "people" ? (
-        <UserList
-          users={userResults}
-          loading={isUserLoading || isUserFetchingNextPage}
-          error={isUserLoadingError || isUserFetchNextPageError}
-          fetchNextPage={fetchNextUserPage}
-          refetch={refetchUsers}
-          hasNextPage={hasUserNextPage}
-        />
-      ) : (
-        <PostFeed
-          posts={postResults}
-          loading={isPostLoading || isPostFetchingNextPage}
-          error={isPostLoadingError || isPostFetchNextPageError}
-          fetchNextPage={fetchNextPostPage}
-          refetch={refetchPosts}
-          hasNextPage={hasPostNextPage}
-        />
+    <div className="flex w-full flex-col items-center">
+      <div className="w-full">
+        {params?.tab === "people" ? (
+          <UserList
+            users={userResults}
+            loading={isUserLoading || isUserFetchingNextPage}
+            error={isUserLoadingError || isUserFetchNextPageError}
+            fetchNextPage={fetchNextUserPage}
+            refetch={refetchUsers}
+            hasNextPage={hasUserNextPage}
+          />
+        ) : (
+          <PostFeed
+            posts={postResults}
+            loading={isPostLoading || isPostFetchingNextPage}
+            error={isPostLoadingError || isPostFetchNextPageError}
+            fetchNextPage={fetchNextPostPage}
+            refetch={refetchPosts}
+            hasNextPage={hasPostNextPage}
+          />
+        )}
+      </div>
+      {(params?.tab === "people"
+        ? rawUserResults?.pages[0]?.users
+        : rawPostResults?.pages[0]?.results
+      )?.length === 0 && (
+        <article className="flex max-w-[450px] flex-col gap-3 p-9">
+          <p className="text-3xl font-black">
+            No results for {`"${params?.query}"`}
+          </p>
+          <p className="text-muted-foreground text-base">
+            Try searching for something else, or check if you made a mistake in
+            your query.
+          </p>
+        </article>
       )}
-      {params?.tab !== "people" &&
-        rawPostResults?.pages[0]?.results.length === 0 && (
-          <article className="flex max-w-[450px] flex-col gap-3 p-9">
-            <p className="text-3xl font-black">
-              No results for {`"${params?.query}"`}
-            </p>
-            <p className="text-muted-foreground text-base">
-              Try searching for something else, or check if you made a mistake
-              in your query.
-            </p>
-          </article>
-        )}
-      {params?.tab === "people" &&
-        rawUserResults?.pages[0]?.users.length === 0 && (
-          <article className="flex max-w-[450px] flex-col gap-3 p-9">
-            <p className="text-3xl font-black">
-              No results for {`"${params?.query}"`}
-            </p>
-            <p className="text-muted-foreground text-base">
-              Try searching for something else, or check if you made a mistake
-              in your query.
-            </p>
-          </article>
-        )}
     </div>
   );
 }
