@@ -38,12 +38,16 @@ export const user = router({
       async ({ ctx: { session }, input: { query, cursor, maxResults } }) => {
         const users = await db.user.findMany({
           where: {
+            name: {
+              search: query,
+            },
+            username: {
+              search: query,
+            },
+            bio: {
+              search: query,
+            },
             registered: { not: null },
-            OR: [
-              { name: { contains: query, mode: "insensitive" } },
-              { username: { contains: query, mode: "insensitive" } },
-              { bio: { contains: query, mode: "insensitive" } },
-            ],
           },
           take: maxResults + 1,
           ...(cursor && { cursor: { id: cursor } }),
