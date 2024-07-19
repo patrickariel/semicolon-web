@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@semicolon/ui/button";
 import { cn } from "@semicolon/ui/utils";
 import { LucideIcon } from "lucide-react";
@@ -8,11 +10,13 @@ import React from "react";
 interface NavItemProps {
   icon?: LucideIcon;
   label?: string;
+  size?: "small" | "normal";
 }
 
 export function NavItem({
   href,
   icon: Icon,
+  size = "normal",
   label,
   children,
   className,
@@ -32,7 +36,7 @@ export function NavItem({
       <Link href={href} className="flex items-center gap-4">
         {Icon && (
           <Icon
-            className={`size-7 flex-none ${href === pathname ? "fill-foreground" : ""}`}
+            className={`${size === "normal" ? "size-7" : "size-6"} flex-none ${href === pathname ? "fill-foreground" : ""}`}
           />
         )}
         {label && (
