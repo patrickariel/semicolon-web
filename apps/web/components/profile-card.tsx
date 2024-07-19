@@ -7,6 +7,7 @@ import type { PublicUserResolved } from "@semicolon/api/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Button } from "@semicolon/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@semicolon/ui/dialog";
+import { ScrollArea } from "@semicolon/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@semicolon/ui/tooltip";
 import { useAtom } from "jotai";
 import { BadgeCheck, CalendarDays, Link2, MapPin, User } from "lucide-react";
@@ -101,11 +102,10 @@ const ProfileCard = (props: ProfileCardProps) => {
                     <span className="font-bold">Edit profile</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent
-                  close={false}
-                  className="max-h-[650px] overflow-y-auto p-0"
-                >
-                  <ProfileEdit {...props} />
+                <DialogContent close={false} className="overflow-hidden p-0">
+                  <ScrollArea className="max-h-[650px]">
+                    <ProfileEdit {...props} />
+                  </ScrollArea>
                 </DialogContent>
               </Dialog>
             ) : (
