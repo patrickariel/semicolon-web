@@ -68,7 +68,9 @@ export default function UserCard({
         }
       }}
       onKeyUp={(e) => {
-        e.key === "Enter" ? router.push(`/${username}`) : null;
+        e.target === e.currentTarget && e.key === "Enter"
+          ? router.push(`/${username}`)
+          : null;
       }}
     >
       <div
