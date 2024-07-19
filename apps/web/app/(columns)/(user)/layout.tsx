@@ -22,7 +22,7 @@ export default function Layout({
         >
           <SearchBar />
         </div>
-        <Sticky>
+        <Sticky top="#search-bar">
           <div className="flex flex-col gap-5">
             <Suggestions />
             <Trends />
