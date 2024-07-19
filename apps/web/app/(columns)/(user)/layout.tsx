@@ -15,10 +15,10 @@ export default function Layout({
         {children}
       </div>
       <Separator orientation="vertical" className="h-auto min-h-screen" />
-      <div className="hidden min-h-full w-full min-w-[300px] max-w-[360px] shrink flex-col justify-start pl-[30px] pt-4 lg:flex">
+      <div className="hidden min-h-full w-full min-w-[300px] max-w-[360px] shrink flex-col justify-start pl-[30px] lg:flex">
         <div
           id="search-bar"
-          className="bg-card sticky top-0 z-10 flex-shrink pb-4"
+          className="bg-background sticky top-0 z-10 flex-shrink pb-4 pt-3"
         >
           <SearchBar />
         </div>
