@@ -52,7 +52,7 @@ export function SearchBar() {
                     type="text"
                     placeholder="Search"
                     {...(query && { defaultValue: query })}
-                    className="h-12 flex-grow rounded-full bg-transparent pl-16 text-base text-white"
+                    className="bg-muted h-12 flex-grow rounded-full pl-16 text-base text-white"
                     {...field}
                   />
                 </FormControl>
