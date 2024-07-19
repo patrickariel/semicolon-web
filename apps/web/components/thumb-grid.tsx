@@ -50,7 +50,7 @@ export function ThumbGrid(
       return (
         <div
           className={cn(
-            "flex w-full flex-row overflow-hidden rounded-lg border",
+            "relative z-0 flex w-full flex-row overflow-hidden rounded-lg border",
             className,
           )}
         >
@@ -85,7 +85,7 @@ export function ThumbGrid(
       return (
         <div
           className={cn(
-            "flex w-full flex-row overflow-hidden rounded-lg border",
+            "relative z-0 flex w-full flex-row overflow-hidden rounded-lg border",
             className,
           )}
         >
@@ -142,7 +142,7 @@ export function ThumbGrid(
       return (
         <div
           className={cn(
-            "flex w-full flex-col overflow-hidden rounded-lg border",
+            "relative z-0 flex w-full flex-col overflow-hidden rounded-lg border",
             className,
           )}
         >
