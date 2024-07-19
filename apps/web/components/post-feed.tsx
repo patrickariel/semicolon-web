@@ -37,7 +37,7 @@ export function PostFeed({
   return (
     <>
       {!media ? (
-        <div className="flex flex-col">
+        <div className="flex min-w-full flex-col">
           {posts.map((post) => (
             <Fragment key={post.id}>
               <Post {...post} indicateReply={indicateReply} />

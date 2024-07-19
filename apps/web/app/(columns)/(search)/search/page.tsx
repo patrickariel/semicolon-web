@@ -1,10 +1,7 @@
 "use client";
 
-import { PostFeed } from "@/components/post-feed";
-import { UserList } from "@/components/user-list";
-import { trpc } from "@/lib/trpc";
-import { PostResolved, PublicUserResolved } from "@semicolon/api/schema";
-import { skipToken } from "@tanstack/react-query";
+import { PostSearch, UserSearch } from "@/components/search-view";
+import Spinner from "@semicolon/ui/spinner";
 import { redirect, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { z } from "zod";
@@ -15,54 +12,6 @@ export default function Page() {
     query: string;
     tab: "rel" | "latest" | "people";
   } | null>(null);
-  const [postResults, setPostResults] = useState<PostResolved[]>([]);
-  const [userResults, setUserResults] = useState<PublicUserResolved[]>([]);
-
-  const {
-    data: rawPostResults,
-    fetchNextPage: fetchNextPostPage,
-    isLoading: isPostLoading,
-    isLoadingError: isPostLoadingError,
-    isFetchingNextPage: isPostFetchingNextPage,
-    isFetchNextPageError: isPostFetchNextPageError,
-    hasNextPage: hasPostNextPage,
-    refetch: refetchPosts,
-  } = trpc.post.search.useInfiniteQuery(
-    params && params.tab !== "people"
-      ? {
-          query: params.query,
-          sortBy: params.tab === "rel" ? "relevancy" : "recency",
-          maxResults: 15,
-        }
-      : skipToken,
-    { getNextPageParam: (lastPage) => lastPage.nextCursor },
-  );
-
-  const {
-    data: rawUserResults,
-    fetchNextPage: fetchNextUserPage,
-    isLoading: isUserLoading,
-    isLoadingError: isUserLoadingError,
-    isFetchingNextPage: isUserFetchingNextPage,
-    isFetchNextPageError: isUserFetchNextPageError,
-    hasNextPage: hasUserNextPage,
-    refetch: refetchUsers,
-  } = trpc.user.search.useInfiniteQuery(
-    params && params.tab === "people"
-      ? { query: params.query, maxResults: 15 }
-      : skipToken,
-    { getNextPageParam: (lastPage) => lastPage.nextCursor },
-  );
-
-  useEffect(() => {
-    setPostResults(
-      (rawPostResults?.pages ?? []).flatMap((page) => page.results),
-    );
-  }, [rawPostResults, params]);
-
-  useEffect(() => {
-    setUserResults((rawUserResults?.pages ?? []).flatMap((page) => page.users));
-  }, [rawUserResults, params]);
 
   useEffect(() => {
     const query = searchParams.get("q");
@@ -86,40 +35,19 @@ export default function Page() {
 
   return (
     <div className="flex w-full flex-col items-center">
-      <div className="w-full">
-        {params?.tab === "people" ? (
-          <UserList
-            users={userResults}
-            loading={isUserLoading || isUserFetchingNextPage}
-            error={isUserLoadingError || isUserFetchNextPageError}
-            fetchNextPage={fetchNextUserPage}
-            refetch={refetchUsers}
-            hasNextPage={hasUserNextPage}
-          />
+      {params ? (
+        params.tab === "people" ? (
+          <UserSearch query={params.query} />
         ) : (
-          <PostFeed
-            posts={postResults}
-            loading={isPostLoading || isPostFetchingNextPage}
-            error={isPostLoadingError || isPostFetchNextPageError}
-            fetchNextPage={fetchNextPostPage}
-            refetch={refetchPosts}
-            hasNextPage={hasPostNextPage}
+          <PostSearch
+            query={params.query}
+            sortBy={params.tab === "rel" ? "relevancy" : "recency"}
           />
-        )}
-      </div>
-      {(params?.tab === "people"
-        ? rawUserResults?.pages[0]?.users
-        : rawPostResults?.pages[0]?.results
-      )?.length === 0 && (
-        <article className="flex max-w-[450px] flex-col gap-3 p-9">
-          <p className="text-3xl font-black">
-            No results for {`"${params?.query}"`}
-          </p>
-          <p className="text-muted-foreground text-base">
-            Try searching for something else, or check if you made a mistake in
-            your query.
-          </p>
-        </article>
+        )
+      ) : (
+        <div className="flex min-h-20 items-center justify-center">
+          <Spinner size={30} />
+        </div>
       )}
     </div>
   );
