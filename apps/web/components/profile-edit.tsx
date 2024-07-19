@@ -204,10 +204,10 @@ export function ProfileEdit({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="relative flex flex-col gap-0"
+          className="relative z-0 flex flex-col gap-0"
         >
           <div className="flex flex-col gap-0">
-            <div className="bg-background/65 sticky top-0 z-50 flex flex-row items-center justify-between p-2 py-2 backdrop-blur-md">
+            <div className="bg-background/65 sticky top-0 z-10 flex flex-row items-center justify-between p-2 py-2 backdrop-blur-md">
               <div className="flex flex-row items-center gap-3">
                 <DialogClose asChild>
                   <Button
