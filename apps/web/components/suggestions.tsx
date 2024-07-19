@@ -11,8 +11,10 @@ export async function Suggestions() {
   const { users } = await caller.feed.user({ maxResults: 3 });
 
   return (
-    <Card>
-      <CardHeader className="pb-1 pt-4">You might like</CardHeader>
+    <Card className="rounded-2xl">
+      <CardHeader className="pb-1 pt-4 text-lg font-black">
+        Who to follow
+      </CardHeader>
       <CardContent className="p-0">
         <div className="flex flex-col">
           {users.map((user) => (
