@@ -181,7 +181,7 @@ export const user = router({
     ),
   register: newUserProcedure
     .meta({
-      openapi: { method: "POST", path: "/users/register", tags: ["users"] },
+      openapi: { method: "POST", path: "/users/me/register", tags: ["users"] },
     })
     .input(
       z.object({
