@@ -50,7 +50,9 @@ export function Post({
         }
       }}
       onKeyUp={(e) => {
-        e.key === "Enter" ? router.push(`/${username}/post/${id}`) : null;
+        e.target === e.currentTarget && e.key === "Enter"
+          ? router.push(`/${username}/post/${id}`)
+          : null;
       }}
     >
       <div className="pt-2">
