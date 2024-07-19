@@ -126,7 +126,7 @@ export default function UserCard({
         </div>
       </div>
       <Button
-        className={`group ml-2 w-full ${variant === "normal" ? "max-w-[110px]" : "h-9 max-w-[100px]"} flex-none cursor-pointer text-nowrap rounded-full font-bold text-black ${
+        className={`group ml-2 w-full ${variant === "normal" ? "max-w-[110px]" : "h-9 max-w-[102px]"} flex-none cursor-pointer text-nowrap rounded-full font-bold text-black ${
           follows[username]
             ? "text-foreground hover:bg-destructive/15 hover:border-red-900"
             : "text-background"
