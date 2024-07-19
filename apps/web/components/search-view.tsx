@@ -11,7 +11,9 @@ export function NoResultsMessage({
   className,
 }: React.ComponentProps<"article"> & { term: string }) {
   return (
-    <article className={cn("flex max-w-[450px] flex-col gap-3 p-9", className)}>
+    <article
+      className={cn("mx-auto flex max-w-[450px] flex-col gap-3 p-9", className)}
+    >
       <p className="text-3xl font-black">No results for {`"${term}"`}</p>
       <p className="text-muted-foreground text-base">
         Try searching for something else, or check if you made a mistake in your

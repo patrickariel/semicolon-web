@@ -1,4 +1,4 @@
-import { PostResolvedSchema } from "../schema";
+import { PostResolvedSchema, PublicUserResolvedSchema } from "../schema";
 import { router, userProcedure } from "../trpc";
 import { db } from "@semicolon/db";
 import { NotNull, sql } from "kysely";
@@ -294,6 +294,70 @@ export const feed = router({
             likeCount: post._count.likes,
             replyCount: post._count.children,
             liked: post.likes.length > 0,
+          })),
+          nextCursor,
+        };
+      },
+    ),
+  user: userProcedure
+    .meta({ openapi: { method: "GET", path: "/feed/users" } })
+    .input(
+      z.object({
+        cursor: z.string().uuid().optional(),
+        maxResults: z.number().min(1).max(100).default(50),
+      }),
+    )
+    .output(
+      z.object({
+        users: z.array(PublicUserResolvedSchema),
+        nextCursor: z.string().uuid().optional(),
+      }),
+    )
+    .query(
+      async ({
+        ctx: {
+          user: { username },
+        },
+        input: { cursor, maxResults },
+      }) => {
+        const users = await db.user.findMany({
+          where: { username: { not: username } },
+          orderBy: { followedBy: { _count: "desc" } },
+          take: maxResults + 1,
+          ...(cursor && { cursor: { id: cursor } }),
+          include: {
+            _count: {
+              select: {
+                followedBy: true,
+                following: true,
+                posts: true,
+              },
+            },
+            followedBy: {
+              where: {
+                username,
+              },
+            },
+          },
+        });
+
+        let nextCursor: typeof cursor | undefined;
+
+        if (users.length > maxResults) {
+          const nextItem = users.pop();
+          nextCursor = nextItem!.id;
+        }
+
+        return {
+          users: users.map((user) => ({
+            ...user,
+            name: user.name!,
+            username: user.username!,
+            registered: user.registered!,
+            following: user._count.following,
+            followers: user._count.followedBy,
+            followed: user.followedBy.length > 0,
+            posts: user._count.posts,
           })),
           nextCursor,
         };

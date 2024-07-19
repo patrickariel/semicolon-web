@@ -34,7 +34,7 @@ export default function Page() {
   }, [searchParams]);
 
   return (
-    <div className="flex w-full flex-col items-center">
+    <>
       {params ? (
         params.tab === "people" ? (
           <UserSearch query={params.query} />
@@ -49,6 +49,6 @@ export default function Page() {
           <Spinner size={30} />
         </div>
       )}
-    </div>
+    </>
   );
 }
