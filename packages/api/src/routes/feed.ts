@@ -304,7 +304,7 @@ export const feed = router({
       },
     ),
   user: userProcedure
-    .meta({ openapi: { method: "GET", path: "/feed/users" } })
+    .meta({ openapi: { method: "GET", path: "/feed/users", tags: ["feed"] } })
     .input(
       z.object({
         cursor: z.string().uuid().optional(),
