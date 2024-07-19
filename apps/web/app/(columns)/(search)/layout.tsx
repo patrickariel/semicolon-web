@@ -15,7 +15,7 @@ export default function Layout({
       </div>
       <Separator orientation="vertical" className="h-auto min-h-screen" />
       <div className="hidden min-h-full w-full min-w-[300px] max-w-[360px] shrink flex-col justify-start pl-[30px] pt-4 lg:flex">
-        <Sticky>
+        <Sticky top={16}>
           <div className="flex flex-col gap-5">
             <Suggestions />
             <Trends />
