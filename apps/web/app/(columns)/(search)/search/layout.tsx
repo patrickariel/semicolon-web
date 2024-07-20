@@ -2,8 +2,6 @@ import { BackHeader } from "@/components/back-header";
 import { SearchBar } from "@/components/search-bar";
 import { SearchDropdown } from "@/components/search-dropdown";
 import { TabsList, TabsLink } from "@/components/tabs-link";
-import { Button } from "@semicolon/ui/button";
-import { Ellipsis } from "lucide-react";
 import React from "react";
 
 export default function Layout({
