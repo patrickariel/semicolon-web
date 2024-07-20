@@ -57,6 +57,8 @@ const ProfileCard = (props: ProfileCardProps) => {
         follows[username] = true;
       });
       await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
     onSettled: () => setDisableFollow(false),
   });
@@ -68,6 +70,8 @@ const ProfileCard = (props: ProfileCardProps) => {
         follows[username] = false;
       });
       await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
     onSettled: () => setDisableFollow(false),
   });
@@ -110,16 +114,16 @@ const ProfileCard = (props: ProfileCardProps) => {
               </Dialog>
             ) : (
               <Button
-                className={`group min-w-[110px] cursor-pointer text-nowrap rounded-full font-bold text-black ${follows[username] ? "text-foreground hover:bg-destructive/15 hover:border-red-900" : "text-background"}`}
+                className={`group min-w-[110px] cursor-pointer text-nowrap rounded-full font-bold text-black ${follows[username] ?? followed ? "text-foreground hover:bg-destructive/15 hover:border-red-900" : "text-background"}`}
                 disabled={disableFollow}
-                variant={follows[username] ? "outline" : "default"}
+                variant={follows[username] ?? followed ? "outline" : "default"}
                 onClick={() =>
-                  follows[username]
+                  follows[username] ?? followed
                     ? unfollowUser.mutate({ username })
                     : followUser.mutate({ username })
                 }
               >
-                {follows[username] ? (
+                {follows[username] ?? followed ? (
                   <>
                     <p className="group-hover:hidden">Following</p>
                     <p className="hidden text-red-700 group-hover:block">

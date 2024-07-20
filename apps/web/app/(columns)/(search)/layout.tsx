@@ -1,3 +1,4 @@
+import { SimpleFilter } from "@/components/search-filter";
 import { Sticky } from "@/components/sticky";
 import { Suggestions } from "@/components/suggestions";
 import { Trends } from "@/components/trends";
@@ -17,6 +18,7 @@ export default function Layout({
       <div className="hidden min-h-full w-full min-w-[300px] max-w-[360px] shrink flex-col justify-start pl-[30px] pt-4 lg:flex">
         <Sticky top={16}>
           <div className="flex flex-col gap-5">
+            <SimpleFilter />
             <Suggestions />
             <Trends />
             <div />

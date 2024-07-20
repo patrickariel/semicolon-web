@@ -44,6 +44,10 @@ export function PostDropdown({
     },
   });
 
+  useEffect(() => {
+    setOpenDropdown(openEdit);
+  }, [openEdit, setOpenDropdown]);
+
   const [follows, updateFollows] = useAtom(followsAtom);
 
   useEffect(() => {
@@ -59,7 +63,9 @@ export function PostDropdown({
       updateFollows((follows) => {
         follows[username] = true;
       });
-      await utils.feed.following.refetch();
+      await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
   });
 
@@ -68,7 +74,9 @@ export function PostDropdown({
       updateFollows((follows) => {
         follows[username] = false;
       });
-      await utils.feed.following.refetch();
+      await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
   });
 
@@ -115,10 +123,7 @@ export function PostDropdown({
                 <PostForm
                   avatar={session?.user?.image}
                   className="min-h-[230px]"
-                  onPost={() => {
-                    setOpenEdit(false);
-                    setOpenDropdown(false);
-                  }}
+                  onPost={() => setOpenEdit(false)}
                   editData={{
                     id,
                     content: content ?? undefined,

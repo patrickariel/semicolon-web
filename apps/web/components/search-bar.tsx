@@ -1,11 +1,10 @@
 "use client";
 
+import { useSearchFilters } from "@/lib/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@semicolon/ui/form";
 import { Input } from "@semicolon/ui/input";
 import { Search } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -14,27 +13,16 @@ const SearchSchema = z.object({
 });
 
 export function SearchBar() {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
-  const [query, setQuery] = useState<string | null>(null);
-
-  useEffect(() => {
-    setQuery(searchParams.get("q"));
-  }, [searchParams]);
+  const [updateFilters, { query }] = useSearchFilters();
 
   const form = useForm<z.infer<typeof SearchSchema>>({
     resolver: zodResolver(SearchSchema),
   });
 
-  const onSubmit = (data: z.infer<typeof SearchSchema>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("q", data.query);
-    if (pathname === "/search") {
-      window.history.pushState(null, "", `?${params.toString()}`);
-    } else {
-      router.push(`/search?${params.toString()}`);
-    }
+  const onSubmit = ({ query }: z.infer<typeof SearchSchema>) => {
+    updateFilters((f) => {
+      f.query = query;
+    });
   };
 
   return (

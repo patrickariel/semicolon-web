@@ -19,12 +19,13 @@ import _ from "lodash";
 import { z } from "zod";
 
 export const user = router({
-  search: userProcedure
+  search: publicProcedure
     .meta({ openapi: { method: "GET", path: "/users/search" } })
     .input(
       z.object({
         query: z.string(),
         cursor: z.string().uuid().optional(),
+        following: z.boolean().default(false),
         maxResults: z.number().min(1).max(100).default(50),
       }),
     )
@@ -35,7 +36,10 @@ export const user = router({
       }),
     )
     .query(
-      async ({ ctx: { session }, input: { query, cursor, maxResults } }) => {
+      async ({
+        ctx: { session },
+        input: { query, cursor, maxResults, following },
+      }) => {
         const users = await db.user.findMany({
           where: {
             name: {
@@ -48,6 +52,9 @@ export const user = router({
               search: query,
             },
             registered: { not: null },
+            ...(following && {
+              followedBy: { some: { username: session?.user?.username } },
+            }),
           },
           take: maxResults + 1,
           ...(cursor && { cursor: { id: cursor } }),

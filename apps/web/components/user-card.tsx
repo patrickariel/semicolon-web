@@ -42,6 +42,8 @@ export default function UserCard({
         follows[username] = true;
       });
       await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
     onSettled: () => setDisableFollow(false),
   });
@@ -53,6 +55,8 @@ export default function UserCard({
         follows[username] = false;
       });
       await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
     onSettled: () => setDisableFollow(false),
   });
@@ -68,7 +72,9 @@ export default function UserCard({
         }
       }}
       onKeyUp={(e) => {
-        e.key === "Enter" ? router.push(`/${username}`) : null;
+        e.target === e.currentTarget && e.key === "Enter"
+          ? router.push(`/${username}`)
+          : null;
       }}
     >
       <div
@@ -127,21 +133,21 @@ export default function UserCard({
       </div>
       <Button
         className={`group ml-2 w-full ${variant === "normal" ? "max-w-[110px]" : "h-9 max-w-[102px]"} flex-none cursor-pointer text-nowrap rounded-full font-bold text-black ${
-          follows[username]
+          follows[username] ?? followed
             ? "text-foreground hover:bg-destructive/15 hover:border-red-900"
             : "text-background"
         }`}
         disabled={disableFollow}
-        variant={follows[username] ? "outline" : "default"}
+        variant={follows[username] ?? followed ? "outline" : "default"}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          follows[username]
+          follows[username] ?? followed
             ? unfollowUser.mutate({ username })
             : followUser.mutate({ username });
         }}
       >
-        {follows[username] ? (
+        {follows[username] ?? followed ? (
           <>
             <p className="truncate group-hover:hidden">Following</p>
             <p className="hidden truncate text-red-700 group-hover:block">

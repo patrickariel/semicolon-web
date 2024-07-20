@@ -7,12 +7,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@semicolon/ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "@semicolon/ui/dialog";
 import { Separator } from "@semicolon/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@semicolon/ui/tooltip";
+import { toast } from "@semicolon/ui/use-toast";
 import {
   BadgeCheck,
   BarChart2,
   Bookmark,
   Heart,
   MessageCircle,
+  Paperclip,
   Repeat2,
   Upload,
   User,
@@ -95,7 +97,7 @@ export function PostActions({
     },
   );
 
-  const { replyCount, id, views, likeCount, liked } = post;
+  const { username, replyCount, id, views, likeCount, liked } = post;
 
   const likePost = trpc.post.like.useMutation({
     onMutate: () =>
@@ -195,7 +197,25 @@ export function PostActions({
       {variant === "normal" ? (
         <div className="hidden flex-row min-[300px]:flex">
           <PostButton icon={Bookmark} className="hidden min-[350px]:block" />
-          <PostButton icon={Upload} />
+          <PostButton
+            icon={Upload}
+            onClick={async () => {
+              await navigator.clipboard.writeText(
+                `${window.location.origin}/${username}/post/${id}`,
+              );
+              toast({
+                description: (
+                  <div className="flex items-center justify-start gap-4">
+                    <Paperclip size={35} />
+                    <article className="flex flex-col gap-2">
+                      <h3 className="text-base font-black">Copied</h3>
+                      <p>The link is now in your clipboard.</p>
+                    </article>
+                  </div>
+                ),
+              });
+            }}
+          />
         </div>
       ) : (
         <>
