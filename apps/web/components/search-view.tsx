@@ -23,11 +23,9 @@ export function NoResultsMessage({
   );
 }
 
-export function PostSearch({
-  query,
-  sortBy,
-  maxResults,
-}: RouterInput["post"]["search"] & { query: string }) {
+export function PostSearch(
+  query: RouterInput["post"]["search"] & { query: string },
+) {
   const [results, setResults] = useState<PostResolved[]>([]);
 
   const {
@@ -39,14 +37,9 @@ export function PostSearch({
     isFetchNextPageError,
     hasNextPage,
     refetch,
-  } = trpc.post.search.useInfiniteQuery(
-    {
-      query,
-      sortBy,
-      maxResults,
-    },
-    { getNextPageParam: (lastPage) => lastPage.nextCursor },
-  );
+  } = trpc.post.search.useInfiniteQuery(query, {
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+  });
 
   useEffect(() => {
     setResults((rawResults?.pages ?? []).flatMap((page) => page.results));
@@ -63,16 +56,13 @@ export function PostSearch({
         hasNextPage={hasNextPage}
       />
       {rawResults?.pages[0]?.results?.length === 0 && (
-        <NoResultsMessage term={query} />
+        <NoResultsMessage term={query.query} />
       )}
     </>
   );
 }
 
-export function UserSearch({
-  query,
-  maxResults,
-}: RouterInput["user"]["search"]) {
+export function UserSearch(query: RouterInput["user"]["search"]) {
   const [results, setResults] = useState<PublicUserResolved[]>([]);
 
   const {
@@ -84,13 +74,9 @@ export function UserSearch({
     isFetchNextPageError,
     hasNextPage,
     refetch,
-  } = trpc.user.search.useInfiniteQuery(
-    {
-      query,
-      maxResults,
-    },
-    { getNextPageParam: (lastPage) => lastPage.nextCursor },
-  );
+  } = trpc.user.search.useInfiniteQuery(query, {
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+  });
 
   useEffect(() => {
     setResults((rawResults?.pages ?? []).flatMap((page) => page.users));
@@ -107,7 +93,7 @@ export function UserSearch({
         hasNextPage={hasNextPage}
       />
       {rawResults?.pages[0]?.users?.length === 0 && (
-        <NoResultsMessage term={query} />
+        <NoResultsMessage term={query.query} />
       )}
     </>
   );
