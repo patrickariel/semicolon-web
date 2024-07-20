@@ -7,7 +7,12 @@ import { z } from "zod";
 export const feed = router({
   recommended: userProcedure
     .meta({
-      openapi: { method: "GET", path: "/feed/recommended", tags: ["feed"] },
+      openapi: {
+        method: "GET",
+        path: "/feed/recommended",
+        summary: "Recommended posts feed",
+        tags: ["feed"],
+      },
     })
     .input(
       z.object({
@@ -213,7 +218,12 @@ export const feed = router({
     ),
   following: userProcedure
     .meta({
-      openapi: { method: "GET", path: "/feed/following", tags: ["feed"] },
+      openapi: {
+        method: "GET",
+        path: "/feed/following",
+        summary: "Chronological feed of posts from followed users",
+        tags: ["feed"],
+      },
     })
     .input(
       z.object({
@@ -304,7 +314,14 @@ export const feed = router({
       },
     ),
   user: userProcedure
-    .meta({ openapi: { method: "GET", path: "/feed/users", tags: ["feed"] } })
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/feed/users",
+        summary: "Recommended users feed",
+        tags: ["feed"],
+      },
+    })
     .input(
       z.object({
         cursor: z.string().uuid().optional(),
