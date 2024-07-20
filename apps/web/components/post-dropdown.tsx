@@ -44,6 +44,10 @@ export function PostDropdown({
     },
   });
 
+  useEffect(() => {
+    setOpenDropdown(openEdit);
+  }, [openEdit, setOpenDropdown]);
+
   const [follows, updateFollows] = useAtom(followsAtom);
 
   useEffect(() => {
@@ -115,10 +119,7 @@ export function PostDropdown({
                 <PostForm
                   avatar={session?.user?.image}
                   className="min-h-[230px]"
-                  onPost={() => {
-                    setOpenEdit(false);
-                    setOpenDropdown(false);
-                  }}
+                  onPost={() => setOpenEdit(false)}
                   editData={{
                     id,
                     content: content ?? undefined,
