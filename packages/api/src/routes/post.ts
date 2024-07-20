@@ -14,7 +14,14 @@ import { z } from "zod";
 
 export const post = router({
   new: userProcedure
-    .meta({ openapi: { method: "POST", path: "/posts/new" } })
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/posts/new",
+        summary: "Create a new post",
+        tags: ["posts"],
+      },
+    })
     .input(
       z
         .object({
@@ -94,7 +101,14 @@ export const post = router({
       };
     }),
   search: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/posts/search" } })
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/posts/search",
+        summary: "Search for posts",
+        tags: ["posts"],
+      },
+    })
     .input(
       z
         .object({
@@ -394,7 +408,14 @@ export const post = router({
       },
     ),
   id: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/posts/{id}" } })
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/posts/{id}",
+        summary: "Get a post",
+        tags: ["posts"],
+      },
+    })
     .input(z.object({ id: ShortToUUID }))
     .output(PostResolvedSchema)
     .query(async ({ ctx: { session }, input: { id } }) => {
@@ -450,7 +471,14 @@ export const post = router({
       };
     }),
   update: userProcedure
-    .meta({ openapi: { method: "POST", path: "/posts/{id}" } })
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/posts/{id}",
+        summary: "Update a post",
+        tags: ["posts"],
+      },
+    })
     .input(
       z
         .object({
@@ -542,7 +570,14 @@ export const post = router({
       };
     }),
   delete: userProcedure
-    .meta({ openapi: { method: "DELETE", path: "/posts/{id}" } })
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/posts/{id}",
+        summary: "Delete a post",
+        tags: ["posts"],
+      },
+    })
     .input(
       z.object({
         id: ShortToUUID,
@@ -618,7 +653,14 @@ export const post = router({
       };
     }),
   replies: publicProcedure
-    .meta({ openapi: { method: "GET", path: "/posts/{id}/replies" } })
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/posts/{id}/replies",
+        summary: "Get a post's replies",
+        tags: ["posts"],
+      },
+    })
     .input(
       z.object({
         id: ShortToUUID,
@@ -708,7 +750,14 @@ export const post = router({
       };
     }),
   like: userProcedure
-    .meta({ openapi: { method: "PUT", path: "/posts/{id}/like" } })
+    .meta({
+      openapi: {
+        method: "PUT",
+        path: "/posts/{id}/like",
+        summary: "Like a post",
+        tags: ["posts"],
+      },
+    })
     .input(z.object({ id: ShortToUUID }))
     .output(z.void())
     .mutation(async ({ ctx: { user }, input: { id } }) => {
@@ -734,7 +783,14 @@ export const post = router({
       });
     }),
   unlike: userProcedure
-    .meta({ openapi: { method: "DELETE", path: "/posts/{id}/like" } })
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/posts/{id}/like",
+        summary: "Unlike a post",
+        tags: ["posts"],
+      },
+    })
     .input(z.object({ id: ShortToUUID }))
     .output(z.void())
     .mutation(async ({ ctx: { user }, input: { id } }) => {
