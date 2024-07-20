@@ -1,5 +1,6 @@
 import { BackHeader } from "@/components/back-header";
 import { SearchBar } from "@/components/search-bar";
+import { SearchDropdown } from "@/components/search-dropdown";
 import { TabsList, TabsLink } from "@/components/tabs-link";
 import { Button } from "@semicolon/ui/button";
 import { Ellipsis } from "lucide-react";
@@ -13,13 +14,7 @@ export default function Layout({
       <div className="sticky top-0 z-10 flex flex-col backdrop-blur-md">
         <BackHeader className="flex flex-row px-3">
           <SearchBar />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="aspect-square size-fit rounded-full p-2"
-          >
-            <Ellipsis className="flex-none" size={19} />
-          </Button>
+          <SearchDropdown />
         </BackHeader>
         <TabsList className="relative">
           <TabsLink href="/search" query={{ f: null }}>
