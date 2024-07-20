@@ -30,6 +30,7 @@ export function SearchDropdown() {
           variant="ghost"
           size="icon"
           className="aspect-square size-fit rounded-full p-2"
+          aria-label="Search dropdown"
         >
           <Ellipsis className="flex-none" size={19} />
         </Button>

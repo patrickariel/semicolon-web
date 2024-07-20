@@ -149,11 +149,11 @@ export function ProfileEdit({
 
           const blobUrl = URL.createObjectURL(file);
 
-          updateAvatar(() => ({
+          updateAvatar({
             blob: blobUrl,
             status: "uploading",
             file,
-          }));
+          });
 
           const form = new FormData();
           form.set("media", file);
@@ -182,11 +182,11 @@ export function ProfileEdit({
 
           const blobUrl = URL.createObjectURL(file);
 
-          updateHeader(() => ({
+          updateHeader({
             blob: blobUrl,
             status: "uploading",
             file,
-          }));
+          });
 
           const form = new FormData();
           form.set("media", file);
@@ -234,7 +234,7 @@ export function ProfileEdit({
                 {(header?.blob ?? initialHeader) && (
                   <Image
                     className="object-cover"
-                    alt={`${username}'s header image`}
+                    alt={`${name}'s header image`}
                     fill
                     src={header?.blob ?? initialHeader!}
                   />
@@ -293,7 +293,7 @@ export function ProfileEdit({
                           size={20}
                           onClick={() => {
                             setInitialHeader(null);
-                            updateHeader(() => null);
+                            updateHeader(null);
                           }}
                         />
                       </Button>
@@ -306,7 +306,7 @@ export function ProfileEdit({
               {(avatar?.blob ?? initialAvatar) && (
                 <AvatarImage
                   src={avatar?.blob ?? initialAvatar!}
-                  alt="Profile Photo"
+                  alt={`${name}'s avatar`}
                 />
               )}
               <AvatarFallback>

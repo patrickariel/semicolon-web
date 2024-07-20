@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@semicolon/ui/dropdown-menu";
 import { useAtom } from "jotai";
-import { useSetAtom } from "jotai";
 import { Ellipsis, Flag, Pencil, Trash2, UserPlus, UserX } from "lucide-react";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
@@ -30,11 +29,11 @@ export function PostDropdown({
   const [openEdit, setOpenEdit] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
   const { data: session } = useSession();
-  const setMyPosts = useSetAtom(myPostsAtom);
+  const [myPosts, setMyPosts] = useAtom(myPostsAtom);
   const utils = trpc.useUtils();
   const deletePost = trpc.post.delete.useMutation({
     onSuccess: async ({ parentId }, { id }) => {
-      setMyPosts((myPosts) => myPosts.filter((post) => post.id !== id));
+      setMyPosts(myPosts.filter((post) => post.id !== id));
       await utils.post.search.invalidate();
       if (parentId) {
         await utils.post.replies.invalidate();
@@ -89,6 +88,7 @@ export function PostDropdown({
         <Button
           variant="ghost"
           size="icon"
+          aria-label="Post dropdown"
           className="aspect-square size-fit rounded-full p-2"
         >
           <Ellipsis className="flex-none" size={19} />

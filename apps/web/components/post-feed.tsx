@@ -48,7 +48,7 @@ export function PostFeed({
       ) : (
         posts.length > 0 && (
           <div className="grid grid-cols-1 gap-1 p-1 sm:grid-cols-2 md:grid-cols-3">
-            {posts.map(({ id, media, username }, i) => (
+            {posts.map(({ id, media, username, name }, i) => (
               <Link
                 key={id}
                 href={`/${username}/post/${id}/photo/1`}
@@ -57,7 +57,7 @@ export function PostFeed({
                 <AspectRatio ratio={1} className="bg-muted">
                   <Image
                     src={media[0]!}
-                    alt={`${username}'s image (${i})`}
+                    alt={`${name}'s media (${i})`}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 45vw, 15vw"
                     className="object-cover"

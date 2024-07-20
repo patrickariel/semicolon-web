@@ -118,7 +118,7 @@ export function useSearchFilters() {
 
   useEffect(() => {
     if (pathname === "/search") {
-      updateFilters(() => ParseParams.parse(params));
+      updateFilters(ParseParams.parse(params));
     }
   }, [params]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -139,6 +139,10 @@ export function useSearchFilters() {
           window.history.pushState(null, "", `?${newParams}`);
         } else if (newFilters.query) {
           router.push(`/search?${newParams}`);
+        }
+
+        if (typeof f !== "function") {
+          return g;
         }
       });
     },
