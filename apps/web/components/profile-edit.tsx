@@ -149,11 +149,11 @@ export function ProfileEdit({
 
           const blobUrl = URL.createObjectURL(file);
 
-          updateAvatar(() => ({
+          updateAvatar({
             blob: blobUrl,
             status: "uploading",
             file,
-          }));
+          });
 
           const form = new FormData();
           form.set("media", file);
@@ -182,11 +182,11 @@ export function ProfileEdit({
 
           const blobUrl = URL.createObjectURL(file);
 
-          updateHeader(() => ({
+          updateHeader({
             blob: blobUrl,
             status: "uploading",
             file,
-          }));
+          });
 
           const form = new FormData();
           form.set("media", file);
@@ -293,7 +293,7 @@ export function ProfileEdit({
                           size={20}
                           onClick={() => {
                             setInitialHeader(null);
-                            updateHeader(() => null);
+                            updateHeader(null);
                           }}
                         />
                       </Button>

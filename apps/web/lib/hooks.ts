@@ -118,7 +118,7 @@ export function useSearchFilters() {
 
   useEffect(() => {
     if (pathname === "/search") {
-      updateFilters(() => ParseParams.parse(params));
+      updateFilters(ParseParams.parse(params));
     }
   }, [params]); // eslint-disable-line react-hooks/exhaustive-deps
 
