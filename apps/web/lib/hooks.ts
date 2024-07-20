@@ -140,6 +140,10 @@ export function useSearchFilters() {
         } else if (newFilters.query) {
           router.push(`/search?${newParams}`);
         }
+
+        if (typeof f !== "function") {
+          return g;
+        }
       });
     },
     [params, pathname, router, updateFilters],
