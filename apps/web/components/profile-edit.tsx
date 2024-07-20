@@ -234,7 +234,7 @@ export function ProfileEdit({
                 {(header?.blob ?? initialHeader) && (
                   <Image
                     className="object-cover"
-                    alt={`${username}'s header image`}
+                    alt={`${name}'s header image`}
                     fill
                     src={header?.blob ?? initialHeader!}
                   />
@@ -306,7 +306,7 @@ export function ProfileEdit({
               {(avatar?.blob ?? initialAvatar) && (
                 <AvatarImage
                   src={avatar?.blob ?? initialAvatar!}
-                  alt="Profile Photo"
+                  alt={`${name}'s avatar`}
                 />
               )}
               <AvatarFallback>

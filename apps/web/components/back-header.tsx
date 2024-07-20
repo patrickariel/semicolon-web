@@ -23,6 +23,7 @@ export function BackHeader({
         variant="ghost"
         size="icon"
         className="rounded-full p-2"
+        aria-label="Back button"
         onClick={() => {
           if (window.history.length > 1) {
             router.back();

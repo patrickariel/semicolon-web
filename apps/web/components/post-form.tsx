@@ -167,7 +167,7 @@ export function PostForm({
     >
       <div className="pt-2">
         <Avatar className="size-11">
-          <AvatarImage src={avatar ?? undefined} />
+          <AvatarImage src={avatar ?? undefined} alt="User's avatar" />
           <AvatarFallback>
             <User />
           </AvatarFallback>
@@ -262,6 +262,7 @@ export function PostForm({
                             variant="ghost"
                             size="icon"
                             className="bg-background/50 hover:bg-background/80 rounded-full"
+                            aria-label="Retry media upload"
                             onClick={async (e) => {
                               e.preventDefault();
                               updateMedia((media) => {
@@ -292,6 +293,7 @@ export function PostForm({
                       <Button
                         variant="ghost"
                         size="icon"
+                        aria-label="Delete media"
                         className="bg-background/50 hover:bg-background/80 absolute right-3 top-3 rounded-full"
                         onClick={(e) => {
                           e.preventDefault();
@@ -319,6 +321,7 @@ export function PostForm({
                 variant="ghost"
                 size="icon"
                 className="rounded-full hover:bg-sky-400/10"
+                aria-label="Add emoji"
                 onClick={(e) => e.preventDefault()}
               >
                 <Smile className="stroke-sky-400" />
@@ -328,6 +331,7 @@ export function PostForm({
                 size="icon"
                 className="m-0 rounded-full hover:bg-sky-400/10"
                 disabled={mediaDisabled}
+                aria-label="Upload media"
                 onClick={(e) => {
                   e.preventDefault();
                   mediaInputRef.current?.click();

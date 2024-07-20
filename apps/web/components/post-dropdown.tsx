@@ -89,6 +89,7 @@ export function PostDropdown({
         <Button
           variant="ghost"
           size="icon"
+          aria-label="Post dropdown"
           className="aspect-square size-fit rounded-full p-2"
         >
           <Ellipsis className="flex-none" size={19} />

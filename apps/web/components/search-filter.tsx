@@ -360,13 +360,21 @@ export function SimpleFilter() {
                         <FormItem className="flex items-center justify-between gap-2">
                           <Label htmlFor="r1">From anyone</Label>
                           <FormControl>
-                            <RadioGroupItem value="anyone" id="r1" />
+                            <RadioGroupItem
+                              value="anyone"
+                              id="r1"
+                              aria-label="From anyone"
+                            />
                           </FormControl>
                         </FormItem>
                         <FormItem className="flex items-center justify-between gap-2">
                           <Label htmlFor="r2">People you follow</Label>
                           <FormControl>
-                            <RadioGroupItem value="following" id="r2" />
+                            <RadioGroupItem
+                              value="following"
+                              id="r2"
+                              aria-label="People you follow"
+                            />
                           </FormControl>
                         </FormItem>
                       </RadioGroup>

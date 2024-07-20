@@ -83,12 +83,20 @@ export default function UserCard({
         <Link
           href={`/${username}`}
           onClick={(e) => e.stopPropagation()}
+          aria-label={`Go to ${username}'s profile`}
           className="z-10"
         >
           <Avatar
             className={`${variant === "normal" ? "h-12 w-12" : "h-10 w-10"} rounded-full`}
           >
-            {image && <AvatarImage width={300} height={300} src={image} />}
+            {image && (
+              <AvatarImage
+                width={300}
+                height={300}
+                src={image}
+                alt={`${name}'s avatar`}
+              />
+            )}
             <AvatarFallback>
               <User />
             </AvatarFallback>

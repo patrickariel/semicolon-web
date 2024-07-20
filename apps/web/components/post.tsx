@@ -58,11 +58,19 @@ export function Post({
       <div className="pt-2">
         <Link
           href={`/${username}`}
+          aria-label={`Go to ${name}'s profile`}
           onClick={(e) => e.stopPropagation()}
           className="z-10"
         >
           <Avatar className="size-11">
-            {avatar && <AvatarImage width={300} height={300} src={avatar} />}
+            {avatar && (
+              <AvatarImage
+                width={300}
+                height={300}
+                src={avatar}
+                alt={`${name}'s avatar`}
+              />
+            )}
             <AvatarFallback>
               <User />
             </AvatarFallback>
