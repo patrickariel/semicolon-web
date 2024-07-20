@@ -63,7 +63,9 @@ export function PostDropdown({
       updateFollows((follows) => {
         follows[username] = true;
       });
-      await utils.feed.following.refetch();
+      await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
   });
 
@@ -72,7 +74,9 @@ export function PostDropdown({
       updateFollows((follows) => {
         follows[username] = false;
       });
-      await utils.feed.following.refetch();
+      await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
   });
 

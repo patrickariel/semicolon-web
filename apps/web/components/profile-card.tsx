@@ -57,6 +57,8 @@ const ProfileCard = (props: ProfileCardProps) => {
         follows[username] = true;
       });
       await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
     onSettled: () => setDisableFollow(false),
   });
@@ -68,6 +70,8 @@ const ProfileCard = (props: ProfileCardProps) => {
         follows[username] = false;
       });
       await utils.feed.following.invalidate();
+      await utils.post.search.invalidate();
+      await utils.user.search.invalidate();
     },
     onSettled: () => setDisableFollow(false),
   });
