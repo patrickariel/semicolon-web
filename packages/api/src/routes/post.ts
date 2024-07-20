@@ -106,6 +106,7 @@ export const post = router({
           reply: z.boolean().optional(),
           minLikes: z.number().optional(),
           minReplies: z.number().optional(),
+          following: z.boolean().default(false),
           sortBy: z
             .union([z.literal("recency"), z.literal("relevancy")])
             .default("recency"),
@@ -130,6 +131,7 @@ export const post = router({
           query,
           since,
           until,
+          following,
           reply,
           from,
           to,
@@ -233,7 +235,10 @@ export const post = router({
               .select([
                 "UserFollow.count as followedBy",
                 "LikeStatus.userId as likeStatus",
-              ]),
+              ])
+              .$if(following, (qb) =>
+                qb.where(({ eb }) => eb("UserFollow.count", "!=", 0)),
+              ),
           )
           .select([
             "Post.id",
