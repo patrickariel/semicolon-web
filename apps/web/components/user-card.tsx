@@ -89,14 +89,7 @@ export default function UserCard({
           <Avatar
             className={`${variant === "normal" ? "h-12 w-12" : "h-10 w-10"} rounded-full`}
           >
-            {image && (
-              <AvatarImage
-                width={300}
-                height={300}
-                src={image}
-                alt={`${name}'s avatar`}
-              />
-            )}
+            {image && <AvatarImage src={image} alt={`${name}'s avatar`} />}
             <AvatarFallback>
               <User />
             </AvatarFallback>

@@ -33,14 +33,7 @@ export function PostDetail({
             aria-label="Go to user's profile"
           >
             <Avatar className="size-11">
-              {avatar && (
-                <AvatarImage
-                  width={300}
-                  height={300}
-                  src={avatar}
-                  alt={`${name}'s avatar`}
-                />
-              )}
+              {avatar && <AvatarImage src={avatar} alt={`${name}'s avatar`} />}
               <AvatarFallback>
                 <User />
               </AvatarFallback>
