@@ -9,8 +9,6 @@ test("nav-item", () => {
 
   const { rerender } = render(<NavItem href="/foo" />);
   const navItem = screen.getByRole("link");
-  expect(navItem).toBeDefined();
-
   expect(navItem.classList).not.toContain("font-black");
 
   vi.mocked(usePathname).mockReturnValue("/foo");

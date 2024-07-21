@@ -12,7 +12,6 @@ test("back-header", () => {
   render(<BackHeader />);
 
   const backButton = screen.getByLabelText("Go back");
-  expect(backButton).toBeDefined();
 
   vi.spyOn(window.history, "length", "get").mockReturnValue(0);
   backButton.click();
