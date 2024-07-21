@@ -10,7 +10,11 @@ export default function Loading() {
         </div>
       </div>
       <Separator orientation="vertical" className="h-auto min-h-screen" />
-      <div className="hidden min-h-full w-full min-w-[300px] max-w-[360px] shrink flex-col justify-start pl-[30px] lg:flex"></div>
+      <div className="hidden min-h-full w-full min-w-[300px] max-w-[360px] shrink flex-col justify-start pl-[30px] lg:flex">
+        <div className="flex min-h-20 items-center justify-center">
+          <Spinner size={30} />
+        </div>
+      </div>
     </>
   );
 }
