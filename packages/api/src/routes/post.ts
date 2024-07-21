@@ -358,7 +358,7 @@ export const post = router({
               eb
                 .selectFrom("Post")
                 .select("Post.id")
-                .where("Post.id", "=", cursor),
+                .where("Post.id", "=", eb.cast<string>(eb.val(cursor), "uuid")),
             );
 
             switch (sortBy) {
@@ -366,7 +366,11 @@ export const post = router({
                 const cursorQuery = eb
                   .selectFrom("Post")
                   .select("Post.createdAt")
-                  .where("Post.id", "=", cursor);
+                  .where(
+                    "Post.id",
+                    "=",
+                    eb.cast<string>(eb.val(cursor), "uuid"),
+                  );
 
                 return or([
                   and([eb("Post.createdAt", "=", cursorQuery), tieBreaker]),
@@ -377,7 +381,11 @@ export const post = router({
                 const cursorQuery = eb
                   .selectFrom("Post")
                   .select(tsRank.as("rank"))
-                  .where("Post.id", "=", cursor);
+                  .where(
+                    "Post.id",
+                    "=",
+                    eb.cast<string>(eb.val(cursor), "uuid"),
+                  );
 
                 return or([
                   and([eb(tsRank, "=", cursorQuery), tieBreaker]),
