@@ -1,12 +1,17 @@
+"use client";
+
 import { BackHeader } from "@/components/back-header";
 import { SearchBar } from "@/components/search-bar";
 import { SearchDropdown } from "@/components/search-dropdown";
 import { TabsList, TabsLink } from "@/components/tabs-link";
-import React from "react";
+import { useSearchParams } from "next/navigation";
+import React, { Suspense } from "react";
 
 export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const searchParams = useSearchParams();
+
   return (
     <div className="relative z-0 flex w-full flex-col">
       <div className="sticky top-0 z-10 flex flex-col backdrop-blur-md">
@@ -26,7 +31,7 @@ export default function Layout({
           </TabsLink>
         </TabsList>
       </div>
-      {children}
+      <Suspense key={searchParams.toString()}>{children}</Suspense>
     </div>
   );
 }
