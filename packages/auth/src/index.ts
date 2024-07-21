@@ -42,7 +42,9 @@ export const {
   auth,
 } = NextAuth({
   providers: [
-    Resend({ from: "onboarding@resend.dev" }),
+    Resend({
+      from: `onboarding@${process.env.NODE_ENV === "production" ? process.env.DEPLOYMENT_URL! : "resend.dev"}`,
+    }),
     Google,
     Discord,
     GitHub,
