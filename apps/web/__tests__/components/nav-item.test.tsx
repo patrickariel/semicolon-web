@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { usePathname } from "next/navigation";
 import { expect, test, vi } from "vitest";
 
-test("back-header", () => {
+test("nav-item", () => {
   vi.mock("next/navigation");
   vi.mocked(usePathname).mockReturnValue("/bar");
 
