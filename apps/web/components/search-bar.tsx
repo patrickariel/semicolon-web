@@ -27,7 +27,11 @@ export function SearchBar() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex-grow">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex-grow"
+        aria-label="search"
+      >
         <FormField
           control={form.control}
           name="query"
@@ -37,7 +41,7 @@ export function SearchBar() {
                 <Search className="absolute left-6 block items-center" />
                 <FormControl>
                   <Input
-                    type="text"
+                    type="search"
                     placeholder="Search"
                     {...(query && { defaultValue: query })}
                     className="bg-muted h-12 flex-grow rounded-full pl-16 text-base text-white"
@@ -48,7 +52,7 @@ export function SearchBar() {
             </FormItem>
           )}
         />
-        <input type="submit" hidden />
+        <input type="submit" hidden aria-label="Submit search" />
       </form>
     </Form>
   );
