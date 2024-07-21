@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@semicolon/ui/card";
-import { Ban, Frown } from "lucide-react";
+import { Frown } from "lucide-react";
 import Link from "next/link";
 
 enum Error {
