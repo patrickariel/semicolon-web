@@ -26,26 +26,23 @@ export default function Page() {
     redirect("/home");
   }
 
-  return (
-    <>
-      {tab === "people" ? (
-        <UserSearch query={query} following={following} />
-      ) : (
-        <PostSearch
-          sortBy={tab}
-          {...{
-            query,
-            following,
-            from,
-            to,
-            minLikes,
-            minReplies,
-            reply,
-            since,
-            until,
-          }}
-        />
-      )}
-    </>
+  return tab === "people" ? (
+    <UserSearch query={query} following={following} maxResults={15} />
+  ) : (
+    <PostSearch
+      sortBy={tab}
+      maxResults={15}
+      {...{
+        query,
+        following,
+        from,
+        to,
+        minLikes,
+        minReplies,
+        reply,
+        since,
+        until,
+      }}
+    />
   );
 }
