@@ -34,14 +34,7 @@ function ReplyIndicator({
     <div className="relative flex w-full flex-row gap-3 p-3 pb-2">
       <div className="flex flex-col items-center pt-2">
         <Avatar className="size-11">
-          {avatar && (
-            <AvatarImage
-              width={300}
-              height={300}
-              src={avatar}
-              alt={`${name}'s avatar`}
-            />
-          )}
+          {avatar && <AvatarImage src={avatar} alt={`${name}'s avatar`} />}
           <AvatarFallback>
             <User />
           </AvatarFallback>
