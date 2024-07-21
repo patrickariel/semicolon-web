@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@semicolon/ui/card";
-import { Ban } from "lucide-react";
+import { Ban, Frown } from "lucide-react";
 import Link from "next/link";
 
 enum Error {
@@ -22,11 +22,13 @@ export default function Page({
   const errors: Record<`${Error}`, { heading: string; message: JSX.Element }> =
     {
       Default: {
-        heading: "A problem has occured",
+        heading: "Something went wrong",
         message: (
           <div>
-            <p>We{"'"}re not sure what went wrong.</p>
-            <p>Please wait a few minutes before you try again.</p>
+            <p>
+              We{"'"}re not sure what happened, but please try again in a few
+              minutes.
+            </p>
           </div>
         ),
       },
@@ -62,7 +64,7 @@ export default function Page({
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <Ban size={100} className="stroke-destructive flex-none" />
+      <Frown size={100} className="flex-none" />
       <div className="flex h-full flex-col items-start justify-center gap-2">
         <CardHeader className="flex flex-row items-center gap-7 self-center">
           <CardTitle className="self-center text-nowrap text-2xl sm:text-4xl">
